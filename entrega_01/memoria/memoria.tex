@@ -4,6 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
+\usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{hyperref}
@@ -34,8 +35,65 @@
 
 \newpage
 
-\section{Introducción}
+\section{Introdución}
 
-\section{blablabla}
+No presente informe descríbese o diseño da nosa Base de Datos Analítica. \\
+
+
+Nós somos parte do equipo técnico de Airbnb e para analizar o negocio e evaluar onde pode mellorarse ou que aspectos estan a fallar encomendóusenos o diseño dunha Base de Datos Analítica. Se ben os directivos facilitaronnos unhas preguntas ás que queren respostas (\emph{consultas} na nosa Base de Datos) tamén temos que satisfacer a restriccións dos datos en si mesmos. Non podemos simplemente diseñar o Almacén de datos que queramos, ten que ser posible chegar a él a partires dos \texttt{.csv} que temos a nosa disposición. Polo tanto a nosa aproximación metódoloxica é hibrida, pois dispoñemos de restriccións de \textbf{ o proceso de negocio} a modelar (de alto nivel, materializadas nas \emph{consultas}) e de \textbf{as fontes de datos} (baixo nivel, materializadas nos \texttt{.csv}). 
+
+
+\section{Restricións}
+\subsection{Proceso de negocioi, parte \emph{top-down}}
+
+O interés desde o punto de vista de o proceso de negocio e respostar a: as preguntas evidentes facilmente formulables e ás preguntas que xurdan en función destas. Por eso, polo que poda ocurrir elixiremos sempre a granularidade máis pequena \textcolor{olive}{(desenvolver este punto en outro lado máis profundamente)}. 
+
+\subsubsection{Consultas}
+
+\begin{itemize}
+	\item Teñen mellores valoracións os terratenentes con múltiples vivendas?
+	\item 
+	\item 
+	\item 
+	\item 
+	\item 
+	\item 
+\end{itemize}
+
+\subsection{Fontes de datos, parte \emph{bottom-dowm}}
+
+Veúsenos dado, como punto de partida material para o desenvolvemento do Almacén de Datos, unha colección de \texttt{.csv}s, nos que, para cada cidade dispoñemos do seguinte (ver Figura \ref{fig:oltp}):
+\begin{itemize}
+	\item \texttt{hospedaxes}: cada fila é un obxecto de aluguer. Tense información de valor \footnote{acompañada de información que non aporta ó análise do negocio.} sobre: os donos (quenes son e información sobre eles); cantos baños, habitacións e dormitorios hai; cantas persoas poden alugar; o barrio; a dispoñibilidade e información xeral de reserva (cantas noites como mínimo); puntuación das valoracións \textcolor{olive}{asegurar a completitude e correctitude de esto que se dice aquí} 
+	\item \texttt{hospedaxes\_resumo}: é un subconxunto das columnas de \texttt{hospedaxes}. Por tanto máis manexable pero sin información adicional.  
+	\item \texttt{calendario}: ten unha  
+	\item \texttt{}:
+	\item \texttt{}:
+	\item \texttt{}:
+	\item 
+	
+\end{itemize}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{diagramas/antes.drawio.png}
+  \caption{Diagrama de los datos del OLTP}
+  \label{fig:oltp}
+\end{figure}
+
+\subsection{Suposiciones adicionales}
+
+\section{Detalles da implementación}
+
+
+\subsection{Qué es que cousa?}
+
+\subsection{Granularidade}
+
+\subsection{Dimensions particulares}
+
+\subsection{Métricas}
+
+
 
 \end{document}
