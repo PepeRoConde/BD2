@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.15 Chrome/132.0.6834.196 Electron/34.2.0 Safari/537.36" version="26.0.15">
   <diagram name="Página-1" id="7AMaddkGKQSCFDNU3dys">
-    <mxGraphModel dx="2664" dy="189" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2232" dy="-130" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -202,7 +202,7 @@
         <mxCell id="wgnbF_KAsAlEtkSF_Tjt-150" value="host_total_listings_count [&lt;i&gt;&lt;font style=&quot;color: rgb(102, 102, 255);&quot;&gt;bigint&lt;/font&gt;&lt;/i&gt;]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="wgnbF_KAsAlEtkSF_Tjt-72">
           <mxGeometry y="720" width="290" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="wgnbF_KAsAlEtkSF_Tjt-151" value="host_verifications [&lt;i&gt;&lt;font style=&quot;color: rgb(255, 102, 179);&quot;&gt;varchar&lt;/font&gt;&lt;/i&gt;]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="wgnbF_KAsAlEtkSF_Tjt-72">
+        <mxCell id="wgnbF_KAsAlEtkSF_Tjt-151" value="&lt;font style=&quot;color: rgb(153, 128, 62);&quot;&gt;host_verifications&lt;/font&gt; [&lt;i&gt;&lt;font style=&quot;color: rgb(255, 102, 179);&quot;&gt;varchar&lt;/font&gt;&lt;/i&gt;]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="wgnbF_KAsAlEtkSF_Tjt-72">
           <mxGeometry y="750" width="290" height="30" as="geometry" />
         </mxCell>
         <mxCell id="wgnbF_KAsAlEtkSF_Tjt-152" value="host_has_profile_pic [&lt;i&gt;&lt;font style=&quot;color: rgb(0, 153, 0);&quot;&gt;boolean&lt;/font&gt;&lt;/i&gt;]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="wgnbF_KAsAlEtkSF_Tjt-72">

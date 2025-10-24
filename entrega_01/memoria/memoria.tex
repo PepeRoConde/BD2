@@ -12,6 +12,8 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{float}
+\usepackage{epigraph}
+\usepackage{cite}
 
 % Configurar márgenes
 \geometry{
@@ -44,7 +46,7 @@ Nós somos parte do equipo técnico de Airbnb e para analizar o negocio e evalua
 
 
 \section{Restricións}
-\subsection{Proceso de negocioi, parte \emph{top-down}}
+\subsection{Proceso de negocio, parte \emph{top-down}}
 
 O interés desde o punto de vista de o proceso de negocio e respostar a: as preguntas evidentes facilmente formulables e ás preguntas que xurdan en función destas. Por eso, polo que poda ocurrir elixiremos sempre a granularidade máis pequena \textcolor{olive}{(desenvolver este punto en outro lado máis profundamente)}. 
 
@@ -52,25 +54,24 @@ O interés desde o punto de vista de o proceso de negocio e respostar a: as preg
 
 \begin{itemize}
 	\item Teñen mellores valoracións os terratenentes con múltiples vivendas?
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
+	\item Canta é a influencia dos axentes externos (chuvia, eventos deportivos ou concertos) no número de reservas?
+	\item Influe a idade do arrendatario no seu calendario de viaxes?
+	\item Que caracteriza ós arrendatarios con máis valoracións feitas? 
+	\item Que caracteriza ós arrendadores con mellores \emph{scores}?
+	\item Como é a relación entre o precio dun hospedaxe e o seu score medio? Os barrios máis caros son os que teñen mellores scores?
 \end{itemize}
 
-\subsection{Fontes de datos, parte \emph{bottom-dowm}}
+\subsection{Fontes de datos, parte \emph{bottom-up}}
 
 Veúsenos dado, como punto de partida material para o desenvolvemento do Almacén de Datos, unha colección de \texttt{.csv}s, nos que, para cada cidade dispoñemos do seguinte (ver Figura \ref{fig:oltp}):
 \begin{itemize}
 	\item \texttt{hospedaxes}: cada fila é un obxecto de aluguer. Tense información de valor \footnote{acompañada de información que non aporta ó análise do negocio.} sobre: os donos (quenes son e información sobre eles); cantos baños, habitacións e dormitorios hai; cantas persoas poden alugar; o barrio; a dispoñibilidade e información xeral de reserva (cantas noites como mínimo); puntuación das valoracións \textcolor{olive}{asegurar a completitude e correctitude de esto que se dice aquí} 
 	\item \texttt{hospedaxes\_resumo}: é un subconxunto das columnas de \texttt{hospedaxes}. Por tanto máis manexable pero sin información adicional.  
-	\item \texttt{calendario}: ten unha  
-	\item \texttt{}:
-	\item \texttt{}:
-	\item \texttt{}:
-	\item 
+	\item \texttt{calendario}: ten un rexistro da dispoñibilidade de os hospedaxes ó largo do tempo. Seranos de utilidade para caract--------------------------------------------------
+erizar a influecia de factores externos.
+	\item \texttt{valoracions}: dinos \emph{quen} fixo \emph{que} reseña e \emph{cando}. No proceso ETL estas reseñas deberan sufrir un proceso de conversión a través dunha ferramenta de Procesamento da Linguaxe Natural (NLP) para obter un \emph{score} númerico, máis útil á hora de ser agregado que a reseña en si mesma.
+	\item \texttt{valoracions\_resumo}: son pares (\texttt{id\_hospedaxe}, \texttt{data}).
+	\item \texttt{vecindario}: Esta táboa dependendo da cidade da que a descarguemos, pode conter unha pequena información do barrio ou estar baleira directamente. No que sigue, simularemos a súa completitude con información aleatoria, por cuestións do alcance da práctica.
 	
 \end{itemize}
 
@@ -83,17 +84,54 @@ Veúsenos dado, como punto de partida material para o desenvolvemento do Almacé
 
 \subsection{Suposiciones adicionales}
 
+Para a futura construcción da Base de Datos Analítica serán precisas as seguintes fontes de información actualmente non dispoñibles (para o complimento da práctica é probable que inventemos os datos):
+\begin{itemize}
+	\item Información adicional sobre os arrendatarios (actualmente só dispoñemos o nome). Idealmente deberíamos contar con: fecha de nacemento, xénero, lugar de nacemento...
+	\item Rexistros meteorolóxicos (chuvia, neve, altas temperaturas). Estos datos integraranse naturalmente no modelo dimensial como unha dimensión máis.
+	\item Información sobre eventos de interese tales comos concertos de música ou partidos deportivos.
+\end{itemize}
+
 \section{Detalles da implementación}
 
+A continuación descríbese as decisións técnicas que tiveron lugar na construcción do Modelo de Feitos Dimensionais. Para unha representación visual ver a Figura \ref{fig:dfm}.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{diagramas/multidimensional.drawio.png}
+  \caption{Diagrama do Modelo de Feitos Dimensional (\emph{DFM}) }
+  \label{fig:dfm}
+\end{figure}
 
 \subsection{Qué es que cousa?}
 
+No noso modelo as reseñas son os \textbf{feitos}, pois son moitos e crecen a moita velocidade, e son un punto de partida para moitos análisis. É posible que cada departamento teña as súas necesidades especiais, e eventualmente poderase crear \emph{data marts} para cada un deles, pero nós pensamos que as reseñas son de alto interés para calqueira análise. Estas contan cunha única \textbf{métrica}, o \emph{score}, que indica o grao de satisfacción do usuario ca experiencia do hospedaxe. Así, as circunstancias que circumbalan á reseña son ás \textbf{dimensións}, responden as seguintes preguntas:
+\begin{itemize}
+	\item \emph{Quen?} O valorador, cos seus atributos: idade, sexo...
+	\item \emph{Cando?} Indicando ate o día, con información de estacións (para estudar a influencia da tempada alta)
+	\item \emph{A que?} O hospedaxe. Este á sua vez debe respostar a: \emph{De quen?} (o propietario, cos seus atributos) \emph{Onde?} O lugar onde esta o hospedaxe.
+	\item \emph{Baixo que circunstancias?} Información meteorolóxica e de eventos xerais.
+\end{itemize}
+
+Pódese apreciar que dentro de \emph{A que?} vai \emph{De quen?} e \emph{Onde?}. Esto indica que o noso Modelo sigue os esquema de copo de neve \cite{kimball1996} . 
+
 \subsection{Granularidade}
+
+\epigraph{
+“All grain definitions should start at the lowest, most atomic grain and should describe the physical process that collects the data.”
+}{
+Ralph Kimball \cite{kimball2007}
+}
+
+No noso diseño levamos a granularidade ó máis fino que podemos, esto significa que as datas van ate o día, os lugares ate os barrios.
 
 \subsection{Dimensions particulares}
 
 \subsection{Métricas}
 
+\newpage
+
+\bibliographystyle{plain}
+\bibliography{referencias}
 
 
 \end{document}
