@@ -57,7 +57,7 @@ Nós somos parte do equipo técnico de Airbnb e para analizar o negocio e avalia
 \section{Restricións}
 \subsection{Proceso de negocio, parte \emph{top-down}}
 
-O interese desde o punto de vista do proceso de negocio é responder ás preguntas evidentes facilmente formulables e ás preguntas que xurdan en función destas. Por iso, para o que poida ocorrer elixiremos sempre a granularidade máis pequena (ver sección \ref{sub:cousa}). 
+O interese desde o punto de vista do proceso de negocio é responder ás preguntas evidentes facilmente formulables e ás preguntas que xurdan en función destas. Por iso, para o que poida ocorrer elixiremos sempre a granularidade máis pequena (ver sección 3.2). 
 
 \subsubsection{Consultas}
 
@@ -69,15 +69,15 @@ O interese desde o punto de vista do proceso de negocio é responder ás pregunt
 	\item Que caracteriza ós arrendadores con mellores \emph{scores}? (HOSPEDADOR, verificacións)
 	\item Como é a relación entre o precio e o score? Os barrios máis caros teñen mellores scores? (HOSPEDAXE, LOCALIZACIÓN)
 	\item Depende o número de verificacións do tempo de resposta? (HOSPEDADOR)
-	\item Que amenities correlacionan con mellores scores? (AMENITY, HOSPEDAXE)
-	\item Varía a importancia das amenities por localización ou temporada? (AMENITY, LOCALIZACIÓN, TEMPO)
+	\item Que comodidades correlacionan con mellores scores? (HOSPEDAXE, comodidades)
+	\item Varía a importancia das comodidades por localización ou temporada? (HOSPEDAXE, LOCALIZACIÓN, TEMPO)
 \end{itemize}
 
 \subsection{Fontes de datos, parte \emph{bottom-up}}
 
 Veusenos dado, como punto de partida material para o desenvolvemento do Almacén de Datos, unha colección de \texttt{.csv}s, nos que, para cada cidade dispoñemos do seguinte (ver Figura \ref{fig:oltp}):
 \begin{itemize}
-	\item \texttt{hospedaxes}: cada fila é un obxecto de alugueiro. Tense información de valor \footnote{acompañada de información que non aporta á análise do negocio.} sobre: os donos (quen son e información sobre eles); cantos baños, habitacións e dormitorios hai; cantas persoas poden alugar; o barrio; a dispoñibilidade e información xeral de reserva (cantas noites como mínimo); puntuación das valoracións; e as \textbf{amenities} (formato JSON array).
+	\item \texttt{hospedaxes}: cada fila é un obxecto de alugueiro. Tense información de valor \footnote{acompañada de información que non aporta á análise do negocio.} sobre: os donos (quen son e información sobre eles); cantos baños, habitacións e dormitorios hai; cantas persoas poden alugar; o barrio; a dispoñibilidade e información xeral de reserva (cantas noites como mínimo); puntuación das valoracións; e as \textbf{comodidades} (formato JSON array).
 	\item \texttt{hospedaxes\_resumo}: é un subconxunto das columnas de \texttt{hospedaxes}. Por tanto máis manexable pero sen información adicional.  
 	\item \texttt{calendario}: ten un rexistro da dispoñibilidade dos hospedaxes ao longo do tempo. Seranos de utilidade para caracterizar a influencia de factores externos.
 	\item \texttt{valoracións}: dinos \emph{quen} fixo \emph{que} reseña e \emph{cando}. No proceso ETL estas reseñas deberán sufrir un proceso de conversión a través dunha ferramenta de Procesamento da Linguaxe Natural (NLP) para obter un \emph{score} numérico, máis útil á hora de ser agregado que a reseña en si mesma.
@@ -86,7 +86,7 @@ Veusenos dado, como punto de partida material para o desenvolvemento do Almacén
 	
 \end{itemize}
 
-\textbf{Nota:} As \texttt{amenities} e \texttt{host\_verifications} son campos multivaluados en formato array que requiren procesamento no ETL. As reviews individuais con data e reviewer provén de \texttt{reviews.csv}.
+\textbf{Nota:} As \texttt{comodidades} e \texttt{host\_verifications} son campos multivaluados en formato array que requiren procesamento no ETL. As reviews individuais con data e reviewer provén de \texttt{reviews.csv}.
 
 \begin{figure}[h!]
   \centering
@@ -108,103 +108,74 @@ Para a futura construción da Base de Datos Analítica serán precisas as seguin
 
 A continuación descríbense as decisións técnicas que tiveron lugar na construción do Modelo de Feitos Dimensionais. Para unha representación visual ver a Figura \ref{fig:dfm}.
 
-\subsection{Nomenclatura e atributos}
+\subsection{Nomenclatura e atributos do DFM}
 
-Seguindo as recomendacións de deseño, todos os atributos do modelo utilizan nomes descritivos e autoexplicativos, evitando abreviaturas que dificulten a comprensión:
+Seguindo as recomendacións de deseño, os atributos representados no diagrama DFM (Figura \ref{fig:dfm}) utilizan nomes descritivos e autoexplicativos, evitando abreviaturas que dificulten a comprensión. A continuación detállanse únicamente os atributos incluídos no modelo conceptual dimensional:
 
 \subsubsection{Táboa de Feitos: FEITOS\_REVIEW}
 \begin{itemize}
     \item \texttt{review\_id} (PK): Identificador único da valoración
     \item \texttt{score}: Puntuación da valoración (0.00-5.00)
-    \item \texttt{valorador\_id} (FK): Referencia ao usuario que fai a valoración
-    \item \texttt{hospedaxe\_id} (FK): Referencia ao aloxamento valorado
-    \item \texttt{data\_id} (FK): Referencia á data da valoración
-    \item \texttt{eventos\_id} (FK): Referencia aos eventos da zona nesa data
-    \item \texttt{chuvia\_id} (FK): Referencia ás condicións meteorolóxicas
+    \item Claves foráneas ás dimensións: \texttt{valorador\_id}, \texttt{hospedaxe\_id}, \texttt{data\_id}, \texttt{eventos\_id}, \texttt{chuvia\_id}
 \end{itemize}
 
 \subsubsection{Dimensión VALORADOR}
 \begin{itemize}
     \item \texttt{valorador\_id} (PK): Identificador único do valorador
     \item \texttt{nome\_valorador}: Nome completo do usuario
-    \item \texttt{data\_nacemento}: Data de nacemento (para calcular idade)
-    \item \texttt{xenero}: Xénero do valorador (M/F/Outro/Non especifica)
-    \item \texttt{pais\_orixe}: País de procedencia do valorador
-    \item \texttt{grupo\_etario}: Categoría de idade derivada (18-25, 26-35, 36-50, 51+)
+    \item \texttt{idade}: Idade do valorador (calculada de data\_nacemento)
+    \item \texttt{xenero}: Xénero (M/F/Outro/Non especifica)
+    \item \texttt{grupo\_etario}: Categoría de idade (18-25, 26-35, 36-50, 51+) - jerarquía
 \end{itemize}
 
 \subsubsection{Dimensión HOSPEDAXE}
 \begin{itemize}
     \item \texttt{hospedaxe\_id} (PK): Identificador único do aloxamento
     \item \texttt{nome\_hospedaxe}: Nome descritivo da propiedade
-    \item \texttt{tipo\_propiedade}: Tipo (apartamento, casa, habitación privada, etc.)
-    \item \texttt{numero\_habitacions}: Cantidade de habitacións
-    \item \texttt{numero\_banos}: Cantidade de baños
-    \item \texttt{numero\_camas}: Cantidade de camas
-    \item \texttt{capacidade\_maxima}: Número máximo de hóspedes
-    \item \texttt{noites\_minimas}: Estancia mínima requirida
+    \item \texttt{tipo\_propiedade}: Tipo de aloxamento (apartamento, casa, habitación privada, etc.)
     \item \texttt{precio\_noite}: Prezo por noite en moeda local
-    \item \texttt{dispoñibilidade\_365}: Días dispoñibles no último ano
-    \item \texttt{hospedador\_id} (FK): Referencia ao propietario
-    \item \texttt{localizacion\_id} (FK): Referencia á localización
+    \item \texttt{comodidades}: Atributo multivaluado con elementos gratuitos do hospedaxe (WiFi, cociña, piscina, etc.)
+    \item \texttt{accesibilidade}: Atributo multivaluado con características de accesibilidade (rampla, ascensor, etc.)
+    \item \texttt{capacidade\_maxima}: Número máximo de hóspedes
+    \item \texttt{hospedador\_id} (FK): Referencia ao propietario (esquema copo de neve)
+    \item \texttt{localizacion\_id} (FK): Referencia á localización (esquema copo de neve)
 \end{itemize}
 
 \subsubsection{Dimensión HOSPEDADOR}
 \begin{itemize}
     \item \texttt{hospedador\_id} (PK): Identificador único do propietario
     \item \texttt{nome\_hospedador}: Nome do propietario
-    \item \texttt{data\_rexistro}: Data de alta na plataforma
-    \item \texttt{tempo\_resposta\_medio}: Tempo medio de resposta (minutos)
-    \item \texttt{taxa\_resposta}: Porcentaxe de mensaxes respondidas (0-100)
+    \item \texttt{tempo\_resposta}: Tempo medio de resposta
     \item \texttt{numero\_propiedades}: Cantidade de aloxamentos que xestiona
     \item \texttt{score\_medio}: Valoración media de todas as súas propiedades
-    \item \texttt{email\_verificado}: Indicador de verificación de email (S/N)
-    \item \texttt{telefono\_verificado}: Indicador de verificación de teléfono (S/N)
-    \item \texttt{identidade\_verificada}: Indicador de verificación de identidade (S/N)
-    \item \texttt{es\_superhost}: Indicador de status de Superhost (S/N)
+    \item \texttt{email\_verificado}: Verificación de email (S/N)
+    \item \texttt{telefono\_verificado}: Verificación de teléfono (S/N)
+    \item \texttt{es\_superhost}: Status de Superhost (S/N)
 \end{itemize}
 
 \subsubsection{Dimensión LOCALIZACIÓN}
 \begin{itemize}
     \item \texttt{localizacion\_id} (PK): Identificador único da localización
     \item \texttt{barrio}: Nome do barrio
-    \item \texttt{cidade}: Nome da cidade
+    \item \texttt{cidade}: Nome da cidade  
     \item \texttt{pais}: Nome do país
-    \item \texttt{latitude}: Coordenada xeográfica (latitude)
-    \item \texttt{lonxitude}: Coordenada xeográfica (lonxitude)
-    \item \texttt{precio\_medio\_barrio}: Prezo medio do barrio (calculado)
-    \item \texttt{densidade\_aloxamentos}: Número de aloxamentos por km² (calculado)
+    \item Jerarquía xeográfica: barrio $\rightarrow$ cidade $\rightarrow$ país
 \end{itemize}
 
 \subsubsection{Dimensión TEMPO}
 \begin{itemize}
     \item \texttt{data\_id} (PK): Identificador único da data (formato YYYYMMDD)
-    \item \texttt{data\_completa}: Data en formato DATE
-    \item \texttt{dia}: Día do mes (1-31)
-    \item \texttt{mes}: Mes (1-12)
-    \item \texttt{ano}: Ano (YYYY)
-    \item \texttt{nome\_mes}: Nome do mes en galego
-    \item \texttt{trimestre}: Trimestre (1-4)
-    \item \texttt{dia\_semana}: Día da semana (1=Luns, 7=Domingo)
-    \item \texttt{nome\_dia\_semana}: Nome do día en galego
+    \item \texttt{dia}: Día do mes
+    \item \texttt{mes}: Mes
+    \item \texttt{ano}: Ano
     \item \texttt{estacion}: Estación do ano (Primavera, Verán, Outono, Inverno)
-    \item \texttt{es\_fin\_semana}: Indicador de fin de semana (S/N)
-    \item \texttt{es\_festivo}: Indicador de día festivo (S/N)
     \item \texttt{tempada\_alta}: Indicador de tempada alta turística (S/N)
-\end{itemize}
-
-\subsubsection{Dimensión AMENITY}
-\begin{itemize}
-    \item \texttt{amenity\_id} (PK): Identificador único da comodidade
-    \item \texttt{nome\_amenity}: Nome descritivo da amenity (Wifi, Cociña, etc.)
-    \item \texttt{categoria\_amenity}: Categoría agrupadora (Conectividade, Confort, Seguridade, etc.)
-    \item \texttt{es\_premium}: Indicador de amenity premium (S/N)
+    \item Xerarquías: día $\rightarrow$ mes $\rightarrow$ ano; día $\rightarrow$ estación $\rightarrow$ ano
 \end{itemize}
 
 \subsubsection{Dimensión EVENTOS}
 \begin{itemize}
     \item \texttt{eventos\_id} (PK): Identificador único do rexistro de eventos
-    \item \texttt{data}: Data dos eventos
     \item \texttt{numero\_eventos}: Cantidade de eventos na cidade ese día
     \item \texttt{tipo\_evento\_principal}: Tipo do evento máis relevante (Deportivo, Musical, Cultural, etc.)
     \item \texttt{impacto\_estimado}: Impacto esperado no turismo (Baixo/Medio/Alto)
@@ -213,39 +184,25 @@ Seguindo as recomendacións de deseño, todos os atributos do modelo utilizan no
 \subsubsection{Dimensión CHUVIA}
 \begin{itemize}
     \item \texttt{chuvia\_id} (PK): Identificador único do rexistro meteorolóxico
-    \item \texttt{data}: Data do rexistro
     \item \texttt{precipitacion\_mm}: Precipitación en milímetros
     \item \texttt{temperatura\_media}: Temperatura media en graos Celsius
-    \item \texttt{temperatura\_maxima}: Temperatura máxima
-    \item \texttt{temperatura\_minima}: Temperatura mínima
     \item \texttt{condicao\_xeral}: Descrición xeral (Soleado, Nubrado, Choiva, Tormenta, etc.)
 \end{itemize}
-
-\subsubsection{Táboa Ponte: HOSPEDAXE\_AMENITY}
-\begin{itemize}
-    \item \texttt{hospedaxe\_id} (FK): Referencia ao aloxamento
-    \item \texttt{amenity\_id} (FK): Referencia á amenity
-    \item Clave primaria composta: (hospedaxe\_id, amenity\_id)
-\end{itemize}
-
-\textbf{Nota sobre nomenclatura:} Os atributos que requiren explicación adicional son aqueles derivados ou calculados. Por exemplo, \texttt{grupo\_etario} calcúlase a partir de \texttt{data\_nacemento}, e \texttt{precio\_medio\_barrio} agrégase a partir dos prezos individuais dos aloxamentos.
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\textwidth]{diagramas/multidimensional.drawio.png}
-  \caption{Diagrama do Modelo de Feitos Dimensional (\emph{DFM}). Nota: A dimensión AMENITY conecta con HOSPEDAXE mediante relación N:M a través dunha táboa ponte. Atributos: amenity\_id, nome, categoría.}
+  \caption{Diagrama do Modelo de Feitos Dimensional (\emph{DFM}). Nota: Os atributos \texttt{comodidades} e \texttt{accesibilidade} en HOSPEDAXE son multivaluados.}
   \label{fig:dfm}
 \end{figure}
 
-\subsection{Qué é cada cousa?}
-\label{sub:cousa}
+\subsection{Elección de feitos e dimensións}
 
 No noso modelo as reseñas son os \textbf{feitos}, pois son moitos e crecen a moita velocidade, e son un punto de partida para moitas análises. É posible que cada departamento teña as súas necesidades especiais, e eventualmente poderase crear \emph{data marts} para cada un deles, pero nós pensamos que as reseñas son de alto interese para calquera análise. Estas contan cunha única \textbf{métrica}, o \emph{score}, que indica o grao de satisfacción do usuario coa experiencia do hospedaxe. Así, as circunstancias que circundan á reseña son as \textbf{dimensións}, responden ás seguintes preguntas:
 \begin{itemize}
 	\item \emph{Quen?} O valorador, cos seus atributos: idade, sexo.
 	\item \emph{Cando?} Indicando ata o día, con información de estacións (para estudar a influencia da tempada alta).
-	\item \emph{A que?} O hospedaxe. Este á súa vez debe responder a: \emph{De quen?} (o propietario, cos seus atributos) e \emph{Onde?} (localización).
-	\item \emph{Que amenities?} Comodidades do hospedaxe (Wifi, cociña, piscina...) mediante táboa ponte N:M.
+	\item \emph{A que?} O hospedaxe. Este á súa vez debe responder a: \emph{De quen?} (o propietario, cos seus atributos) e \emph{Onde?} (localización). Ademais, o hospedaxe inclúe \emph{Que comodidades?} como atributos multivaluados.
 	\item \emph{Baixo que circunstancias?} Información meteorolóxica e de eventos xerais.
 \end{itemize}
 
@@ -261,76 +218,114 @@ Ralph Kimball \cite{kimball2007}
 
 No noso deseño levamos a granularidade ao máis fino que podemos: as datas van ata o día, os lugares ata os barrios, e cada fila da táboa de feitos representa unha \textbf{reseña individual}. Esta granularidade atómica permite máxima flexibilidade nas consultas analíticas.
 
-\subsection{Dimensións particulares}
+\subsection{Xustificación de decisións relevantes do modelo}
 
-\subsubsection{Dimensións dexeneradas}
+Nesta sección detállanse as decisións de deseño máis importantes do modelo dimensional, en particular aquelas relacionadas coas particularidades das dimensións e as medidas.
 
-Non temos dimensións dexeneradas. Todas as dimensións (TEMPO, VALORADOR, HOSPEDAXE, HOSPEDADOR, LOCALIZACIÓN, AMENITY, EVENTOS, CHUVIA) contan con táboas propias e atributos descritivos.
+\subsubsection{Esquema de copo de neve}
 
-\subsubsection{Atributos multivaluados}
-
-\paragraph{AMENITIES:}
-Nos datos fonte aparecen como array JSON: \texttt{["Wifi", "Kitchen", "TV"]}. Implementamos unha táboa ponte (bridge table):
-
-\begin{center}
-HOSPEDAXE $---<$ HOSPEDAXE\_AMENITY $>---$ AMENITY
-\end{center}
-
-\textbf{Estrutura:}
-\begin{itemize}
-    \item Táboa AMENITY: \texttt{amenity\_id} (PK), \texttt{nome}, \texttt{categoría}
-    \item Táboa HOSPEDAXE\_AMENITY: \texttt{hospedaxe\_id} (FK), \texttt{amenity\_id} (FK)
-\end{itemize}
-
-\textbf{Xustificación:} 
-\begin{itemize}
-    \item Alta cardinalidade (50-200+ valores únicos)
-    \item Crecemento dinámico (novas amenities emerxentes)
-    \item Permite consultas flexibles tipo: ``hospedaxes con Wifi E Piscina''
-    \item No ETL parseamos o JSON, normalizamos nomes e poboamos as táboas
-    \item Ao agregar, úsase \texttt{COUNT(DISTINCT)} para evitar duplicación
-\end{itemize}
-
-\paragraph{HOST\_VERIFICATIONS:}
-Array como \texttt{['email', 'phone', 'work\_email']}. Desnormalizamos en atributos booleanos na táboa HOSPEDADOR:
-
-\textbf{Estrutura:}
-\begin{itemize}
-    \item \texttt{email\_verificado} (CHAR(1): 'S'/'N')
-    \item \texttt{telefono\_verificado} (CHAR(1): 'S'/'N')
-    \item \texttt{work\_email\_verificado} (CHAR(1): 'S'/'N')
-\end{itemize}
-
-\textbf{Xustificación:} 
-\begin{itemize}
-    \item Baixa cardinalidade (4-5 valores)
-    \item Simplifica consultas (sen JOINs adicionais)
-    \item Valores estables no tempo
-\end{itemize}
-
-\subsubsection{Dimensións basura}
-
-Non identificamos dimensións basura no modelo actual.
-
-\subsubsection{Dimensións que cambian no tempo (SCD)}
-
-\paragraph{HOSPEDADOR e HOSPEDAXE:} 
-\textbf{SCD Tipo 1 (sobrescribir).}
-
-Atributos como \texttt{score\_medio}, \texttt{tempo\_resposta}, \texttt{price} cambian ao longo do tempo. Non obstante, para a análise de reviews interésanos o estado \textbf{actual}. 
+O modelo segue un esquema de copo de neve, normalizado parcialmente. Pódese apreciar que a dimensión HOSPEDAXE conecta con HOSPEDADOR e LOCALIZACIÓN, creando dous niveis de normalización.
 
 \textbf{Xustificación:}
 \begin{itemize}
-    \item Cada review é un snapshot puntual do momento da valoración
-    \item Manter histórico completo (Tipo 2) complicaría o modelo sen valor analítico significativo
-    \item As consultas céantranse en tendencias actuais, non en evolución histórica de atributos
+    \item \textbf{Evitar redundancia:} Un hospedador xestiona múltiples hospedaxes. Almacenar os seus atributos (nome, verificacións, tempo\_resposta) en cada hospedaxe produciría duplicación masiva.
+    \item \textbf{Xerarquías xeográficas:} A localización ten unha xerarquía natural (barrio $\rightarrow$ cidade $\rightarrow$ país) que benefíciase da normalización.
+    \item \textbf{Trade-off aceptable:} Aínda que require máis JOINs nas consultas, en DW analíticos con volumes moderados este custo é asumible. A alternativa (esquema estrela desnormalizado) produciría actualizacións complexas e inconsistencias.
 \end{itemize}
 
-\paragraph{LOCALIZACIÓN, TEMPO, EVENTOS, CHUVIA, AMENITY:} 
-\textbf{SCD Tipo 0 (sen cambios).} Son datos estables ou históricos por natureza.
+\subsubsection{Atributos multivaluados para comodidades e accesibilidade}
 
-\paragraph{VALORADOR:} 
-\textbf{SCD Tipo 1.} A idade calcúlase dinamicamente da data de nacemento en cada consulta.
+As comodidades e características de accesibilidade represéntanse como atributos multivaluados dentro da dimensión HOSPEDAXE, non como dimensións independentes.
+
+\textbf{Xustificación:}
+\begin{itemize}
+    \item \textbf{Natureza descritiva:} As comodidades e a accesibilidade son propiedades intrínsecas do hospedaxe que o describen, non entidades independentes. Non teñen atributos propios máis aló do seu nome.
+    \item \textbf{Simplicidade do modelo:} Mantelas como atributos multivaluados evita crear dimensións adicionais e táboas ponte que complicarían o modelo sen aportar valor analítico significativo.
+    \item \textbf{Orixe dos datos:} Nos ficheiros fonte (\texttt{listings.csv}) xa veñen como arrays JSON, polo que manter esta estrutura simplifica o proceso ETL.
+    \item \textbf{Consultas típicas:} As análises sobre comodidades son principalmente de tipo:
+        \begin{itemize}
+            \item ``Hospedaxes con Wifi'' (filtro simple)
+            \item ``Score medio de hospedaxes con piscina'' (filtro + agregación)
+            \item ``Comodidades máis comúns nos hospedaxes de 5 estrelas'' (parsing do atributo)
+        \end{itemize}
+    \item \textbf{Implementación técnica:} No modelo lógico, estas representaranse como:
+        \begin{itemize}
+            \item Opción 1: Campos TEXT coa lista de comodidades (para consultas simples)
+            \item Opción 2: Táboa auxiliar normalizada \texttt{HOSPEDAXE\_AMENITIES} (se a análise requirira conteos exactos ou combinacións)
+        \end{itemize}
+\end{itemize}
+
+\textbf{Consideracións de implementación:}
+
+No DFM conceptual, os atributos multivaluados indícanse simplemente como \texttt{comodidades} e \texttt{accesibilidade}. No modelo lógico/físico decidirase se:
+\begin{itemize}
+    \item Almacenalos como TEXT delimitado (para consultas WHERE con LIKE)
+    \item Crear unha táboa ponte auxiliar para consultas máis complexas
+    \item Usar tipos de datos específicos do SGBD (arrays, JSON) se están dispoñibles
+\end{itemize}
+
+Esta decisión reflecte o principio de \emph{``o modelo conceptual debe capturar os requisitos de negocio, mentres que os detalles de implementación adáptanse ás capacidades tecnolóxicas''}.
+
+\subsubsection{Desnormalización de HOST\_VERIFICATIONS}
+
+Ao contrario que comodidades, as verificacións do hospedador almacénanse como atributos booleanos directamente na táboa HOSPEDADOR.
+
+\textbf{Xustificación:}
+\begin{itemize}
+    \item \textbf{Baixa cardinalidade:} Só 4-5 tipos de verificación (email, phone, work\_email, government\_id, identity)
+    \item \textbf{Valores estables:} O conxunto de verificacións non cambia frecuentemente
+    \item \textbf{Simplificación:} Consultas como ``hospedadores con email E teléfono verificados'' son triviais sen JOINs
+    \item \textbf{Performance:} Evita unha táboa ponte adicional con moi poucas filas
+\end{itemize}
+
+Esta decisión ilustra o principio de \emph{``normalizar ou desnormalizar en función da cardinalidade e patrón de uso''}.
+
+\subsubsection{Dimensións que cambian no tempo (SCD)}
+
+\paragraph{SCD Tipo 1 (Sobrescribir) - HOSPEDADOR e HOSPEDAXE:}
+
+Atributos como \texttt{score\_medio}, \texttt{tempo\_resposta\_medio}, \texttt{precio\_noite} son variables no tempo pero aplícase SCD Tipo 1.
+
+\textbf{Xustificación:}
+\begin{itemize}
+    \item \textbf{Foco en estado actual:} As análises empresariais préguntanse ``cal é o score actual deste hospedador?'', non ``cal era o seu score hai 6 meses?''
+    \item \textbf{Reviews como snapshots:} Cada review xa é un rexistro histórico puntual. O score da review non cambia retroactivamente cando o score\_medio do hospedador mellora.
+    \item \textbf{Complexidade vs. valor:} Implementar SCD Tipo 2 (versionado histórico) requiriría:
+        \begin{itemize}
+            \item Columnas \texttt{data\_inicio\_vixencia}, \texttt{data\_fin\_vixencia}, \texttt{version\_actual}
+            \item Lóxica ETL complexa para detectar cambios e crear novas filas
+            \item Consultas máis complexas (filtrar por \texttt{version\_actual = 'S'})
+            \item Volume aumentado (múltiples versións de cada hospedador/hospedaxe)
+        \end{itemize}
+    \item \textbf{Queries típicas non requiren histórico:} As consultas de negocio son tipo:
+        \begin{itemize}
+            \item ``Hospedadores superhost con tempo\_resposta < 1 hora'' (estado actual)
+            \item ``Evolución temporal do número de reviews'' (xa capturada na táboa de feitos por data)
+        \end{itemize}
+\end{itemize}
+
+\textbf{Escenario donde SCD Tipo 2 sería útil:}
+Se o negocio precisara analizar ``como evolucionou o precio deste hospedaxe ao longo do tempo e como afectou ás súas reviews'', entón sería necesario. Pero este non é un requisito das consultas actuais.
+
+\paragraph{SCD Tipo 0 (Sen cambios) - LOCALIZACIÓN, TEMPO, EVENTOS, CHUVIA:}
+
+Estas dimensións son estables ou históricas por natureza:
+\begin{itemize}
+    \item \textbf{TEMPO:} Dimensión estática por definición (o 1 de xaneiro de 2023 sempre será o mesmo día)
+    \item \textbf{LOCALIZACIÓN:} Barrios e cidades non cambian de nome/país (casos excepcionais ignóranse)
+    \item \textbf{EVENTOS e CHUVIA:} Son rexistros históricos puntuais (o tempo do 15/03/2023 xa non cambia)
+\end{itemize}
+
+\paragraph{SCD Tipo 1 implícito - VALORADOR:}
+
+A \texttt{idade} calcúlase dinamicamente como \texttt{EXTRACT(YEAR FROM CURRENT\_DATE) - EXTRACT(YEAR FROM data\_nacemento)}. Non se almacena, polo que sempre reflicte o valor atual. O \texttt{grupo\_etario} derivase da idade, tamén calculado en tempo de consulta.
+
+\subsubsection{Dimensións dexeneradas}
+
+Non se identificaron dimensións dexeneradas no modelo actual. Todos os atributos dimensionais residen en táboas de dimensión propias con atributos descritivos.
+
+\textbf{Xustificación:}
+Os candidatos típicos a dimensións dexeneradas (como números de factura, códigos de transacción) non aplican no noso contexto. O \texttt{review\_id} é a clave primaria da táboa de feitos, pero non se usa para análises descritivas (non tes consultas tipo ``agrupa por review\_id'').
 
 \subsubsection{Xerarquías dimensionais}
 
@@ -344,7 +339,6 @@ As seguintes xerarquías permiten drill-down e roll-up nas análises:
 	\end{itemize}
 	\item \textbf{LOCALIZACIÓN:} barrio $\rightarrow$ cidade $\rightarrow$ país
 	\item \textbf{VALORADOR:} idade $\rightarrow$ grupo\_etario (18-25, 26-35, 36-50, 51+)
-	\item \textbf{AMENITY:} nome $\rightarrow$ categoría (Conectividade, Cociña, Entretemento...)
 \end{itemize}
 
 \subsection{Métricas}
@@ -385,7 +379,7 @@ As valoracións miden satisfacción nunha escala fixa. Non son magnitudes acumul
 
 \textbf{Agregacións non aditivas:}
 \begin{itemize}
-	\item \texttt{AVG(score)}: agregación principal por hospedaxe, barrio, hospedador, estación, amenity
+	\item \texttt{AVG(score)}: agregación principal por hospedaxe, barrio, hospedador, estación
 	\item \texttt{MIN/MAX(score)}: rangos de satisfacción
 	\item \texttt{MEDIAN(score)}: tendencia central robusta a outliers
 	\item \texttt{STDDEV(score)}: variabilidade das valoracións
