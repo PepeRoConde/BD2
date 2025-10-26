@@ -57,7 +57,7 @@ Nós somos parte do equipo técnico de Airbnb e para analizar o negocio e avalia
 \section{Restricións}
 \subsection{Proceso de negocio, parte \emph{top-down}}
 
-O interese desde o punto de vista do proceso de negocio é responder ás preguntas evidentes facilmente formulables e ás preguntas que xurdan en función destas. Por iso, para o que poida ocorrer elixiremos sempre a granularidade máis pequena (ver sección 3.2). 
+O interese desde o punto de vista do proceso de negocio é responder ás preguntas evidentes facilmente formulables e ás preguntas que xurdan en función destas. Por iso, para o que poida ocorrer elixiremos sempre a granularidade máis pequena (ver sección \ref{sub:eleccion}). 
 
 \subsubsection{Consultas}
 
@@ -197,6 +197,7 @@ Seguindo as recomendacións de deseño, os atributos representados no diagrama D
 \end{figure}
 
 \subsection{Elección de feitos e dimensións}
+\label{sub:eleccion}
 
 No noso modelo as reseñas son os \textbf{feitos}, pois son moitos e crecen a moita velocidade, e son un punto de partida para moitas análises. É posible que cada departamento teña as súas necesidades especiais, e eventualmente poderase crear \emph{data marts} para cada un deles, pero nós pensamos que as reseñas son de alto interese para calquera análise. Estas contan cunha única \textbf{métrica}, o \emph{score}, que indica o grao de satisfacción do usuario coa experiencia do hospedaxe. Así, as circunstancias que circundan á reseña son as \textbf{dimensións}, responden ás seguintes preguntas:
 \begin{itemize}
