@@ -353,21 +353,121 @@ incluyendo alguna métrica DAX.
 \addcontentsline{toc}{subsection}{Consulta 1}
 
 \begin{lstlisting}
-blablabla
+SELECT 
+    h.numero_hospedaxes,
+    COUNT(DISTINCT h.hospedador_chave) AS num_hospedadores,
+    AVG(v.score) AS score_medio,
+    COUNT(v.valoracion_id) AS total_valoraciones,
+    -- Ratio de superhosts en este grupo
+    SUM(CASE WHEN h.e_superhost = 1 THEN 1 ELSE 0 END) * 100.0 / 
+        COUNT(DISTINCT h.hospedador_chave) AS porcentaje_superhosts
+FROM feito_valoracion v
+JOIN dim_hospedador h ON v.hospedador_chave = h.hospedador_chave
+WHERE h.actual = 1
+GROUP BY h.numero_hospedaxes
+HAVING COUNT(v.valoracion_id) >= 10  -- Filtrar grupos con pocas valoraciones
+ORDER BY h.numero_hospedaxes;
 \end{lstlisting}
 
 \subsection*{Consulta 2: Cales son os barrios con peores valoracións? Ordeados descendentemente pola valoración media da cidade. }
 \addcontentsline{toc}{subsection}{Consulta 2}
 
 \begin{lstlisting}
-blablabla
+WITH valoraciones_barrio AS (
+    -- Calcular score medio por barrio
+    SELECT 
+        l.lugar_id,
+        l.barrio,
+        l.cidade,
+        l.pais,
+        AVG(v.score) AS score_medio_barrio,
+        COUNT(v.valoracion_id) AS num_valoraciones_barrio,
+        STDDEV(v.score) AS desviacion_barrio
+    FROM feito_valoracion v
+    JOIN dim_lugar l ON v.lugar_id = l.lugar_id
+    GROUP BY l.lugar_id, l.barrio, l.cidade, l.pais
+),
+valoraciones_cidade AS (
+    -- Calcular score medio por ciudad
+    SELECT 
+        l.cidade,
+        l.pais,
+        AVG(v.score) AS score_medio_cidade,
+        COUNT(v.valoracion_id) AS num_valoraciones_cidade
+    FROM feito_valoracion v
+    JOIN dim_lugar l ON v.lugar_id = l.lugar_id
+    GROUP BY l.cidade, l.pais
+),
+ranking_barrios AS (
+    -- Combinar y rankear barrios dentro de cada ciudad
+    SELECT 
+        vb.barrio,
+        vb.cidade,
+        vb.pais,
+        vb.score_medio_barrio,
+        vb.num_valoraciones_barrio,
+        vc.score_medio_cidade,
+        vc.num_valoraciones_cidade,
+        -- Diferencia del barrio respecto a la media de su ciudad
+        vb.score_medio_barrio - vc.score_medio_cidade AS diferencia_vs_cidade,
+        -- Ranking dentro de la ciudad (1 = peor barrio)
+        RANK() OVER (PARTITION BY vb.cidade, vb.pais 
+                     ORDER BY vb.score_medio_barrio ASC) AS ranking_en_cidade
+    FROM valoraciones_barrio vb
+    JOIN valoraciones_cidade vc ON vb.cidade = vc.cidade AND vb.pais = vc.pais
+    WHERE vb.num_valoraciones_barrio >= 5  -- Filtrar barrios con pocas valoraciones
+)
+SELECT 
+    barrio,
+    cidade,
+    pais,
+    ROUND(score_medio_barrio, 2) AS score_barrio,
+    num_valoraciones_barrio,
+    ROUND(score_medio_cidade, 2) AS score_cidade,
+    ROUND(diferencia_vs_cidade, 2) AS diferencia,
+    ranking_en_cidade AS posicion_en_cidade
+FROM ranking_barrios
+WHERE ranking_en_cidade <= 5  -- Top 5 peores barrios por ciudad
+ORDER BY 
+    score_medio_cidade DESC,  -- Ciudades con mejor valoración primero
+    ranking_en_cidade ASC;    -- Dentro de cada ciudad, peores barrios primero
 \end{lstlisting}
 
 \subsection*{Consulta 3: Entre as comodidades e accesibilidades que pode ter un hospedaxe, cal beneficia máis á valoracion ca súa presencia e cal perxudica máis ca súa ausencia?}
 \addcontentsline{toc}{subsection}{Consulta 3}
 
 \begin{lstlisting}
-blablabla
+-- Top 5 comodidades que MÁS BENEFICIAN (mayor score con ellas)
+SELECT * FROM (
+    SELECT 
+        commodidade,
+        'Comodidade' AS tipo,
+        ROUND(AVG(v.score), 2) AS score_medio
+    FROM feito_valoracion v
+    JOIN ponte_hospedaxe_commodidade pc ON v.hospedaxe_id = pc.hospedaxe_id
+    GROUP BY commodidade
+    HAVING COUNT(*) >= 10
+    ORDER BY AVG(v.score) DESC
+) WHERE ROWNUM <= 5
+
+UNION ALL
+
+-- Top 5 accesibilidades cuya AUSENCIA más PERJUDICA (menor score sin ellas)
+SELECT * FROM (
+    SELECT 
+        accesibilidade AS commodidade,
+        'Accesibilidade (ausente)' AS tipo,
+        ROUND(AVG(v.score), 2) AS score_medio_sin_ella
+    FROM feito_valoracion v
+    WHERE NOT EXISTS (
+        SELECT 1 
+        FROM ponte_hospedaxe_accesibilidade pa
+        WHERE pa.hospedaxe_id = v.hospedaxe_id
+    )
+    GROUP BY accesibilidade
+    HAVING COUNT(*) >= 10
+    ORDER BY AVG(v.score) ASC
+) WHERE ROWNUM <= 5;
 \end{lstlisting}
 
 \newpage
