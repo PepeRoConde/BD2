@@ -144,13 +144,13 @@ Con todo resulta un modelo en estrela. Onde:
 	\item A dimensión \texttt{Tempo} está denormalizada, para que en vez de estar representada de forma xerárquica, sea tipo Estrela. Ademáis, como proposto nas teóricas usamos o atributo \texttt{data} como chave primaria (identifica o que ten que identificar).
 	\item Á dimensión \texttt{Lugar} tivemos que crearlle unha chave primaria \emph{surrogada} pois pode haber, por exemplo, máis dun barrio \emph{chinés}. Con todo, si forzamos a non duplicidade das ternas \texttt{(barrio, cidade, pais)} con \texttt{UNIQUE KEY}.
 	\item A dimensión \texttt{Hospedaxe} ten dos atributos multievaluados (\texttt{Comodidades} e \texttt{Accesibilidade}, que describen prestacións do aloxsmento e formas de chegar a él, respectivamente) e modelarasen con Táboas Ponte.
-	\item A dimensión \texttt{Eventos} inclúe un índice (\texttt{INDEX}) para que as consultas do tipo: 
+	\item A dimensión \texttt{Eventos} usa chaves foráneas para asegurar coherencia e restriccións para asegurar que os valores categóricos son os esperados e para evitar duplicados. Ademáis inclúe un índice (\texttt{INDEX}) para que as consultas do tipo: 
 		\begin{lstlisting}
-SELECT evento_id
-FROM dim_eventos
-WHERE evento_data = "2024-11-10"
-AND cidade_nome = "Madrid"
-\end{lstlisting}
+SELECT e.evento_id, e.evento_nome, e.impacto
+FROM dim_eventos e
+JOIN dim_lugar l ON e.lugar_id = l.lugar_id
+WHERE e.evento_data = DATE '2024-11-10'
+  AND l.cidade = 'Madrid';\end{lstlisting}
 sexan veloces, e xustamente son ese tipo de consultas ás que nos interesan (os eventos ocurren nun momento nunha cidade) (ver \cite{index}).
 	\item Os atributos \texttt{comodidade} e \texttt{accesibilidade} ó seren multievaluados teñen que ser modelados cunha táboa ponte. Por tanto merecen a súa dimensión propia (ademáis da ponte).
 	\item A dimensión \texttt{Chuvia} é dexenerada pois a única métrica que aporta son os mm de precipitacion. Polo tanto ben a podemos incluir na táboa de feitos.
@@ -198,11 +198,22 @@ CREATE TABLE dim_eventos (
     evento_nome VARCHAR2(200) NOT NULL,
     evento_tipo VARCHAR2(50) NOT NULL,
     impacto VARCHAR2(20) NOT NULL,
-    cidade_nome VARCHAR2(100) NOT NULL,
+    lugar_id NUMBER NOT NULL,
     evento_data DATE NOT NULL
+
+    CONSTRAINT chk_impacto CHECK (impacto IN ('Bajo', 'Medio', 'Alto')),
+    CONSTRAINT uk_evento UNIQUE (evento_nome, lugar_id, evento_data)
+
+    -- Chaves Foraneas
+    CONSTRAINT fk_evento_lugar FOREIGN KEY (lugar_id) 
+        REFERENCES dim_lugar(lugar_id),
+    CONSTRAINT fk_evento_tempo FOREIGN KEY (evento_data) 
+        REFERENCES dim_tempo(data),
+    
+
 );
 -- Index en Oracle faise fóra do CREATE TABLE:
-CREATE INDEX idx_evento_data_cidade ON dim_eventos(evento_data, cidade_nome);
+CREATE INDEX idx_evento_data_cidade ON dim_eventos(evento_data, lugar_id);
 \end{lstlisting}
 
 \subsubsection{Táboas de dimensión que cambian lentamente, implementadas con SCD tipo 2}
