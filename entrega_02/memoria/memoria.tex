@@ -19,6 +19,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{subcaption}
+\usepackage{url}
 
 % Configurar márgenes
 \geometry{
@@ -91,9 +92,9 @@
 
 \section{Introdución}
 
-\section{Diseño del modelo lógico e implementación del DW en Oracle}
+blablabla
 
-\subsection{Rediseño do modelo da práctica anterior}
+\section{Diseño del modelo lógico e implementación del DW en Oracle}
 
 \textcolor{red}{
 \begin{itemize}
@@ -103,15 +104,20 @@ y crear las tablas resultantes en Oracle.
 	\item Crear las tablas necesarias en Oracle.
 \end{itemize}}
 
+\subsection{Rediseño do modelo da práctica anterior}
+
+
 Despóis da corrección da entrega anterior modificamos o DFM do seguinte xeito:
 \begin{itemize}
-	\item Baixamos as dimensións de \texttt{Hospedador} e \texttt{Lugar} ó nivel de \texttt{Hospedaxe} para evitar o modelo \emph{Copo de neve}, o cal atopamos vantaxoso por gañar simpleza do modelo e velocidade das consultas \cite{evitarSnowflake}.  
+	\item Baixamos as dimensións de \texttt{Hospedador} e \texttt{Lugar} ó nivel de \texttt{Hospedaxe} para evitar o modelo \emph{Copo de neve}, o cal atopamos vantaxoso por gañar simpleza do modelo e velocidade das consultas (ver \cite{evitarSnowflake}).  
 	\item Actualizamos o DFM cos atributos da dimensión \texttt{Eventos} especificados no informe.
+	\item Cambiamos as SCD a tipo 2 para conservar os datos do pasado e poder analizalos (dimensións \texttt{Hospedador} e \texttt{Valorador}).	
 	\item Cambios sobre o resto de atributos para buscala coherencia co informe anterior.
 \end{itemize}
 
+Estos cambios pódense ver reflictidos na Figura \ref{fig:dfm}. Na seguinte subsección veremos como implementar estos cambios.
 
-\begin{figure}[h!]
+\begin{figure}[]
     \centering
 
     \begin{subfigure}[l]{0.8\textwidth}
@@ -129,53 +135,103 @@ Despóis da corrección da entrega anterior modificamos o DFM do seguinte xeito:
         \label{fig:dfm-modificado}
     \end{subfigure}
 
-  \caption{Diagrama do Modelo de Feitos Dimensional (\emph{DFM})}
+  \caption{Diagrama do Modelo de Feitos Dimensional (\emph{DFM}) antes e despóis da corrección}
   \label{fig:dfm}
 \end{figure}
 
 
+\subsection{Toma de decisións}
 
-
-Con todo resulta un modelo en estrela. Donde:
+Con todo resulta un modelo en estrela. Onde:
 \begin{itemize}
-	\item A dimensión \texttt{Chuvia} é dexenerada pois a única métrica que aporta son os mm de precipitacion. Polo tanto ben a podemos incluir na táboa de feitos.
+	\item A dimensión \texttt{Tempo} está denormalizada, para que en vez de estar representada de forma xerárquica, sea tipo Estrela. Ademáis, como proposto nas teóricas usamos o atributo \texttt{data} como chave primaria (identifica o que ten que identificar).
+	\item Á dimensión \texttt{Lugar} tivemos que crearlle unha chave primaria \emph{surrogada} pois pode haber, por exemplo, máis dun barrio \emph{chinés}. Con todo, si forzamos a non duplicidade das ternas \texttt{(barrio, cidade, pais)} con \texttt{UNIQUE KEY}.
 	\item A dimensión \texttt{Hospedaxe} ten dos atributos multievaluados (\texttt{Comodidades} e \texttt{Accesibilidade}, que describen prestacións do aloxsmento e formas de chegar a él, respectivamente) e modelarasen con Táboas Ponte.
-	\item A dimensión \texttt{Tempo} está denormalizada, para que en vez de estar representada de forma xerárquica, sea tipo Estrela.
+	\item A dimensión \texttt{Eventos} inclúe un índice (\texttt{INDEX}) para que as consultas do tipo: 
+		\begin{sqlbox}
+SELECT evento\_id\\ 
+FROM dim\_eventos \\
+WHERE evento\_data = `2024-11-10' \\
+AND cidade\_nome = `Madrid';\end{sqlbox}
+sexan veloces, e xustamente son ese tipo de consultas ás que nos interesan (os eventos ocurren nun momento nunha cidade) (ver \cite{index}).
+	\item Os atributos \texttt{comodidade} e \texttt{accesibilidade} ó seren multievaluados teñen que ser modelados cunha táboa ponte. Por tanto merecen a súa dimensión propia (ademáis da ponte).
+	\item A dimensión \texttt{Chuvia} é dexenerada pois a única métrica que aporta son os mm de precipitacion. Polo tanto ben a podemos incluir na táboa de feitos.
 \end{itemize}
+
 
 \subsection{Creación das Táboas}
 
+A continuación mostrase as instruccións SQL para crealas táboas. Agrupadas segundo o tipo.
+
 \begin{sqlbox}[title={Táboas de dimensión}]
 CREATE TABLE dim\_tempo (\\
-    tempo\_id INT PRIMARY KEY,\\
-    data DATE NOT NULL UNIQUE,\\
+    data DATE NOT NULL PRIMARY KEY,\\
     dia INT NOT NULL,\\
     mes INT NOT NULL,\\
     ano INT NOT NULL,\\
     estacion VARCHAR(10) NOT NULL,\\
-    tempada\_alta BOOLEAN NOT NULL\\
-);\\
+    tempada\_alta BOOLEAN NOT NULL);\\
 
 CREATE TABLE dim\_lugar (\\
     lugar\_id INT PRIMARY KEY AUTO\_INCREMENT,\\
-    barrio\_nome VARCHAR(100) NOT NULL,\\
-    cidade\_nome VARCHAR(100) NOT NULL,\\
-    pais\_nome VARCHAR(100) NOT NULL,\\
-    UNIQUE KEY uk\_place (neighborhood\_name, city\_name, country\_name)\\
-);\\
+    barrio VARCHAR(100) NOT NULL,\\
+    cidade VARCHAR(100) NOT NULL,\\
+    pais VARCHAR(100) NOT NULL,\\
+    UNIQUE KEY uk\_lugar (barrio, cidade, pais));\\
 
 CREATE TABLE dim\_hospedaxe (\\
-    hospedaxe\_id INT PRIMARY KEY, -- Xa a tiñamos\\
+    hospedaxe\_id INT PRIMARY KEY, -- Xa a tiñamos na OLTP\\
     precio\_noite DECIMAL(10,2) NOT NULL,\\
-    tipo VARCHAR(50) NOT NULL\\
-);
+    tipo VARCHAR(50) NOT NULL);\\
+
+CREATE TABLE dim\_comodidades (\\
+    comodidade\_id INT PRIMARY KEY AUTO\_INCREMENT,\\
+    comodidade\_nome VARCHAR(100) NOT NULL UNIQUE);\\
+
+
+CREATE TABLE dim\_accesibilidade (\\
+    accesibilidade\_id INT PRIMARY KEY AUTO\_INCREMENT,\\
+    accesibilidade\_nome VARCHAR(100) NOT NULL UNIQUE);\\
+
+CREATE TABLE dim\_eventos (\\
+    evento\_id INT PRIMARY KEY AUTO\_INCREMENT,\\
+    evento\_nome VARCHAR(200) NOT NULL,\\
+    evento\_tipo VARCHAR(50) NOT NULL,\\
+    impacto VARCHAR(20) NOT NULL,\\
+    cidade\_nome VARCHAR(100) NOT NULL,\\
+    evento\_data DATE NOT NULL,\\
+    INDEX idx\_evento\_data\_cidade (evento\_date, cidade\_nome));\\
+
+\end{sqlbox}
+
+\begin{sqlbox}[title={Táboas de dimensión que cambian lentamente, implementadas con SCD tipo 2}]
+
+CREATE TABLE dim\_valorador (\\
+    valorador\_chave INT PRIMARY KEY AUTO\_INCREMENT, -- Chave surrogada, unha para cada versión\\
+    valorador\_id INT NOT NULL, -- ID do OLTP, non muda no tempo e identifica o individuo\\
+    idade INT NOT NULL,\\
+    sexo VARCHAR(10), -- Opcional\\
+    data\_nacemento DATE NOT NULL,\\
+    actual BOOLEAN NOT NULL DEFAULT TRUE,\\
+    INDEX idx\_valorador\_id (valorador\_id),\\
+    INDEX idx\_actual (actual)\\
+);\\
+\\
+
+CREATE TABLE dim\_hospedador (\\
+    hospedador\_chave INT PRIMARY KEY AUTO\_INCREMENT, -- Chave surrogada, unha para cada versión\\ 
+    hospedador\_id INT NOT NULL, -- ID do OLTP\\
+    tempo\_resposta VARCHAR(50) NOT NULL,\\
+    score\_medio DECIMAL(3,2),\\
+    numero\_hospedaxes INT NOT NULL,\\
+    é\_superhost BOOL NOT NULL,\\
+    actual BOOLEAN NOT NULL DEFAULT TRUE,\\
+    INDEX idx\_hospedador\_id (hospedador\_id),\\
+    INDEX idx\_actual (actual)\\
+);\\
 \end{sqlbox}
 
 \begin{sqlbox}[title={Táboas ponte}]
-CREATE TABLE dim\_comodidades (\\
-    comodidade\_id INT PRIMARY KEY AUTO\_INCREMENT,\\
-    comodidade\_nome VARCHAR(100) NOT NULL UNIQUE\\
-);\\
 
 CREATE TABLE ponte\_hospedaxe\_commodidade (\\
     hospedaxe\_id INT NOT NULL,\\
@@ -185,25 +241,48 @@ CREATE TABLE ponte\_hospedaxe\_commodidade (\\
     FOREIGN KEY (commodidade\_id) REFERENCES dim\_comodidade(commodidade\_id)\\
 );\\
 
-CREATE TABLE dim\_accesibilidade (\\
-    accesibilidade\_id INT PRIMARY KEY AUTO\_INCREMENT,\\
-    accesibilidade\_nome VARCHAR(100) NOT NULL UNIQUE\\
-);\\
 
-CREATE TABLE ponte\_apartment\_accessibility (\\
-    apartment\_id INT NOT NULL,\\
-    accessibility\_id INT NOT NULL,\\
+CREATE TABLE ponte\_hospedaxe\_accesibilidade (\\
+    hospedaxe\_id INT NOT NULL,\\
+    accesibilidade\_id INT NOT NULL,\\
     PRIMARY KEY (hospedaxe\_id, accesibilidade\_id),\\
     FOREIGN KEY (hospedaxe\_id) REFERENCES dim\_hospedaxe(hospedaxe\_id),\\
     FOREIGN KEY (accesibilidade\_id) REFERENCES dim\_accesibilidade(accesibilidade\_id)\\
 );\\
+
+
+CREATE TABLE ponte\_valoracion\_eventos (\\
+    valoracion\_id INT NOT NULL,\\
+    evento\_id INT NOT NULL,\\
+    PRIMARY KEY (valoracion\_id, evento\_id),\\
+    FOREIGN KEY (valoracion\_id) REFERENCES feito\_valoracion(valoracion\_id),\\
+    FOREIGN KEY (evento\_id) REFERENCES dim\_eventos(evento\_id)\\
+);\\
 \end{sqlbox}
 
+E finalmente...
 
-Notas sobre a implementación:
-\begin{itemize}
-	\item Na dimensión \texttt{Lugar} usouse \texttt{UNIQUE KEY} para evitar duplicados.
-\end{itemize}
+\begin{sqlbox}[title={Táboa de feitos}]
+
+CREATE TABLE feito\_valoracion (\\
+    valoracion\_id INT PRIMARY KEY, -- Do OLTP\\
+    hospedaxe\_id INT NOT NULL,\\
+    lugar\_id INT NOT NULL,\\
+    data INT NOT NULL,\\
+    valorador\_chave INT NOT NULL, -- Chave surrogada (SCD Tipo 2)\\
+    hospedador\_chave INT NOT NULL, -- Chave surrogada (SCD Tipo 2)\\
+    score DECIMAL(3,2) NOT NULL,\\
+    chuvia\_mm DECIMAL(5,2), -- Dimensión dexenerada\\
+    \\
+    -- Chaves Foraneas\\
+    FOREIGN KEY (hospedaxe\_id) REFERENCES dim\_hospedaxe(hospedaxe\_id),\\
+    FOREIGN KEY (lugar\_id) REFERENCES dim\_lugar(lugar\_id),\\
+    FOREIGN KEY (data) REFERENCES dim\_tempo(data),\\
+    FOREIGN KEY (valorador\_chave) REFERENCES dim\_valorador(valorador\_chave),\\
+    FOREIGN KEY (hospedador\_chave) REFERENCES dim\_hospedador(hospedador\_chave),\\
+);\\
+
+\end{sqlbox}
 
 \section{Diseño e implementación del ETL}
 \textcolor{red}{
@@ -231,8 +310,17 @@ y credenciales, facilitando la reutilización.
 \item No es requisito mínimo, pero se valorará positivamente la inclusión de al menos una de las
 siguientes funcionalidades avanzadas: Gestión de dimensiones lentamente cambiantes (SCD tipo 1 o
 2), control de carga incremental (detección de nuevos registros o cambios) o mecanismo de logging
-o control de errores mediante variables o salidas de Hop.}
+o control de errores mediante variables o salidas de Hop.
 \end{itemize}}
+
+\begin{itemize}
+	\item \textbf{\emph{Conxunto de datos utilizados:}} 
+	\item \textbf{\emph{Tratamento de nulos/inconsistentes:}} 
+	\item \textbf{\emph{Claves foráneas}} 
+	\item \textbf{\emph{...}} 
+\end{itemize}
+
+
 \section{Explotación del DW}
 
 \textcolor{red}{
@@ -246,21 +334,30 @@ consultas analíticas).
 incluyendo alguna métrica DAX.
 \end{itemize}}
 
-\subsection{Consulta 1: \{nombre\}}
+\subsection*{Consulta 1: Influe o número de hospedaxes dun hospedador sobre o seu score medio? Canto?}
+\addcontentsline{toc}{subsection}{Consulta 1}
 
 \begin{sqlbox}[title={Consulta 1}]
-SELECT name, salary\\
-FROM employees\\
-WHERE department = `Engineering'\\
-ORDER BY salary DESC;
+blablabla
 \end{sqlbox}
 
-\subsection{Consulta 2: \{nombre\}}
-\subsection{Consulta 3: \{nombre\}}
+\subsection*{Consulta 2: Cales son os barrios con peores valoracións? Ordeados descendentemente pola valoración media da cidade. }
+\addcontentsline{toc}{subsection}{Consulta 2}
+
+\begin{sqlbox}[title={Consulta 2}]
+blablabla
+\end{sqlbox}
+
+\subsection*{Consulta 3: Entre as comodidades e accesibilidades que pode ter un hospedaxe, cal beneficia máis á valoracion ca súa presencia e cal perxudica máis ca súa ausencia?}
+\addcontentsline{toc}{subsection}{Consulta 3}
+
+\begin{sqlbox}[title={Consulta 3}]
+blablabla
+\end{sqlbox}
 
 \newpage
 
-\bibliographystyle{plain}
+\bibliographystyle{IEEEtran}
 \bibliography{referencias}
 
 
