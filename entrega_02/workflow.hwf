@@ -43,8 +43,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_HOSPEDAXE.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -71,8 +69,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_LUGAR.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -99,8 +95,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_PONTE_ACCESIBILIDADES.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -127,8 +121,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_EVENTOS.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -155,8 +147,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_HOSPEDADOR_SCD2.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -183,8 +173,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_VALORADOR_SCD2.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -211,8 +199,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_PONTE_COMODIDADES.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -239,8 +225,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_TEMPO.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -262,36 +246,48 @@
       <attributes/>
       <fields>
         <field>
-          <variable_name>${ORACLE_HOST}</variable_name>
-          <variable_type>JVM</variable_type>
-          <variable_value>localhost:1521</variable_value>
+          <variable_name>PROJECT_HOME</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>${Internal.Entry.Current.Directory}</variable_value>
         </field>
         <field>
-          <variable_name>${ORACLE_SID}</variable_name>
-          <variable_type>JVM</variable_type>
-          <variable_value>ORCL</variable_value>
+          <variable_name>DATASETS_PATH</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>${PROJECT_HOME}/datasets</variable_value>
         </field>
         <field>
-          <variable_name>${ORACLE_PASSWORD}</variable_name>
-          <variable_type>JVM</variable_type>
+          <variable_name>REVIEWS_FILE</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>reviews.csv</variable_value>
+        </field>
+        <field>
+          <variable_name>LISTINGS_FILE</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>listings.csv</variable_value>
+        </field>
+        <field>
+          <variable_name>LOG_PATH</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>${PROJECT_HOME}/logs</variable_value>
+        </field>
+        <field>
+          <variable_name>ORACLE_USER</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
           <variable_value>airbnb_dw</variable_value>
         </field>
         <field>
-          <variable_name>${ORACLE_USER}</variable_name>
-          <variable_type>JVM</variable_type>
+          <variable_name>ORACLE_PASS</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>oracle123</variable_value>
         </field>
         <field>
-          <variable_name>${DATA_PATH}</variable_name>
-          <variable_type>JVM</variable_type>
-          <variable_value>${Internal.Entry.Current.Directory}/datasets</variable_value>
-        </field>
-        <field>
-          <variable_name>${LOG_PATH}</variable_name>
-          <variable_type>JVM</variable_type>
-          <variable_value>${Internal.Entry.Current.Directory}/logs</variable_value>
+          <variable_name>ORACLE_HOST</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>localhost:1521/XEPDB1</variable_value>
         </field>
       </fields>
       <file_variable_type>CURRENT_WORKFLOW</file_variable_type>
+      <filename/>
       <replacevars>Y</replacevars>
       <parallel>N</parallel>
       <xloc>112</xloc>
@@ -322,8 +318,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_VALORACION.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -350,8 +344,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_PONTE_EVENTO_VALORACION.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
