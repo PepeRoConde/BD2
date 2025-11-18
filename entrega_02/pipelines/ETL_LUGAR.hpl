@@ -21,8 +21,18 @@
   </notepads>
   <order>
     <hop>
-      <from>CSV file input</from>
-      <to>Select values</to>
+      <from>Sort rows</from>
+      <to>Unique rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Filter rows</from>
+      <to>Sort rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Filter rows</from>
+      <to>Write to log 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -31,42 +41,22 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>CSV file input</from>
-      <to>Write to log 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Select values</from>
       <to>Filter rows</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Filter rows</from>
-      <to>String operations</to>
+      <from>CSV file input</from>
+      <to>Formula</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>String operations</from>
-      <to>Calculator</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Calculator</from>
-      <to>Sort rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Sort rows</from>
-      <to>Unique rows</to>
+      <from>Formula</from>
+      <to>Select values</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>Unique rows</from>
-      <to>Add sequence</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Add sequence</from>
       <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
@@ -82,7 +72,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename/>
+    <filename>${PROJECT_HOME}/datasets/places.csv</filename>
     <filename_field/>
     <rownum_field/>
     <include_filename>N</include_filename>
@@ -97,10 +87,153 @@
     <newline_possible>N</newline_possible>
     <encoding/>
     <fields>
+      <field>
+        <name>STREET</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>14</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>CITY</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>11</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>COUNTRY</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>3</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>LATITUD</name>
+        <type>Number</type>
+        <format>#.#</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>LONGITUD</name>
+        <type>Number</type>
+        <format>#.#</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>1</precision>
+        <trim_type>none</trim_type>
+      </field>
     </fields>
     <attributes/>
     <GUI>
-      <xloc>80</xloc>
+      <xloc>48</xloc>
+      <yloc>208</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Filter rows</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compare>
+      <condition>
+        <conditions>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>PLACE_ID</leftvalue>
+            <negated>N</negated>
+            <operator>-</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>COUNTRY</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>CITY</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>STREET</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+        </conditions>
+        <function>IS NOT NULL</function>
+        <leftvalue>PLACE_ID</leftvalue>
+        <negated>N</negated>
+        <operator>-</operator>
+      </condition>
+    </compare>
+    <send_false_to>Write to log 2</send_false_to>
+    <send_true_to>Sort rows</send_true_to>
+    <attributes/>
+    <GUI>
+      <xloc>480</xloc>
+      <yloc>208</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Formula</name>
+    <type>Formula</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <formulas>
+      <formula>
+        <field_name>PLACE_ID</field_name>
+        <formula>SUBSTITUTE([STREET]&amp;"_"&amp;[CITY]&amp;"_"&amp;[COUNTRY]," ","")</formula>
+        <set_na>N</set_na>
+        <value_length>-1</value_length>
+        <value_precision>-1</value_precision>
+        <value_type>2</value_type>
+      </formula>
+    </formulas>
+    <attributes/>
+    <GUI>
+      <xloc>160</xloc>
       <yloc>208</yloc>
     </GUI>
   </transform>
@@ -116,11 +249,190 @@
       <schema_name/>
     </partitioning>
     <fields>
+      <field>
+        <length>-2</length>
+        <name>STREET</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>CITY</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>COUNTRY</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>LATITUD</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>LONGITUD</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>PLACE_ID</name>
+        <precision>-2</precision>
+      </field>
+      <remove>
+        <name>LONGITUD</name>
+      </remove>
+      <remove>
+        <name>LATITUD</name>
+      </remove>
       <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
     <GUI>
-      <xloc>256</xloc>
+      <xloc>288</xloc>
+      <yloc>208</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compress>N</compress>
+    <directory>${java.io.tmpdir}</directory>
+    <fields>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>STREET</name>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>CITY</name>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>COUNTRY</name>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>PLACE_ID</name>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <sort_prefix>out</sort_prefix>
+    <sort_size>1000000</sort_size>
+    <unique_rows>N</unique_rows>
+    <attributes/>
+    <GUI>
+      <xloc>640</xloc>
+      <yloc>208</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Table output</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <commit>1000</commit>
+    <connection>docencia</connection>
+    <fields>
+      <field>
+        <column_name>STREET</column_name>
+        <stream_name>STREET</stream_name>
+      </field>
+      <field>
+        <column_name>CITY</column_name>
+        <stream_name>CITY</stream_name>
+      </field>
+      <field>
+        <column_name>COUNTRY</column_name>
+        <stream_name>COUNTRY</stream_name>
+      </field>
+      <field>
+        <column_name>PLACE_ID</column_name>
+        <stream_name>PLACE_ID</stream_name>
+      </field>
+    </fields>
+    <ignore_errors>N</ignore_errors>
+    <only_when_have_rows>N</only_when_have_rows>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <return_keys>N</return_keys>
+    <schema>"pablo.chantada"</schema>
+    <specify_fields>Y</specify_fields>
+    <table>dim_lugar</table>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_in_table>Y</tablename_in_table>
+    <truncate>Y</truncate>
+    <use_batch>Y</use_batch>
+    <attributes/>
+    <GUI>
+      <xloc>928</xloc>
+      <yloc>208</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Unique rows</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <count_rows>N</count_rows>
+    <fields>
+      <field>
+        <case_insensitive>N</case_insensitive>
+        <name>STREET</name>
+      </field>
+      <field>
+        <case_insensitive>N</case_insensitive>
+        <name>CITY</name>
+      </field>
+      <field>
+        <case_insensitive>N</case_insensitive>
+        <name>COUNTRY</name>
+      </field>
+      <field>
+        <case_insensitive>N</case_insensitive>
+        <name>PLACE_ID</name>
+      </field>
+    </fields>
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <attributes/>
+    <GUI>
+      <xloc>784</xloc>
       <yloc>208</yloc>
     </GUI>
   </transform>
@@ -141,11 +453,10 @@
     <limitRows>N</limitRows>
     <limitRowsNumber>0</limitRowsNumber>
     <loglevel>Basic</loglevel>
-    <logmessage/>
     <attributes/>
     <GUI>
-      <xloc>256</xloc>
-      <yloc>320</yloc>
+      <xloc>288</xloc>
+      <yloc>384</yloc>
     </GUI>
   </transform>
   <transform>
@@ -161,184 +472,18 @@
     </partitioning>
     <displayHeader>Y</displayHeader>
     <fields>
-</fields>
+      <field>
+        <name>STREET</name>
+      </field>
+    </fields>
     <limitRows>N</limitRows>
     <limitRowsNumber>0</limitRowsNumber>
     <loglevel>Basic</loglevel>
-    <logmessage/>
+    <logmessage>Failed to filter row: ${STREET}</logmessage>
     <attributes/>
     <GUI>
-      <xloc>80</xloc>
-      <yloc>320</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Filter rows</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compare>
-      <condition>
-        <conditions>
-</conditions>
-        <function>=</function>
-        <negated>N</negated>
-        <operator>-</operator>
-      </condition>
-    </compare>
-    <send_true_to>String operations</send_true_to>
-    <attributes/>
-    <GUI>
-      <xloc>384</xloc>
-      <yloc>208</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>String operations</name>
-    <type>StringOperations</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-    </fields>
-    <attributes/>
-    <GUI>
-      <xloc>544</xloc>
-      <yloc>208</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Calculator</name>
-    <type>Calculator</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <failIfNoFile>Y</failIfNoFile>
-    <attributes/>
-    <GUI>
-      <xloc>688</xloc>
-      <yloc>208</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Sort rows</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compress>N</compress>
-    <directory>${java.io.tmpdir}</directory>
-    <fields>
-</fields>
-    <sort_prefix>out</sort_prefix>
-    <sort_size>1000000</sort_size>
-    <unique_rows>N</unique_rows>
-    <attributes/>
-    <GUI>
-      <xloc>688</xloc>
-      <yloc>352</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Unique rows</name>
-    <type>Unique</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <count_field/>
-    <count_rows>N</count_rows>
-    <fields>
-</fields>
-    <reject_duplicate_row>N</reject_duplicate_row>
-    <attributes/>
-    <GUI>
-      <xloc>688</xloc>
-      <yloc>496</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Add sequence</name>
-    <type>Sequence</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <increment_by>1</increment_by>
-    <max_value>999999999</max_value>
-    <schema/>
-    <seqname>SEQ_</seqname>
-    <start_at>1</start_at>
-    <use_counter>Y</use_counter>
-    <use_database>N</use_database>
-    <valuename>valuename</valuename>
-    <attributes/>
-    <GUI>
-      <xloc>512</xloc>
-      <yloc>496</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Table output</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <commit>1000</commit>
-    <fields>
-</fields>
-    <ignore_errors>N</ignore_errors>
-    <only_when_have_rows>N</only_when_have_rows>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <return_keys>N</return_keys>
-    <specify_fields>N</specify_fields>
-    <table/>
-    <tablename_field/>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_in_table>Y</tablename_in_table>
-    <truncate>N</truncate>
-    <use_batch>Y</use_batch>
-    <attributes/>
-    <GUI>
-      <xloc>352</xloc>
-      <yloc>496</yloc>
+      <xloc>480</xloc>
+      <yloc>384</yloc>
     </GUI>
   </transform>
   <transform_error_handling>
