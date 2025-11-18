@@ -1,0 +1,1 @@
+- Evitar el uso de ruta absoluta en el parent directory
