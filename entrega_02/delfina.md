@@ -1,1 +1,4 @@
 - Evitar el uso de ruta absoluta en el parent directory
+- El get fields en el CSV input es incorrecto en vez de usar solo 3 ?
+- El script de generar CSV tenemos que añadirlo ?
+- Fallo en el traspaso de Eventos
