@@ -42,7 +42,7 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_HOSPEDAXE.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_HOSPEDAXE.hpl</filename>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -68,7 +68,7 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_LUGAR.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_LUGAR.hpl</filename>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -120,7 +120,7 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_EVENTOS.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_EVENTOS.hpl</filename>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -224,7 +224,7 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_TEMPO.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_TEMPO.hpl</filename>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -248,7 +248,7 @@
         <field>
           <variable_name>PROJECT_HOME</variable_name>
           <variable_type>CURRENT_WORKFLOW</variable_type>
-          <variable_value>${Internal.Entry.Current.Directory}</variable_value>
+          <variable_value>F:/repos/BD2/entrega_02</variable_value>
         </field>
         <field>
           <variable_name>DATASETS_PATH</variable_name>
@@ -256,38 +256,27 @@
           <variable_value>${PROJECT_HOME}/datasets</variable_value>
         </field>
         <field>
-          <variable_name>REVIEWS_FILE</variable_name>
-          <variable_type>CURRENT_WORKFLOW</variable_type>
-          <variable_value>reviews.csv</variable_value>
-        </field>
-        <field>
-          <variable_name>LISTINGS_FILE</variable_name>
-          <variable_type>CURRENT_WORKFLOW</variable_type>
-          <variable_value>listings.csv</variable_value>
-        </field>
-        <field>
-          <variable_name>LOG_PATH</variable_name>
+          <variable_name>LOGS_PATH</variable_name>
           <variable_type>CURRENT_WORKFLOW</variable_type>
           <variable_value>${PROJECT_HOME}/logs</variable_value>
         </field>
         <field>
           <variable_name>ORACLE_USER</variable_name>
           <variable_type>CURRENT_WORKFLOW</variable_type>
-          <variable_value>airbnb_dw</variable_value>
+          <variable_value>pablo.chantada</variable_value>
         </field>
         <field>
           <variable_name>ORACLE_PASS</variable_name>
           <variable_type>CURRENT_WORKFLOW</variable_type>
-          <variable_value>oracle123</variable_value>
+          <variable_value>35634619Y</variable_value>
         </field>
         <field>
           <variable_name>ORACLE_HOST</variable_name>
           <variable_type>CURRENT_WORKFLOW</variable_type>
-          <variable_value>localhost:1521/XEPDB1</variable_value>
+          <variable_value>10.8.48.29</variable_value>
         </field>
       </fields>
       <file_variable_type>CURRENT_WORKFLOW</file_variable_type>
-      <filename/>
       <replacevars>Y</replacevars>
       <parallel>N</parallel>
       <xloc>112</xloc>
@@ -300,7 +289,12 @@
       <type>CHECK_DB_CONNECTIONS</type>
       <attributes/>
       <connections>
-</connections>
+        <connection>
+          <name>docencia</name>
+          <waitfor>0</waitfor>
+          <waittime>millisecond</waittime>
+        </connection>
+      </connections>
       <parallel>N</parallel>
       <xloc>240</xloc>
       <yloc>144</yloc>
@@ -365,33 +359,15 @@
       <attributes/>
       <fields>
         <field>
-          <name>${DATA_PATH}/listings.csv</name>
+          <name>${DATASETS_PATH}/listings.csv</name>
         </field>
         <field>
-          <name>${DATA_PATH}/reviews.csv</name>
+          <name>${DATASETS_PATH}/reviews.csv</name>
         </field>
       </fields>
       <parallel>N</parallel>
       <xloc>240</xloc>
       <yloc>288</yloc>
-      <attributes_hac/>
-    </action>
-    <action>
-      <name>Connection Evaluation</name>
-      <description/>
-      <type>SIMPLE_EVAL</type>
-      <attributes/>
-      <comparevalue>TRUE</comparevalue>
-      <fieldname>$(DB_CONNECTION_SUCCES) == Y</fieldname>
-      <fieldtype>boolean</fieldtype>
-      <successbooleancondition>true</successbooleancondition>
-      <successcondition>equal</successcondition>
-      <successnumbercondition>equal</successnumbercondition>
-      <successwhenvarset>N</successwhenvarset>
-      <valuetype>field</valuetype>
-      <parallel>N</parallel>
-      <xloc>432</xloc>
-      <yloc>144</yloc>
       <attributes_hac/>
     </action>
     <action>
@@ -678,8 +654,8 @@ ${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
 </logmessage>
       <logsubject>Error en conexión a la base de datos</logsubject>
       <parallel>N</parallel>
-      <xloc>432</xloc>
-      <yloc>272</yloc>
+      <xloc>240</xloc>
+      <yloc>32</yloc>
       <attributes_hac/>
     </action>
     <action>
@@ -689,19 +665,25 @@ ${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
       <attributes/>
       <always_log_rows>N</always_log_rows>
       <parallel>N</parallel>
-      <xloc>432</xloc>
-      <yloc>384</yloc>
+      <xloc>384</xloc>
+      <yloc>32</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log 4</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Basic</loglevel>
+      <logmessage>ERROR: No se encuentran los archivos en la ruta: ${DATASETS_PATH}</logmessage>
+      <logsubject>Carga de variables</logsubject>
+      <parallel>N</parallel>
+      <xloc>240</xloc>
+      <yloc>464</yloc>
       <attributes_hac/>
     </action>
   </actions>
   <hops>
-    <hop>
-      <from>Check DB connections</from>
-      <to>Connection Evaluation</to>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
     <hop>
       <from>Checks if files exist</from>
       <to>Check DB connections</to>
@@ -791,13 +773,6 @@ ${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
       <to>Write to log</to>
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Connection Evaluation</from>
-      <to>ETL_TEMPO.hpl</to>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
     <hop>
@@ -948,15 +923,29 @@ ${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Connection Evaluation</from>
+      <from>Write to log 3</from>
+      <to>Abort workflow</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Checks if files exist</from>
+      <to>Write to log 4</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Check DB connections</from>
       <to>Write to log 3</to>
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Write to log 3</from>
-      <to>Abort workflow</to>
+      <from>Check DB connections</from>
+      <to>ETL_TEMPO.hpl</to>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
@@ -977,7 +966,7 @@ ${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
       <fontitalic>N</fontitalic>
       <fontname>.AppleSystemUIFont</fontname>
       <fontsize>13</fontsize>
-      <height>90</height>
+      <height>105</height>
       <xloc>352</xloc>
       <yloc>576</yloc>
       <note>QUEDAN POR HACER:
@@ -985,7 +974,7 @@ ${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
 - HOSPEDADOR
 - VALORADOR
 - ACCESIBILIDAD</note>
-      <width>145</width>
+      <width>183</width>
     </notepad>
   </notepads>
   <attributes/>
