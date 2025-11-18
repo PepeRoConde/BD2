@@ -2,14 +2,17 @@ import csv
 import random
 from datetime import date, timedelta
 
-INPUT_PLACES_CSV = "place.csv"
-OUTPUT_EVENTS_CSV = "events.csv"
+# ---------------- CONFIG ---------------- #
+
+INPUT_PLACES_CSV = "datasets/places.csv"      # tu fichero con STREET,CITY,COUNTRY,LATITUD,LONGITUD
+OUTPUT_EVENTS_CSV = "datasets/events.csv"
 
 MIN_EVENTS_PER_PLACE = 0
-MAX_EVENTS_PER_PLACE = 5
+MAX_EVENTS_PER_PLACE = 2
 
-START_DATE = date(2014, 1, 1)
-END_DATE   = date(2025, 12, 31)
+# ¡AJUSTADO AL RANGO REAL DE dim_tempo!
+START_DATE = date(2014, 7, 1)   # MIN(DATES)
+END_DATE   = date(2025, 9, 5)   # MAX(DATES)
 
 random.seed(42)
 
@@ -70,7 +73,6 @@ def main():
 
         for place in places:
             place_id = place["PLACE_ID"]
-            street   = place.get("STREET", "")
             city     = place.get("CITY", "")
             country  = place.get("COUNTRY", "")
 
@@ -95,8 +97,8 @@ def main():
                     "EVENT_TYPE": event_type,
                     "IMPACT": impact,
                     "PLACE_ID": place_id,
-                    "EVENT_DATE": event_date.strftime("%Y-%m-%d"),
-                })
+                    "EVENT_DATE": event_date.strftime("%Y-%m-%d %H:%M:%S"),     
+                    })
 
                 total_events += 1
 
@@ -104,4 +106,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()
