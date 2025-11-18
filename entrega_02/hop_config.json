@@ -1,24 +1,32 @@
 {
   "variables" : [ {
     "name" : "ORACLE_HOST",
-    "value" : "localhost",
+    "value" : "10.8.48.29",
     "description" : "La IP o el nombre del host de tu servidor Oracle."
   }, {
     "name" : "ORACLE_PORT",
     "value" : "1521",
     "description" : "El puerto del listener de Oracle."
   }, {
-    "name" : "ORACLE_DB_NAME",
-    "value" : "XE",
+    "name" : "ORACLE_HOST_NAME",
+    "value" : "docencia",
     "description" : "El SID o Service Name de tu base de datos."
   }, {
     "name" : "ORACLE_USER",
-    "value" : "user_dw",
+    "value" : "pablo.chantada",
     "description" : "El usuario con permisos sobre el Data Warehouse."
   }, {
     "name" : "ORACLE_PASSWORD",
-    "value" : "1234",
+    "value" : "35634619Y",
     "description" : "La contraseña del usuario."
+  }, {
+    "name" : "CITY_NAME",
+    "value" : "Madrid",
+    "description" : ""
+  }, {
+    "name" : "COUNTRY",
+    "value" : "ES",
+    "description" : ""
   } ],
   "metadata" : [ ],
   "name" : "develop",
