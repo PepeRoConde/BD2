@@ -94,7 +94,9 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_PONTE_ACCESIBILIDADES.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_ACCESIBILIDADES.hpl</filename>
+      <logext/>
+      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -146,7 +148,9 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_HOSPEDADOR_SCD2.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_HOSPEDADOR_SCD2.hpl</filename>
+      <logext/>
+      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -172,7 +176,7 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_VALORADOR_SCD2.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_VALORADOR_SCD2.hpl</filename>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -198,7 +202,9 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_PONTE_COMODIDADES.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_COMODIDADES.hpl</filename>
+      <logext/>
+      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -311,7 +317,9 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_VALORACION.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_VALORACION.hpl</filename>
+      <logext/>
+      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -337,7 +345,9 @@
       <clear_rows>N</clear_rows>
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
-      <filename>/Users/circus/class/4year/APAAD/BD2/entrega_02/workflow/ETL_PONTE_EVENTO_VALORACION.hpl</filename>
+      <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_EVENTO_VALORACION.hpl</filename>
+      <logext/>
+      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -952,30 +962,6 @@ ${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
     </hop>
   </hops>
   <notepads>
-    <notepad>
-      <backgroundcolorblue>210</backgroundcolorblue>
-      <backgroundcolorgreen>136</backgroundcolorgreen>
-      <backgroundcolorred>15</backgroundcolorred>
-      <bordercolorblue>250</bordercolorblue>
-      <bordercolorgreen>231</bordercolorgreen>
-      <bordercolorred>200</bordercolorred>
-      <fontbold>N</fontbold>
-      <fontcolorblue>250</fontcolorblue>
-      <fontcolorgreen>231</fontcolorgreen>
-      <fontcolorred>200</fontcolorred>
-      <fontitalic>N</fontitalic>
-      <fontname>.AppleSystemUIFont</fontname>
-      <fontsize>13</fontsize>
-      <height>105</height>
-      <xloc>352</xloc>
-      <yloc>576</yloc>
-      <note>QUEDAN POR HACER:
-
-- HOSPEDADOR
-- VALORADOR
-- ACCESIBILIDAD</note>
-      <width>183</width>
-    </notepad>
   </notepads>
   <attributes/>
 </workflow>
