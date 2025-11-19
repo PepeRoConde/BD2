@@ -2,3 +2,10 @@
 - El get fields en el CSV input es incorrecto en vez de usar solo 3 ?
 - El script de generar CSV tenemos que añadirlo ?
 - Fallo en el traspaso de Eventos
+- Hay algun problema en que los dataset generados (por ejemplo con Valorador SCD2) estean limpios de por si ? O tenemos que generarlos mal a posta si es casi todo sintetico
+    - En hop el integer es 32 bits ? Porque el ID del valorador excede 65,535
+ 
+- En este caso la estandarizacion de las commodities seria necesaria ? o simplemente las añadimos tal y como estan
+- Los lookup generan nuevas columnas por algun movitov
+- Los weight deben ser supercomplejos o pueden ser simples ?
+- El tiempo de ejecucion es relevante ? (tarda unos X minutos, por el tema de joins en las ultimas dos fases)
