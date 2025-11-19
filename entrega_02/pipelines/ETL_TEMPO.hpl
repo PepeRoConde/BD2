@@ -352,7 +352,7 @@
         <lenient_string_to_number>N</lenient_string_to_number>
         <name>date</name>
         <precision>-2</precision>
-        <rename>DATES</rename>
+        <rename>DATE_KEY</rename>
         <roundingType>half_even</roundingType>
         <storage_type/>
         <type>Date</type>
@@ -467,8 +467,8 @@
     <connection>docencia</connection>
     <fields>
       <field>
-        <column_name>DATES</column_name>
-        <stream_name>DATES</stream_name>
+        <column_name>DATE_KEY</column_name>
+        <stream_name>DATE_KEY</stream_name>
       </field>
       <field>
         <column_name>YEAR</column_name>
@@ -495,11 +495,14 @@
     <only_when_have_rows>N</only_when_have_rows>
     <partitioning_daily>N</partitioning_daily>
     <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
     <partitioning_monthly>Y</partitioning_monthly>
+    <return_field/>
     <return_keys>N</return_keys>
     <schema>"pablo.chantada"</schema>
     <specify_fields>Y</specify_fields>
     <table>dim_tempo</table>
+    <tablename_field/>
     <tablename_in_field>N</tablename_in_field>
     <tablename_in_table>Y</tablename_in_table>
     <truncate>Y</truncate>

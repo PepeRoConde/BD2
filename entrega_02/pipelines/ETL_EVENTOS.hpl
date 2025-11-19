@@ -47,6 +47,11 @@
     </hop>
     <hop>
       <from>Database lookup 2</from>
+      <to>Select values 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values 2</from>
       <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
@@ -197,14 +202,17 @@
       <fail_on_multiple>N</fail_on_multiple>
       <key>
         <condition>=</condition>
-        <field>DATES</field>
+        <field>DATE_KEY</field>
         <name>EVENT_DATE</name>
+        <name2/>
       </key>
+      <orderby/>
       <schema>"pablo.chantada"</schema>
       <table>dim_tempo</table>
       <value>
-        <name>DATES</name>
-        <rename>EVENT_DATE</rename>
+        <default/>
+        <name>DATE_KEY</name>
+        <rename>DATE_KEY</rename>
         <trim_type>none</trim_type>
         <type>Timestamp</type>
       </value>
@@ -402,6 +410,51 @@
     </GUI>
   </transform>
   <transform>
+    <name>Select values 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <length>-2</length>
+        <name>EVENT_NAME</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>EVENT_TYPE</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>IMPACT</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>PLACE_ID</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>EVENT_DATE</name>
+        <precision>-2</precision>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>800</xloc>
+      <yloc>192</yloc>
+    </GUI>
+  </transform>
+  <transform>
     <name>Table output</name>
     <type>TableOutput</type>
     <description/>
@@ -451,7 +504,7 @@
     <use_batch>Y</use_batch>
     <attributes/>
     <GUI>
-      <xloc>784</xloc>
+      <xloc>912</xloc>
       <yloc>192</yloc>
     </GUI>
   </transform>

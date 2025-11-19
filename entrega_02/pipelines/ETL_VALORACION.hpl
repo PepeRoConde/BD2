@@ -18,26 +18,54 @@
     <modified_date>2025/11/11 21:35:01.100</modified_date>
   </info>
   <notepads>
+    <notepad>
+      <backgroundcolorblue>251</backgroundcolorblue>
+      <backgroundcolorgreen>232</backgroundcolorgreen>
+      <backgroundcolorred>201</backgroundcolorred>
+      <bordercolorblue>90</bordercolorblue>
+      <bordercolorgreen>58</bordercolorgreen>
+      <bordercolorred>14</bordercolorred>
+      <fontbold>N</fontbold>
+      <fontcolorblue>90</fontcolorblue>
+      <fontcolorgreen>58</fontcolorgreen>
+      <fontcolorred>14</fontcolorred>
+      <fontitalic>N</fontitalic>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <height>72</height>
+      <xloc>752</xloc>
+      <yloc>192</yloc>
+      <note>WHERE REVIEWER_ID = ?
+
+El "?" sirve como placeholder del parametro
+</note>
+      <width>241</width>
+    </notepad>
   </notepads>
   <order>
     <hop>
-      <from>Add sequence</from>
-      <to>Table output</to>
+      <from>CSV file input</from>
+      <to>Filter rows</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Filter rows 2</from>
-      <to>Add sequence</to>
+      <from>Filter rows</from>
+      <to>Write to log</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Calculator</from>
-      <to>Filter rows 2</to>
+      <from>Filter rows</from>
+      <to>Unique rows</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Database lookup 4</from>
-      <to>Calculator</to>
+      <from>Unique rows</from>
+      <to>Database join</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Database join</from>
+      <to>Database lookup</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -46,50 +74,31 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
+      <from>Unique rows 2</from>
+      <to>Table output</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Filter rows 2</from>
+      <to>Write to log 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
       <from>Database lookup 2</from>
-      <to>Database lookup 3</to>
+      <to>Filter rows 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Database lookup 3</from>
-      <to>Database lookup 4</to>
+      <from>Filter rows 2</from>
+      <to>Select values</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Filter rows</from>
-      <to>Database lookup</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>CSV file input</from>
-      <to>Filter rows</to>
+      <from>Select values</from>
+      <to>Unique rows 2</to>
       <enabled>Y</enabled>
     </hop>
   </order>
-  <transform>
-    <name>Add sequence</name>
-    <type>Sequence</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <increment_by>1</increment_by>
-    <max_value>999999999</max_value>
-    <seqname>SEQ_</seqname>
-    <start_at>1</start_at>
-    <use_counter>Y</use_counter>
-    <use_database>N</use_database>
-    <valuename>valuename</valuename>
-    <attributes/>
-    <GUI>
-      <xloc>624</xloc>
-      <yloc>384</yloc>
-    </GUI>
-  </transform>
   <transform>
     <name>CSV file input</name>
     <type>CSVInput</type>
@@ -101,7 +110,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename/>
+    <filename>${PROJECT_HOME}/datasets/reviews_enriched.csv</filename>
     <filename_field/>
     <rownum_field/>
     <include_filename>N</include_filename>
@@ -116,16 +125,104 @@
     <newline_possible>N</newline_possible>
     <encoding/>
     <fields>
+      <field>
+        <name>listing_id</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>id</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>date</name>
+        <type>Date</type>
+        <format>yyyy-MM-dd HH:mm:ss</format>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>reviewer_id</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>reviewer_name</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>15</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>comments</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>1428</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>score</name>
+        <type>Number</type>
+        <format>#.#</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>rain_mm</name>
+        <type>Number</type>
+        <format>#.#</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>1</precision>
+        <trim_type>none</trim_type>
+      </field>
     </fields>
     <attributes/>
     <GUI>
-      <xloc>64</xloc>
-      <yloc>144</yloc>
+      <xloc>368</xloc>
+      <yloc>304</yloc>
     </GUI>
   </transform>
   <transform>
-    <name>Calculator</name>
-    <type>Calculator</type>
+    <name>Database join</name>
+    <type>DBJoin</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -134,11 +231,26 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <failIfNoFile>Y</failIfNoFile>
+    <cache>N</cache>
+    <cache_size>0</cache_size>
+    <connection>docencia</connection>
+    <outer_join>N</outer_join>
+    <parameter>
+      <field>
+        <name>reviewer_id</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
+    <replace_vars>N</replace_vars>
+    <rowlimit>0</rowlimit>
+    <sql>SELECT REVIEWER_KEY
+FROM dim_valorador
+WHERE REVIEWER_ID = ?
+  AND ACTUAL = 1</sql>
     <attributes/>
     <GUI>
-      <xloc>784</xloc>
-      <yloc>256</yloc>
+      <xloc>864</xloc>
+      <yloc>304</yloc>
     </GUI>
   </transform>
   <transform>
@@ -152,17 +264,31 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <cache>N</cache>
+    <cache>Y</cache>
     <cache_load_all>N</cache_load_all>
     <cache_size>0</cache_size>
+    <connection>docencia</connection>
     <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
+      <eat_row_on_failure>Y</eat_row_on_failure>
       <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>HOSTING_ID</field>
+        <name>listing_id</name>
+      </key>
+      <schema>"pablo.chantada"</schema>
+      <table>dim_hospedaxe</table>
+      <value>
+        <name>HOSTING_ID</name>
+        <rename>HOSTING_ID</rename>
+        <trim_type>none</trim_type>
+        <type>BigNumber</type>
+      </value>
     </lookup>
     <attributes/>
     <GUI>
-      <xloc>320</xloc>
-      <yloc>144</yloc>
+      <xloc>1008</xloc>
+      <yloc>304</yloc>
     </GUI>
   </transform>
   <transform>
@@ -179,62 +305,28 @@
     <cache>N</cache>
     <cache_load_all>N</cache_load_all>
     <cache_size>0</cache_size>
+    <connection>docencia</connection>
     <lookup>
       <eat_row_on_failure>N</eat_row_on_failure>
       <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>DATE_KEY</field>
+        <name>date</name>
+      </key>
+      <schema>"pablo.chantada"</schema>
+      <table>dim_tempo</table>
+      <value>
+        <name>DATE_KEY</name>
+        <rename>DATE_KEY</rename>
+        <trim_type>none</trim_type>
+        <type>Timestamp</type>
+      </value>
     </lookup>
     <attributes/>
     <GUI>
-      <xloc>480</xloc>
-      <yloc>144</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Database lookup 3</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>640</xloc>
-      <yloc>144</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Database lookup 4</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>784</xloc>
-      <yloc>144</yloc>
+      <xloc>1152</xloc>
+      <yloc>304</yloc>
     </GUI>
   </transform>
   <transform>
@@ -251,17 +343,43 @@
     <compare>
       <condition>
         <conditions>
+          <condition>
+            <conditions>
 </conditions>
-        <function>=</function>
+            <function>IS NOT NULL</function>
+            <leftvalue>id</leftvalue>
+            <negated>N</negated>
+            <operator>-</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>date</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>score</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+        </conditions>
+        <function>IS NOT NULL</function>
+        <leftvalue>id</leftvalue>
         <negated>N</negated>
         <operator>-</operator>
       </condition>
     </compare>
-    <send_true_to>Database lookup</send_true_to>
+    <send_false_to>Write to log</send_false_to>
+    <send_true_to>Unique rows</send_true_to>
     <attributes/>
     <GUI>
-      <xloc>192</xloc>
-      <yloc>144</yloc>
+      <xloc>528</xloc>
+      <yloc>304</yloc>
     </GUI>
   </transform>
   <transform>
@@ -278,17 +396,103 @@
     <compare>
       <condition>
         <conditions>
+          <condition>
+            <conditions>
 </conditions>
-        <function>=</function>
+            <function>IS NOT NULL</function>
+            <leftvalue>HOSTING_ID</leftvalue>
+            <negated>N</negated>
+            <operator>-</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>REVIEWER_KEY</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>id</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+        </conditions>
+        <function>IS NOT NULL</function>
+        <leftvalue>HOSTING_ID</leftvalue>
         <negated>N</negated>
         <operator>-</operator>
       </condition>
     </compare>
-    <send_true_to>Add sequence</send_true_to>
+    <send_false_to>Write to log 2</send_false_to>
+    <send_true_to>Select values</send_true_to>
     <attributes/>
     <GUI>
-      <xloc>784</xloc>
-      <yloc>384</yloc>
+      <xloc>1280</xloc>
+      <yloc>304</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <length>-2</length>
+        <name>id</name>
+        <precision>-2</precision>
+        <rename>REVIEW_ID</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>date</name>
+        <precision>-2</precision>
+        <rename>REVIEW_DATE</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>reviewer_id</name>
+        <precision>-2</precision>
+        <rename>REVIEWER_ID</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>score</name>
+        <precision>-2</precision>
+        <rename>SCORE</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>rain_mm</name>
+        <precision>-2</precision>
+        <rename>RAIN_MM</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>REVIEWER_KEY</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>HOSTING_ID</name>
+        <precision>-2</precision>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>1408</xloc>
+      <yloc>304</yloc>
     </GUI>
   </transform>
   <transform>
@@ -303,23 +507,150 @@
       <schema_name/>
     </partitioning>
     <commit>1000</commit>
+    <connection>docencia</connection>
     <fields>
-</fields>
+      <field>
+        <column_name>REVIEW_ID</column_name>
+        <stream_name>REVIEW_ID</stream_name>
+      </field>
+      <field>
+        <column_name>REVIEW_DATE</column_name>
+        <stream_name>REVIEW_DATE</stream_name>
+      </field>
+      <field>
+        <column_name>REVIEWER_ID</column_name>
+        <stream_name>REVIEWER_ID</stream_name>
+      </field>
+      <field>
+        <column_name>SCORE</column_name>
+        <stream_name>SCORE</stream_name>
+      </field>
+      <field>
+        <column_name>RAIN_MM</column_name>
+        <stream_name>RAIN_MM</stream_name>
+      </field>
+      <field>
+        <column_name>REVIEWER_KEY</column_name>
+        <stream_name>REVIEWER_KEY</stream_name>
+      </field>
+      <field>
+        <column_name>HOSTING_ID</column_name>
+        <stream_name>HOSTING_ID</stream_name>
+      </field>
+    </fields>
     <ignore_errors>N</ignore_errors>
     <only_when_have_rows>N</only_when_have_rows>
     <partitioning_daily>N</partitioning_daily>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_monthly>Y</partitioning_monthly>
     <return_keys>N</return_keys>
-    <specify_fields>N</specify_fields>
+    <schema>"pablo.chantada"</schema>
+    <specify_fields>Y</specify_fields>
+    <table>feito_valoracion</table>
     <tablename_in_field>N</tablename_in_field>
     <tablename_in_table>Y</tablename_in_table>
-    <truncate>N</truncate>
+    <truncate>Y</truncate>
     <use_batch>Y</use_batch>
     <attributes/>
     <GUI>
-      <xloc>464</xloc>
-      <yloc>384</yloc>
+      <xloc>1712</xloc>
+      <yloc>304</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Unique rows</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <count_rows>N</count_rows>
+    <fields>
+      <field>
+        <case_insensitive>N</case_insensitive>
+        <name>id</name>
+      </field>
+    </fields>
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <attributes/>
+    <GUI>
+      <xloc>688</xloc>
+      <yloc>304</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Unique rows 2</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <count_rows>N</count_rows>
+    <fields>
+      <field>
+        <case_insensitive>N</case_insensitive>
+        <name>REVIEW_ID</name>
+      </field>
+    </fields>
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <attributes/>
+    <GUI>
+      <xloc>1584</xloc>
+      <yloc>304</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <displayHeader>Y</displayHeader>
+    <fields>
+</fields>
+    <limitRows>N</limitRows>
+    <limitRowsNumber>0</limitRowsNumber>
+    <loglevel>Basic</loglevel>
+    <attributes/>
+    <GUI>
+      <xloc>528</xloc>
+      <yloc>192</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Write to log 2</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <displayHeader>Y</displayHeader>
+    <fields>
+</fields>
+    <limitRows>N</limitRows>
+    <limitRowsNumber>0</limitRowsNumber>
+    <loglevel>Basic</loglevel>
+    <attributes/>
+    <GUI>
+      <xloc>1280</xloc>
+      <yloc>176</yloc>
     </GUI>
   </transform>
   <transform_error_handling>
