@@ -352,6 +352,13 @@ incluyendo alguna métrica DAX.
 \subsection*{Consulta 1: Influe o número de hospedaxes dun hospedador sobre o seu score medio? Canto?}
 \addcontentsline{toc}{subsection}{Consulta 1}
 
+\emph{Motivación no negocio:} [completar luego]
+
+\emph{Gráficas:}  x é o numero de hospedaxes que teñen os hospedadores (de 1 a o numero de hospedaxes que ten o hospedador con mais hospedaxes) e y e o score medio (de os hospedadores con ese numero de hospedaxes) reportar r2 y ajustar un polinomio de grado 1 (recta) y 2 (parabola). si es posible reportar el p valor de los coeficientes. el grafico tipo barplot o escaterplot (pienso que mejor barplot)
+
+\emph{Delfina}: analizais la correlacion entre caracteristicas del anfitrion y sus reseñas, buen punto. Tenéis que ser exhaustivos con las funciones analíticas que le metáis, podéis sacar totales, categorizar a los hosts por numero de hospedajes y media del score, e incluso alguna comparativa entre grupos
+
+
 \begin{lstlisting}
 SELECT 
     h.numero_hospedaxes,
@@ -369,72 +376,25 @@ HAVING COUNT(v.valoracion_id) >= 10  -- Filtrar grupos con pocas valoraciones
 ORDER BY h.numero_hospedaxes;
 \end{lstlisting}
 
-\subsection*{Consulta 2: Cales son os barrios con peores valoracións? Ordeados descendentemente pola valoración media da cidade. }
+\subsection*{Consulta 2: En verán, os barrios con eventos de maior impacto, teñen mellores valoracións que os que menos?}
 \addcontentsline{toc}{subsection}{Consulta 2}
 
-\begin{lstlisting}
-WITH valoraciones_barrio AS (
-    -- Calcular score medio por barrio
-    SELECT 
-        l.lugar_id,
-        l.barrio,
-        l.cidade,
-        l.pais,
-        AVG(v.score) AS score_medio_barrio,
-        COUNT(v.valoracion_id) AS num_valoraciones_barrio,
-        STDDEV(v.score) AS desviacion_barrio
-    FROM feito_valoracion v
-    JOIN dim_lugar l ON v.lugar_id = l.lugar_id
-    GROUP BY l.lugar_id, l.barrio, l.cidade, l.pais
-),
-valoraciones_cidade AS (
-    -- Calcular score medio por ciudad
-    SELECT 
-        l.cidade,
-        l.pais,
-        AVG(v.score) AS score_medio_cidade,
-        COUNT(v.valoracion_id) AS num_valoraciones_cidade
-    FROM feito_valoracion v
-    JOIN dim_lugar l ON v.lugar_id = l.lugar_id
-    GROUP BY l.cidade, l.pais
-),
-ranking_barrios AS (
-    -- Combinar y rankear barrios dentro de cada ciudad
-    SELECT 
-        vb.barrio,
-        vb.cidade,
-        vb.pais,
-        vb.score_medio_barrio,
-        vb.num_valoraciones_barrio,
-        vc.score_medio_cidade,
-        vc.num_valoraciones_cidade,
-        -- Diferencia del barrio respecto a la media de su ciudad
-        vb.score_medio_barrio - vc.score_medio_cidade AS diferencia_vs_cidade,
-        -- Ranking dentro de la ciudad (1 = peor barrio)
-        RANK() OVER (PARTITION BY vb.cidade, vb.pais 
-                     ORDER BY vb.score_medio_barrio ASC) AS ranking_en_cidade
-    FROM valoraciones_barrio vb
-    JOIN valoraciones_cidade vc ON vb.cidade = vc.cidade AND vb.pais = vc.pais
-    WHERE vb.num_valoraciones_barrio >= 5  -- Filtrar barrios con pocas valoraciones
-)
-SELECT 
-    barrio,
-    cidade,
-    pais,
-    ROUND(score_medio_barrio, 2) AS score_barrio,
-    num_valoraciones_barrio,
-    ROUND(score_medio_cidade, 2) AS score_cidade,
-    ROUND(diferencia_vs_cidade, 2) AS diferencia,
-    ranking_en_cidade AS posicion_en_cidade
-FROM ranking_barrios
-WHERE ranking_en_cidade <= 5  -- Top 5 peores barrios por ciudad
-ORDER BY 
-    score_medio_cidade DESC,  -- Ciudades con mejor valoración primero
-    ranking_en_cidade ASC;    -- Dentro de cada ciudad, peores barrios primero
-\end{lstlisting}
+
+\emph{Motivación no negocio:} [completar luego]
+
+\emph{Gráficas:} x es el impacto medio de los eventos de ese barrio en verano, y es la valoracion media de ese barrio en verano. cada barrio es un punto en un escaterplot. seria brutal: que el tamaño del punto sea cuantos eventos hubo. ajustar recta y parabola, reportar r2 y p valor de los coeficientes
+
+esta consulta la acabo de cambiar porque, sobre la anterior, delfina dijo: analizais la correlacion entre caracteristicas del anfitrion y sus reseñas, buen punto. Tenéis que ser exhaustivos con las funciones analíticas que le metáis, podéis sacar totales, categorizar a los hosts por numero de hospedajes y media del score, e incluso alguna comparativa entre grupos
+
 
 \subsection*{Consulta 3: Entre as comodidades e accesibilidades que pode ter un hospedaxe, cal beneficia máis á valoracion ca súa presencia e cal perxudica máis ca súa ausencia?}
 \addcontentsline{toc}{subsection}{Consulta 3}
+
+\emph{Motivación no negocio:} [completar luego]
+
+\emph{Gráficas:} un scater plot con lineas entre algunos puntos de la siguiente forma. por comodidade hai tres puntos: (1) valoracion media das reseñas que teñen esa comodidade, (si ese valor es $v$, entonces el primer punto es ($v$,1), (2) valoracion media das reseñas (va a ser igual para todas las comodidades) y la presencia ($p$) media de esa comodida, por tanto ($v_{media}$,$p$) (3) valoracion media das reseñas que non teñen esa comodidade ($v'$, 0). Esos tres puntos se unen con correspondientes dos lineas rectas, y se plotea todo en un mismo grafico donde cada color es una comodidad
+
+\emph{Delfina:} me gusta la intención pero no tengo claro cómo la implementaríais, aunque se me ocurren varias formas de hacerlo, depende de vuestras decisiones de implementación, pero en sí la consulta me gusta
 
 \begin{lstlisting}
 -- Top 5 comodidades que MÁS BENEFICIAN (mayor score con ellas)
