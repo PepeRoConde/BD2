@@ -36,11 +36,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Value mapper</from>
-      <to>Filter rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>String operations</from>
       <to>Select values 3</to>
       <enabled>Y</enabled>
@@ -85,6 +80,16 @@
       <to>Write to log</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>Value mapper</from>
+      <to>Select values</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values</from>
+      <to>Filter rows</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
   <transform>
     <name>CSV file input</name>
@@ -97,7 +102,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename>${PROJECT_HOME}/datasets/amenities_raw.csv</filename>
+    <filename>${PROJECT_HOME}/datasets/amenities_normalized.csv</filename>
     <filename_field/>
     <rownum_field/>
     <include_filename>N</include_filename>
@@ -131,6 +136,17 @@
         <decimal>,</decimal>
         <group>.</group>
         <length>34</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>commodity_normalized</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>21</length>
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
@@ -178,7 +194,7 @@
     </lookup>
     <attributes/>
     <GUI>
-      <xloc>784</xloc>
+      <xloc>880</xloc>
       <yloc>272</yloc>
     </GUI>
   </transform>
@@ -231,6 +247,41 @@
     <send_true_to>Database lookup</send_true_to>
     <attributes/>
     <GUI>
+      <xloc>736</xloc>
+      <yloc>272</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <length>-2</length>
+        <name>hosting_id</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>COMMODITY</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>WEIGHT</name>
+        <precision>-2</precision>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <GUI>
       <xloc>640</xloc>
       <yloc>272</yloc>
     </GUI>
@@ -257,14 +308,23 @@
         <length>-2</length>
         <name>COMMODITY</name>
         <precision>-2</precision>
+        <rename/>
       </field>
       <field>
         <length>-2</length>
         <name>WEIGHT</name>
         <precision>-2</precision>
+        <rename/>
       </field>
       <meta>
+        <conversion_mask/>
+        <currency_symbol/>
         <date_format_lenient>N</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <decimal_symbol/>
+        <encoding/>
+        <grouping_symbol/>
         <length>-2</length>
         <lenient_string_to_number>N</lenient_string_to_number>
         <name>hosting_id</name>
@@ -272,13 +332,13 @@
         <rename>HOSTING_ID</rename>
         <roundingType>half_even</roundingType>
         <storage_type/>
-        <type>None</type>
+        <type>BigNumber</type>
       </meta>
       <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
     <GUI>
-      <xloc>928</xloc>
+      <xloc>1024</xloc>
       <yloc>272</yloc>
     </GUI>
   </transform>
@@ -328,6 +388,7 @@
       <schema_name/>
     </partitioning>
     <compress>N</compress>
+    <compress_variables/>
     <directory>${java.io.tmpdir}</directory>
     <fields>
       <field>
@@ -347,12 +408,13 @@
         <presorted>N</presorted>
       </field>
     </fields>
+    <free_memory/>
     <sort_prefix>out</sort_prefix>
     <sort_size>1000000</sort_size>
     <unique_rows>N</unique_rows>
     <attributes/>
     <GUI>
-      <xloc>1072</xloc>
+      <xloc>1168</xloc>
       <yloc>272</yloc>
     </GUI>
   </transform>
@@ -372,7 +434,7 @@
     <newfield>COMMODITY</newfield>
     <resetrownumber>Y</resetrownumber>
     <rownum>N</rownum>
-    <splitfield>commodity_raw</splitfield>
+    <splitfield>commodity_normalized</splitfield>
     <attributes/>
     <GUI>
       <xloc>144</xloc>
@@ -453,7 +515,7 @@
     <use_batch>Y</use_batch>
     <attributes/>
     <GUI>
-      <xloc>1312</xloc>
+      <xloc>1408</xloc>
       <yloc>272</yloc>
     </GUI>
   </transform>
@@ -468,6 +530,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <count_field/>
     <count_rows>N</count_rows>
     <error_description>Duplicated tuple for ${HOSTING_ID} and ${COMMODITY}</error_description>
     <fields>
@@ -483,7 +546,7 @@
     <reject_duplicate_row>Y</reject_duplicate_row>
     <attributes/>
     <GUI>
-      <xloc>1200</xloc>
+      <xloc>1296</xloc>
       <yloc>272</yloc>
     </GUI>
   </transform>
@@ -560,6 +623,10 @@
         <source_value>air conditioning</source_value>
         <target_value>4.0</target_value>
       </field>
+      <field>
+        <source_value>other</source_value>
+        <target_value>1.0</target_value>
+      </field>
     </fields>
     <non_match_default>1.0</non_match_default>
     <target_field>WEIGHT</target_field>
@@ -588,7 +655,7 @@
     <loglevel>Basic</loglevel>
     <attributes/>
     <GUI>
-      <xloc>1200</xloc>
+      <xloc>1296</xloc>
       <yloc>432</yloc>
     </GUI>
   </transform>
@@ -611,7 +678,7 @@
     <loglevel>Basic</loglevel>
     <attributes/>
     <GUI>
-      <xloc>784</xloc>
+      <xloc>880</xloc>
       <yloc>432</yloc>
     </GUI>
   </transform>
@@ -634,7 +701,7 @@
     <loglevel>Basic</loglevel>
     <attributes/>
     <GUI>
-      <xloc>640</xloc>
+      <xloc>736</xloc>
       <yloc>160</yloc>
     </GUI>
   </transform>

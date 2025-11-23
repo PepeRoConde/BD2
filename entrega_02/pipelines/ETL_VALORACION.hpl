@@ -59,11 +59,6 @@ El "?" sirve como placeholder del parametro
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Unique rows</from>
-      <to>Database join</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Database join</from>
       <to>Database lookup</to>
       <enabled>Y</enabled>
@@ -96,6 +91,16 @@ El "?" sirve como placeholder del parametro
     <hop>
       <from>Select values</from>
       <to>Unique rows 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Unique rows</from>
+      <to>Select values 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values 2</from>
+      <to>Database join</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -249,7 +254,7 @@ WHERE REVIEWER_ID = ?
   AND ACTUAL = 1</sql>
     <attributes/>
     <GUI>
-      <xloc>864</xloc>
+      <xloc>880</xloc>
       <yloc>304</yloc>
     </GUI>
   </transform>
@@ -496,6 +501,68 @@ WHERE REVIEWER_ID = ?
     </GUI>
   </transform>
   <transform>
+    <name>Select values 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <length>-2</length>
+        <name>listing_id</name>
+        <precision>-2</precision>
+        <rename/>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>id</name>
+        <precision>-2</precision>
+        <rename/>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>date</name>
+        <precision>-2</precision>
+        <rename/>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>reviewer_id</name>
+        <precision>-2</precision>
+        <rename/>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>reviewer_name</name>
+        <precision>-2</precision>
+        <rename/>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>score</name>
+        <precision>-2</precision>
+        <rename/>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>rain_mm</name>
+        <precision>-2</precision>
+        <rename/>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>768</xloc>
+      <yloc>304</yloc>
+    </GUI>
+  </transform>
+  <transform>
     <name>Table output</name>
     <type>TableOutput</type>
     <description/>
@@ -578,7 +645,7 @@ WHERE REVIEWER_ID = ?
     <reject_duplicate_row>N</reject_duplicate_row>
     <attributes/>
     <GUI>
-      <xloc>688</xloc>
+      <xloc>656</xloc>
       <yloc>304</yloc>
     </GUI>
   </transform>
