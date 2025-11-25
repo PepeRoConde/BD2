@@ -95,8 +95,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_ACCESIBILIDADES.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -149,8 +147,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>${PROJECT_HOME}/pipelines/ETL_HOSPEDADOR_SCD2.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -203,8 +199,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_COMODIDADES.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -318,8 +312,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>${PROJECT_HOME}/pipelines/ETL_VALORACION.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -346,8 +338,6 @@
       <create_parent_folder>N</create_parent_folder>
       <exec_per_row>N</exec_per_row>
       <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_EVENTO_VALORACION.hpl</filename>
-      <logext/>
-      <logfile/>
       <loglevel>Basic</loglevel>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
@@ -373,6 +363,30 @@
         </field>
         <field>
           <name>${DATASETS_PATH}/reviews.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/amenities_normalized.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/dim_accesibilidade.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/dim_commodity.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/dim_hospedador_scd2.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/dim_valorador_scd2.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/reviews_enriched.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/places.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/neighbourhoods.csv</name>
         </field>
       </fields>
       <parallel>N</parallel>
@@ -689,7 +703,7 @@ ${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
       <logsubject>Carga de variables</logsubject>
       <parallel>N</parallel>
       <xloc>240</xloc>
-      <yloc>464</yloc>
+      <yloc>400</yloc>
       <attributes_hac/>
     </action>
   </actions>
