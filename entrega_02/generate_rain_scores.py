@@ -72,7 +72,6 @@ def generate_rain_mm(date):
         return 0.0
     
     # Generar cantidad de lluvia con distribución realista
-    # La mayoría de lluvias son ligeras, pocas son intensas
     intensity = np.random.random()
     
     if intensity < 0.6:  # 60% - Lluvia ligera
@@ -85,92 +84,227 @@ def generate_rain_mm(date):
     return round(rain_mm, 2)
 
 
-def enrich_reviews(input_file, output_file):
+def enrich_reviews(input_reviews, input_listings, input_places, output_file):
     """
-    Lee reviews.csv, añade columnas SCORE y RAIN_MM, y guarda resultado.
+    Lee reviews.csv, listings.csv y places.csv, añade columnas SCORE, RAIN_MM, HOST_ID y PLACE_ID, 
+    y guarda resultado.
     
     Args:
-        input_file: ruta al CSV original
+        input_reviews: ruta al CSV de reviews
+        input_listings: ruta al CSV de listings
+        input_places: ruta al CSV de places
         output_file: ruta al CSV de salida
     """
-    print(f"Leyendo archivo: {input_file}")
+    print(f"Leyendo archivos...")
+    print(f"  - Reviews: {input_reviews}")
+    print(f"  - Listings: {input_listings}")
+    print(f"  - Places: {input_places}")
     
-    # Leer CSV original
-    df = pd.read_csv(input_file, parse_dates=['date'])
+    # Leer CSVs
+    df_reviews = pd.read_csv(input_reviews, parse_dates=['date'])
+    df_listings = pd.read_csv(input_listings)
+    df_places = pd.read_csv(input_places)
     
-    print(f"{len(df)} registros cargados")
-    print(f"\nColumnas originales: {list(df.columns)}")
+    print(f"\n{len(df_reviews)} reviews cargadas")
+    print(f"{len(df_listings)} listings cargados")
+    print(f"{len(df_places)} places cargados")
+    print(f"\nColumnas reviews originales: {list(df_reviews.columns)}")
     
-    # Convert to datetime if necessary (keep as datetime for calculations)
-    df['date'] = pd.to_datetime(df['date'], errors='coerce')
-
-    # Generar columna SCORE
+    # ============================================
+    # 1. GENERAR PLACE_ID EN PLACES (CORREGIDO)
+    # ============================================
+    print("\nGenerando PLACE_IDs...")
+    
+    # ✓ CORRECCIÓN: Crear PLACE_ID SIN duplicación
+    # Formato: STREET_CITY_COUNTRY (sin espacios)
+    df_places['PLACE_ID'] = (
+        df_places['STREET'].str.replace(' ', '', regex=False) + '_' + 
+        df_places['CITY'].str.replace(' ', '', regex=False) + '_' + 
+        df_places['COUNTRY'].str.replace(' ', '', regex=False)
+    )
+    
+    print(f"  ✓ {len(df_places)} PLACE_IDs generados")
+    print(f"  ✓ PLACE_IDs únicos: {df_places['PLACE_ID'].nunique()}")
+    
+    # Mostrar ejemplos de PLACE_IDs generados
+    print(f"\n  Ejemplos de PLACE_IDs generados:")
+    for place_id in df_places['PLACE_ID'].head(10):
+        print(f"    - {place_id}")
+    
+    # ============================================
+    # 2. AGREGAR HOST_ID
+    # ============================================
+    print("\nAgregando HOST_ID...")
+    
+    # Crear mapeo listing_id -> host_id
+    listing_to_host = df_listings[['id', 'host_id']].rename(columns={'id': 'listing_id'})
+    
+    # Merge para agregar host_id
+    df_enriched = df_reviews.merge(
+        listing_to_host,
+        on='listing_id',
+        how='left'
+    )
+    
+    print(f"  ✓ Reviews con HOST_ID: {df_enriched['host_id'].notna().sum()}")
+    print(f"  ⚠ Reviews sin HOST_ID: {df_enriched['host_id'].isna().sum()}")
+    
+    # ============================================
+    # 3. AGREGAR PLACE_ID (ALEATORIO DE LA LISTA)
+    # ============================================
+    print("\nAsignando PLACE_ID aleatorio...")
+    
+    # Obtener lista de PLACE_IDs disponibles
+    place_ids = df_places['PLACE_ID'].tolist()
+    
+    # Asignar aleatoriamente un PLACE_ID a cada review
+    np.random.seed(42)  # Para reproducibilidad
+    df_enriched['PLACE_ID'] = np.random.choice(place_ids, size=len(df_enriched))
+    
+    print(f"  ✓ PLACE_IDs asignados: {len(df_enriched)}")
+    print(f"  ✓ Places únicos usados: {df_enriched['PLACE_ID'].nunique()}")
+    
+    # ============================================
+    # 4. CALCULAR SCORE
+    # ============================================
     print("\nCalculando scores de sentimiento...")
-    df['score'] = df['comments'].apply(calculate_sentiment_score)
+    df_enriched['score'] = df_enriched['comments'].apply(calculate_sentiment_score)
     
-    # Generar columna RAIN_MM (use datetime objects)
+    # ============================================
+    # 5. GENERAR RAIN_MM
+    # ============================================
     print("Generando datos de lluvia...")
-    df['rain_mm'] = df['date'].apply(generate_rain_mm)
+    df_enriched['rain_mm'] = df_enriched['date'].apply(generate_rain_mm)
     
-    # Now convert date to string format for output
-    df['date'] = df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
+    # ============================================
+    # 6. FORMATEAR Y GUARDAR
+    # ============================================
+    # Convertir date a string
+    df_enriched['date'] = df_enriched['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Renombrar columnas a mayúsculas para consistencia
+    df_enriched = df_enriched.rename(columns={
+        'id': 'REVIEW_ID',
+        'listing_id': 'HOSTING_ID',
+        'host_id': 'HOST_ID',
+        'date': 'REVIEW_DATE',
+        'reviewer_id': 'REVIEWER_ID',
+        'reviewer_name': 'REVIEWER_NAME',
+        'comments': 'COMMENTS',
+        'score': 'SCORE',
+        'rain_mm': 'RAIN_MM'
+    })
+    
+    # Reordenar columnas
+    column_order = [
+        'REVIEW_ID',
+        'HOSTING_ID',
+        'HOST_ID',
+        'REVIEWER_ID',
+        'PLACE_ID',
+        'REVIEWER_NAME',
+        'REVIEW_DATE',
+        'COMMENTS',
+        'SCORE',
+        'RAIN_MM'
+    ]
+    df_enriched = df_enriched[column_order]
     
     # Guardar CSV enriquecido
-    df.to_csv(output_file, index=False)
-    print(f"\nArchivo guardado: {output_file}")
+    df_enriched.to_csv(output_file, index=False)
+    print(f"\n✓ Archivo reviews guardado: {output_file}")
     
-    # Estadísticas
+    # ============================================
+    # 7. ACTUALIZAR PLACES.CSV CON PLACE_ID
+    # ============================================
+    # Reordenar columnas de places para que PLACE_ID sea la primera
+    df_places = df_places[['PLACE_ID', 'STREET', 'CITY', 'COUNTRY', 'LATITUD', 'LONGITUD']]
+    
+    # Guardar places actualizado
+    df_places.to_csv(input_places, index=False)
+    print(f"✓ Archivo places actualizado: {input_places}")
+    
+    # ============================================
+    # 8. ESTADÍSTICAS
+    # ============================================
     print("\n" + "="*60)
     print("ESTADÍSTICAS GENERADAS")
     print("="*60)
     
+    print(f"\nTOTAL REGISTROS: {len(df_enriched)}")
+    print(f"COLUMNAS: {list(df_enriched.columns)}")
+    
     print("\nSCORE (Sentimiento):")
-    print(f"   Media: {df['score'].mean():.2f}")
-    print(f"   Mediana: {df['score'].median():.2f}")
-    print(f"   Min: {df['score'].min():.2f}")
-    print(f"   Max: {df['score'].max():.2f}")
-    print(f"   Desv. Std: {df['score'].std():.2f}")
+    print(f"   Media: {df_enriched['SCORE'].mean():.2f}")
+    print(f"   Mediana: {df_enriched['SCORE'].median():.2f}")
+    print(f"   Min: {df_enriched['SCORE'].min():.2f}")
+    print(f"   Max: {df_enriched['SCORE'].max():.2f}")
+    print(f"   Desv. Std: {df_enriched['SCORE'].std():.2f}")
     print(f"\n   Distribución:")
-    print(f"   - Muy negativo (1.0-2.0): {len(df[df['score'] < 2.0])} ({len(df[df['score'] < 2.0])/len(df)*100:.1f}%)")
-    print(f"   - Negativo (2.0-3.0):     {len(df[(df['score'] >= 2.0) & (df['score'] < 3.0)])} ({len(df[(df['score'] >= 2.0) & (df['score'] < 3.0)])/len(df)*100:.1f}%)")
-    print(f"   - Neutro (3.0-4.0):       {len(df[(df['score'] >= 3.0) & (df['score'] < 4.0)])} ({len(df[(df['score'] >= 3.0) & (df['score'] < 4.0)])/len(df)*100:.1f}%)")
-    print(f"   - Positivo (4.0-5.0):     {len(df[df['score'] >= 4.0])} ({len(df[df['score'] >= 4.0])/len(df)*100:.1f}%)")
+    print(f"   - Muy negativo (1.0-2.0): {len(df_enriched[df_enriched['SCORE'] < 2.0])} ({len(df_enriched[df_enriched['SCORE'] < 2.0])/len(df_enriched)*100:.1f}%)")
+    print(f"   - Negativo (2.0-3.0):     {len(df_enriched[(df_enriched['SCORE'] >= 2.0) & (df_enriched['SCORE'] < 3.0)])} ({len(df_enriched[(df_enriched['SCORE'] >= 2.0) & (df_enriched['SCORE'] < 3.0)])/len(df_enriched)*100:.1f}%)")
+    print(f"   - Neutro (3.0-4.0):       {len(df_enriched[(df_enriched['SCORE'] >= 3.0) & (df_enriched['SCORE'] < 4.0)])} ({len(df_enriched[(df_enriched['SCORE'] >= 3.0) & (df_enriched['SCORE'] < 4.0)])/len(df_enriched)*100:.1f}%)")
+    print(f"   - Positivo (4.0-5.0):     {len(df_enriched[df_enriched['SCORE'] >= 4.0])} ({len(df_enriched[df_enriched['SCORE'] >= 4.0])/len(df_enriched)*100:.1f}%)")
     
     print("\nRAIN_MM (Lluvia):")
-    rainy_days = df[df['rain_mm'] > 0]
-    print(f"   Días con lluvia: {len(rainy_days)} de {len(df)} ({len(rainy_days)/len(df)*100:.1f}%)")
+    rainy_days = df_enriched[df_enriched['RAIN_MM'] > 0]
+    print(f"   Días con lluvia: {len(rainy_days)} de {len(df_enriched)} ({len(rainy_days)/len(df_enriched)*100:.1f}%)")
     if len(rainy_days) > 0:
-        print(f"   Media (días con lluvia): {rainy_days['rain_mm'].mean():.2f} mm")
-        print(f"   Mediana (días con lluvia): {rainy_days['rain_mm'].median():.2f} mm")
-        print(f"   Máximo: {rainy_days['rain_mm'].max():.2f} mm")
+        print(f"   Media (días con lluvia): {rainy_days['RAIN_MM'].mean():.2f} mm")
+        print(f"   Mediana (días con lluvia): {rainy_days['RAIN_MM'].median():.2f} mm")
+        print(f"   Máximo: {rainy_days['RAIN_MM'].max():.2f} mm")
         print(f"\n   Distribución de intensidad:")
-        print(f"   - Ligera (0.1-5 mm):    {len(rainy_days[rainy_days['rain_mm'] < 5])} ({len(rainy_days[rainy_days['rain_mm'] < 5])/len(rainy_days)*100:.1f}%)")
-        print(f"   - Moderada (5-20 mm):   {len(rainy_days[(rainy_days['rain_mm'] >= 5) & (rainy_days['rain_mm'] < 20)])} ({len(rainy_days[(rainy_days['rain_mm'] >= 5) & (rainy_days['rain_mm'] < 20)])/len(rainy_days)*100:.1f}%)")
-        print(f"   - Intensa (20-45 mm):   {len(rainy_days[rainy_days['rain_mm'] >= 20])} ({len(rainy_days[rainy_days['rain_mm'] >= 20])/len(rainy_days)*100:.1f}%)")
+        print(f"   - Ligera (0.1-5 mm):    {len(rainy_days[rainy_days['RAIN_MM'] < 5])} ({len(rainy_days[rainy_days['RAIN_MM'] < 5])/len(rainy_days)*100:.1f}%)")
+        print(f"   - Moderada (5-20 mm):   {len(rainy_days[(rainy_days['RAIN_MM'] >= 5) & (rainy_days['RAIN_MM'] < 20)])} ({len(rainy_days[(rainy_days['RAIN_MM'] >= 5) & (rainy_days['RAIN_MM'] < 20)])/len(rainy_days)*100:.1f}%)")
+        print(f"   - Intensa (20-45 mm):   {len(rainy_days[rainy_days['RAIN_MM'] >= 20])} ({len(rainy_days[rainy_days['RAIN_MM'] >= 20])/len(rainy_days)*100:.1f}%)")
+    
+    print("\nHOST_ID:")
+    print(f"   Reviews con HOST_ID: {df_enriched['HOST_ID'].notna().sum()} ({df_enriched['HOST_ID'].notna().sum()/len(df_enriched)*100:.1f}%)")
+    print(f"   Reviews sin HOST_ID: {df_enriched['HOST_ID'].isna().sum()} ({df_enriched['HOST_ID'].isna().sum()/len(df_enriched)*100:.1f}%)")
+    print(f"   Hosts únicos: {df_enriched['HOST_ID'].nunique()}")
+    
+    print("\nPLACE_ID:")
+    print(f"   Reviews con PLACE_ID: {len(df_enriched)}")
+    print(f"   Places únicos usados: {df_enriched['PLACE_ID'].nunique()}")
+    print(f"   Places disponibles: {len(place_ids)}")
+    
+    # Mostrar ejemplos de PLACE_IDs más usados
+    print(f"\n   Top 10 PLACE_IDs más usados:")
+    sample_places = df_enriched['PLACE_ID'].value_counts().head(10)
+    for place_id, count in sample_places.items():
+        print(f"      {place_id}: {count} reviews")
     
     # Mostrar ejemplos
-    print("\nEJEMPLOS DE REGISTROS ENRIQUECIDOS:")
-    print("-" * 120)
-    sample = df[['id', 'date', 'comments', 'score', 'rain_mm']].head(5)
+    print("\n" + "="*60)
+    print("EJEMPLOS DE REGISTROS ENRIQUECIDOS")
+    print("="*60)
+    sample = df_enriched[['REVIEW_ID', 'HOSTING_ID', 'HOST_ID', 'PLACE_ID', 'REVIEW_DATE', 'SCORE', 'RAIN_MM', 'COMMENTS']].head(5)
     for idx, row in sample.iterrows():
-        comment_preview = str(row['comments'])[:60] + "..." if len(str(row['comments'])) > 60 else str(row['comments'])
-        print(f"ID: {row['id']} | {row['date']} | Score: {row['score']:.2f} | Lluvia: {row['rain_mm']:.2f}mm")
-        print(f"   Comentario: {comment_preview}")
+        comment_preview = str(row['COMMENTS'])[:60] + "..." if len(str(row['COMMENTS'])) > 60 else str(row['COMMENTS'])
+        print(f"\nID: {row['REVIEW_ID']} | Hosting: {row['HOSTING_ID']} | Host: {row['HOST_ID']}")
+        print(f"Place: {row['PLACE_ID']}")
+        print(f"Fecha: {row['REVIEW_DATE']} | Score: {row['SCORE']:.2f} | Lluvia: {row['RAIN_MM']:.2f}mm")
+        print(f"Comentario: {comment_preview}")
         print("-" * 120)
     
-    return df
+    return df_enriched
 
 
 if __name__ == "__main__":
     # Configuración
-    INPUT_FILE = 'datasets/reviews.csv'
+    INPUT_REVIEWS = 'datasets/reviews.csv'
+    INPUT_LISTINGS = 'datasets/listings.csv'
+    INPUT_PLACES = 'datasets/places.csv'
     OUTPUT_FILE = 'datasets/reviews_enriched.csv'
     
-    # Establecer semilla para reproducibilidad (opcional)
+    # Establecer semilla para reproducibilidad
     np.random.seed(42)
     
     # Ejecutar enriquecimiento
-    df_enriched = enrich_reviews(INPUT_FILE, OUTPUT_FILE)
+    df_enriched = enrich_reviews(INPUT_REVIEWS, INPUT_LISTINGS, INPUT_PLACES, OUTPUT_FILE)
     
-    print("\nProceso completado exitosamente!")
-    print(f"Archivo listo para usar en Apache Hop: {OUTPUT_FILE}")
+    print("\n" + "="*60)
+    print("✓ PROCESO COMPLETADO EXITOSAMENTE")
+    print("="*60)
+    print(f"Archivo reviews listo: {OUTPUT_FILE}")
+    print(f"Archivo places actualizado: {INPUT_PLACES}")
