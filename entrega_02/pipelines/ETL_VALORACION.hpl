@@ -41,11 +41,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Select values</from>
-      <to>Database lookup</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Database lookup</from>
       <to>Database lookup 2</to>
       <enabled>Y</enabled>
@@ -53,6 +48,16 @@
     <hop>
       <from>Database lookup 2</from>
       <to>Filter rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values</from>
+      <to>Database lookup 3</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Database lookup 3</from>
+      <to>Database lookup</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -195,7 +200,7 @@
     </fields>
     <attributes/>
     <GUI>
-      <xloc>192</xloc>
+      <xloc>64</xloc>
       <yloc>288</yloc>
     </GUI>
   </transform>
@@ -272,6 +277,47 @@
     <attributes/>
     <GUI>
       <xloc>592</xloc>
+      <yloc>288</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Database lookup 3</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <connection>docencia</connection>
+    <lookup>
+      <eat_row_on_failure>Y</eat_row_on_failure>
+      <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>HOSTING_ID</field>
+        <name>HOSTING_ID</name>
+        <name2/>
+      </key>
+      <orderby/>
+      <schema>"pablo.chantada"</schema>
+      <table>dim_hospedaxe</table>
+      <value>
+        <default/>
+        <name>HOSTING_ID</name>
+        <rename/>
+        <trim_type>none</trim_type>
+        <type>BigNumber</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <GUI>
+      <xloc>320</xloc>
       <yloc>288</yloc>
     </GUI>
   </transform>
@@ -400,7 +446,7 @@
     </fields>
     <attributes/>
     <GUI>
-      <xloc>320</xloc>
+      <xloc>192</xloc>
       <yloc>288</yloc>
     </GUI>
   </transform>
@@ -526,7 +572,7 @@
     <use_batch>Y</use_batch>
     <attributes/>
     <GUI>
-      <xloc>976</xloc>
+      <xloc>1040</xloc>
       <yloc>288</yloc>
     </GUI>
   </transform>
