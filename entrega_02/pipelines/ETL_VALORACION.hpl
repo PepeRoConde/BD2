@@ -18,48 +18,30 @@
     <modified_date>2025/11/11 21:35:01.100</modified_date>
   </info>
   <notepads>
-    <notepad>
-      <backgroundcolorblue>251</backgroundcolorblue>
-      <backgroundcolorgreen>232</backgroundcolorgreen>
-      <backgroundcolorred>201</backgroundcolorred>
-      <bordercolorblue>90</bordercolorblue>
-      <bordercolorgreen>58</bordercolorgreen>
-      <bordercolorred>14</bordercolorred>
-      <fontbold>N</fontbold>
-      <fontcolorblue>90</fontcolorblue>
-      <fontcolorgreen>58</fontcolorgreen>
-      <fontcolorred>14</fontcolorred>
-      <fontitalic>N</fontitalic>
-      <fontname>Segoe UI</fontname>
-      <fontsize>9</fontsize>
-      <height>72</height>
-      <xloc>752</xloc>
-      <yloc>192</yloc>
-      <note>WHERE REVIEWER_ID = ?
-
-El "?" sirve como placeholder del parametro
-</note>
-      <width>241</width>
-    </notepad>
   </notepads>
   <order>
-    <hop>
-      <from>CSV file input</from>
-      <to>Filter rows</to>
-      <enabled>Y</enabled>
-    </hop>
     <hop>
       <from>Filter rows</from>
       <to>Write to log</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Filter rows</from>
-      <to>Unique rows</to>
+      <from>CSV file input</from>
+      <to>Select values</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Database join</from>
+      <from>Filter rows</from>
+      <to>Select values 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values 2</from>
+      <to>Table output</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values</from>
       <to>Database lookup</to>
       <enabled>Y</enabled>
     </hop>
@@ -69,38 +51,8 @@ El "?" sirve como placeholder del parametro
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Unique rows 2</from>
-      <to>Table output</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Filter rows 2</from>
-      <to>Write to log 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Database lookup 2</from>
-      <to>Filter rows 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Filter rows 2</from>
-      <to>Select values</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Select values</from>
-      <to>Unique rows 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Unique rows</from>
-      <to>Select values 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Select values 2</from>
-      <to>Database join</to>
+      <to>Filter rows</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -131,7 +83,7 @@ El "?" sirve como placeholder del parametro
     <encoding/>
     <fields>
       <field>
-        <name>listing_id</name>
+        <name>REVIEW_ID</name>
         <type>Integer</type>
         <format>#</format>
         <currency>$</currency>
@@ -142,7 +94,7 @@ El "?" sirve como placeholder del parametro
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>id</name>
+        <name>HOSTING_ID</name>
         <type>Integer</type>
         <format>#</format>
         <currency>$</currency>
@@ -153,7 +105,51 @@ El "?" sirve como placeholder del parametro
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>date</name>
+        <name>HOST_ID</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>REVIEWER_ID</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>PLACE_ID</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>29</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>REVIEWER_NAME</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>15</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>REVIEW_DATE</name>
         <type>Date</type>
         <format>yyyy-MM-dd HH:mm:ss</format>
         <currency>$</currency>
@@ -164,29 +160,7 @@ El "?" sirve como placeholder del parametro
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>reviewer_id</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>$</currency>
-        <decimal>,</decimal>
-        <group>.</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>reviewer_name</name>
-        <type>String</type>
-        <format/>
-        <currency>$</currency>
-        <decimal>,</decimal>
-        <group>.</group>
-        <length>15</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>comments</name>
+        <name>COMMENTS</name>
         <type>String</type>
         <format/>
         <currency>$</currency>
@@ -197,7 +171,7 @@ El "?" sirve como placeholder del parametro
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>score</name>
+        <name>SCORE</name>
         <type>Number</type>
         <format>#.#</format>
         <currency>$</currency>
@@ -208,7 +182,7 @@ El "?" sirve como placeholder del parametro
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>rain_mm</name>
+        <name>RAIN_MM</name>
         <type>Number</type>
         <format>#.#</format>
         <currency>$</currency>
@@ -221,41 +195,8 @@ El "?" sirve como placeholder del parametro
     </fields>
     <attributes/>
     <GUI>
-      <xloc>368</xloc>
-      <yloc>304</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Database join</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_size>0</cache_size>
-    <connection>docencia</connection>
-    <outer_join>N</outer_join>
-    <parameter>
-      <field>
-        <name>reviewer_id</name>
-        <type>Integer</type>
-      </field>
-    </parameter>
-    <replace_vars>N</replace_vars>
-    <rowlimit>0</rowlimit>
-    <sql>SELECT REVIEWER_KEY
-FROM dim_valorador
-WHERE REVIEWER_ID = ?
-  AND ACTUAL = 1</sql>
-    <attributes/>
-    <GUI>
-      <xloc>880</xloc>
-      <yloc>304</yloc>
+      <xloc>192</xloc>
+      <yloc>288</yloc>
     </GUI>
   </transform>
   <transform>
@@ -269,7 +210,7 @@ WHERE REVIEWER_ID = ?
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <cache>Y</cache>
+    <cache>N</cache>
     <cache_load_all>N</cache_load_all>
     <cache_size>0</cache_size>
     <connection>docencia</connection>
@@ -278,22 +219,22 @@ WHERE REVIEWER_ID = ?
       <fail_on_multiple>N</fail_on_multiple>
       <key>
         <condition>=</condition>
-        <field>HOSTING_ID</field>
-        <name>listing_id</name>
+        <field>HOST_ID</field>
+        <name>HOST_ID</name>
       </key>
       <schema>"pablo.chantada"</schema>
-      <table>dim_hospedaxe</table>
+      <table>dim_hospedador</table>
       <value>
-        <name>HOSTING_ID</name>
-        <rename>HOSTING_ID</rename>
+        <name>HOST_KEY</name>
+        <rename>HOST_KEY</rename>
         <trim_type>none</trim_type>
         <type>BigNumber</type>
       </value>
     </lookup>
     <attributes/>
     <GUI>
-      <xloc>1008</xloc>
-      <yloc>304</yloc>
+      <xloc>448</xloc>
+      <yloc>288</yloc>
     </GUI>
   </transform>
   <transform>
@@ -312,26 +253,26 @@ WHERE REVIEWER_ID = ?
     <cache_size>0</cache_size>
     <connection>docencia</connection>
     <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
+      <eat_row_on_failure>Y</eat_row_on_failure>
       <fail_on_multiple>N</fail_on_multiple>
       <key>
         <condition>=</condition>
-        <field>DATE_KEY</field>
-        <name>date</name>
+        <field>REVIEWER_ID</field>
+        <name>REVIEWER_ID</name>
       </key>
       <schema>"pablo.chantada"</schema>
-      <table>dim_tempo</table>
+      <table>dim_valorador</table>
       <value>
-        <name>DATE_KEY</name>
-        <rename>DATE_KEY</rename>
+        <name>REVIEWER_KEY</name>
+        <rename>REVIEWER_KEY</rename>
         <trim_type>none</trim_type>
-        <type>Timestamp</type>
+        <type>BigNumber</type>
       </value>
     </lookup>
     <attributes/>
     <GUI>
-      <xloc>1152</xloc>
-      <yloc>304</yloc>
+      <xloc>592</xloc>
+      <yloc>288</yloc>
     </GUI>
   </transform>
   <transform>
@@ -352,60 +293,7 @@ WHERE REVIEWER_ID = ?
             <conditions>
 </conditions>
             <function>IS NOT NULL</function>
-            <leftvalue>id</leftvalue>
-            <negated>N</negated>
-            <operator>-</operator>
-          </condition>
-          <condition>
-            <conditions>
-</conditions>
-            <function>IS NOT NULL</function>
-            <leftvalue>date</leftvalue>
-            <negated>N</negated>
-            <operator>AND</operator>
-          </condition>
-          <condition>
-            <conditions>
-</conditions>
-            <function>IS NOT NULL</function>
-            <leftvalue>score</leftvalue>
-            <negated>N</negated>
-            <operator>AND</operator>
-          </condition>
-        </conditions>
-        <function>IS NOT NULL</function>
-        <leftvalue>id</leftvalue>
-        <negated>N</negated>
-        <operator>-</operator>
-      </condition>
-    </compare>
-    <send_false_to>Write to log</send_false_to>
-    <send_true_to>Unique rows</send_true_to>
-    <attributes/>
-    <GUI>
-      <xloc>528</xloc>
-      <yloc>304</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Filter rows 2</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compare>
-      <condition>
-        <conditions>
-          <condition>
-            <conditions>
-</conditions>
-            <function>IS NOT NULL</function>
-            <leftvalue>HOSTING_ID</leftvalue>
+            <leftvalue>HOST_KEY</leftvalue>
             <negated>N</negated>
             <operator>-</operator>
           </condition>
@@ -421,23 +309,39 @@ WHERE REVIEWER_ID = ?
             <conditions>
 </conditions>
             <function>IS NOT NULL</function>
-            <leftvalue>id</leftvalue>
+            <leftvalue>REVIEW_ID</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>HOSTING_ID</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>PLACE_ID</leftvalue>
             <negated>N</negated>
             <operator>AND</operator>
           </condition>
         </conditions>
         <function>IS NOT NULL</function>
-        <leftvalue>HOSTING_ID</leftvalue>
+        <leftvalue>HOST_KEY</leftvalue>
         <negated>N</negated>
         <operator>-</operator>
       </condition>
     </compare>
-    <send_false_to>Write to log 2</send_false_to>
-    <send_true_to>Select values</send_true_to>
+    <send_false_to>Write to log</send_false_to>
+    <send_true_to>Select values 2</send_true_to>
     <attributes/>
     <GUI>
-      <xloc>1280</xloc>
-      <yloc>304</yloc>
+      <xloc>736</xloc>
+      <yloc>288</yloc>
     </GUI>
   </transform>
   <transform>
@@ -454,37 +358,7 @@ WHERE REVIEWER_ID = ?
     <fields>
       <field>
         <length>-2</length>
-        <name>id</name>
-        <precision>-2</precision>
-        <rename>REVIEW_ID</rename>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>date</name>
-        <precision>-2</precision>
-        <rename>REVIEW_DATE</rename>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>reviewer_id</name>
-        <precision>-2</precision>
-        <rename>REVIEWER_ID</rename>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>score</name>
-        <precision>-2</precision>
-        <rename>SCORE</rename>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>rain_mm</name>
-        <precision>-2</precision>
-        <rename>RAIN_MM</rename>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>REVIEWER_KEY</name>
+        <name>REVIEW_ID</name>
         <precision>-2</precision>
       </field>
       <field>
@@ -492,12 +366,42 @@ WHERE REVIEWER_ID = ?
         <name>HOSTING_ID</name>
         <precision>-2</precision>
       </field>
+      <field>
+        <length>-2</length>
+        <name>HOST_ID</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>REVIEWER_ID</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>PLACE_ID</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>REVIEW_DATE</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>SCORE</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>RAIN_MM</name>
+        <precision>-2</precision>
+      </field>
       <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
     <GUI>
-      <xloc>1408</xloc>
-      <yloc>304</yloc>
+      <xloc>320</xloc>
+      <yloc>288</yloc>
     </GUI>
   </transform>
   <transform>
@@ -514,52 +418,50 @@ WHERE REVIEWER_ID = ?
     <fields>
       <field>
         <length>-2</length>
-        <name>listing_id</name>
+        <name>REVIEW_ID</name>
         <precision>-2</precision>
-        <rename/>
       </field>
       <field>
         <length>-2</length>
-        <name>id</name>
+        <name>HOSTING_ID</name>
         <precision>-2</precision>
-        <rename/>
       </field>
       <field>
         <length>-2</length>
-        <name>date</name>
+        <name>PLACE_ID</name>
         <precision>-2</precision>
-        <rename/>
       </field>
       <field>
         <length>-2</length>
-        <name>reviewer_id</name>
+        <name>REVIEW_DATE</name>
         <precision>-2</precision>
-        <rename/>
       </field>
       <field>
         <length>-2</length>
-        <name>reviewer_name</name>
+        <name>SCORE</name>
         <precision>-2</precision>
-        <rename/>
       </field>
       <field>
         <length>-2</length>
-        <name>score</name>
+        <name>RAIN_MM</name>
         <precision>-2</precision>
-        <rename/>
       </field>
       <field>
         <length>-2</length>
-        <name>rain_mm</name>
+        <name>HOST_KEY</name>
         <precision>-2</precision>
-        <rename/>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>REVIEWER_KEY</name>
+        <precision>-2</precision>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
     <GUI>
-      <xloc>768</xloc>
-      <yloc>304</yloc>
+      <xloc>848</xloc>
+      <yloc>288</yloc>
     </GUI>
   </transform>
   <transform>
@@ -573,7 +475,7 @@ WHERE REVIEWER_ID = ?
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <commit>1000</commit>
+    <commit>100</commit>
     <connection>docencia</connection>
     <fields>
       <field>
@@ -581,12 +483,16 @@ WHERE REVIEWER_ID = ?
         <stream_name>REVIEW_ID</stream_name>
       </field>
       <field>
-        <column_name>REVIEW_DATE</column_name>
-        <stream_name>REVIEW_DATE</stream_name>
+        <column_name>HOSTING_ID</column_name>
+        <stream_name>HOSTING_ID</stream_name>
       </field>
       <field>
-        <column_name>REVIEWER_ID</column_name>
-        <stream_name>REVIEWER_ID</stream_name>
+        <column_name>PLACE_ID</column_name>
+        <stream_name>PLACE_ID</stream_name>
+      </field>
+      <field>
+        <column_name>REVIEW_DATE</column_name>
+        <stream_name>REVIEW_DATE</stream_name>
       </field>
       <field>
         <column_name>SCORE</column_name>
@@ -597,12 +503,12 @@ WHERE REVIEWER_ID = ?
         <stream_name>RAIN_MM</stream_name>
       </field>
       <field>
-        <column_name>REVIEWER_KEY</column_name>
-        <stream_name>REVIEWER_KEY</stream_name>
+        <column_name>HOST_KEY</column_name>
+        <stream_name>HOST_KEY</stream_name>
       </field>
       <field>
-        <column_name>HOSTING_ID</column_name>
-        <stream_name>HOSTING_ID</stream_name>
+        <column_name>REVIEWER_KEY</column_name>
+        <stream_name>REVIEWER_KEY</stream_name>
       </field>
     </fields>
     <ignore_errors>N</ignore_errors>
@@ -620,58 +526,8 @@ WHERE REVIEWER_ID = ?
     <use_batch>Y</use_batch>
     <attributes/>
     <GUI>
-      <xloc>1712</xloc>
-      <yloc>304</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Unique rows</name>
-    <type>Unique</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <count_rows>N</count_rows>
-    <fields>
-      <field>
-        <case_insensitive>N</case_insensitive>
-        <name>id</name>
-      </field>
-    </fields>
-    <reject_duplicate_row>N</reject_duplicate_row>
-    <attributes/>
-    <GUI>
-      <xloc>656</xloc>
-      <yloc>304</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Unique rows 2</name>
-    <type>Unique</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <count_rows>N</count_rows>
-    <fields>
-      <field>
-        <case_insensitive>N</case_insensitive>
-        <name>REVIEW_ID</name>
-      </field>
-    </fields>
-    <reject_duplicate_row>N</reject_duplicate_row>
-    <attributes/>
-    <GUI>
-      <xloc>1584</xloc>
-      <yloc>304</yloc>
+      <xloc>976</xloc>
+      <yloc>288</yloc>
     </GUI>
   </transform>
   <transform>
@@ -693,31 +549,8 @@ WHERE REVIEWER_ID = ?
     <loglevel>Basic</loglevel>
     <attributes/>
     <GUI>
-      <xloc>528</xloc>
-      <yloc>192</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Write to log 2</name>
-    <type>WriteToLog</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <displayHeader>Y</displayHeader>
-    <fields>
-</fields>
-    <limitRows>N</limitRows>
-    <limitRowsNumber>0</limitRowsNumber>
-    <loglevel>Basic</loglevel>
-    <attributes/>
-    <GUI>
-      <xloc>1280</xloc>
-      <yloc>176</yloc>
+      <xloc>736</xloc>
+      <yloc>400</yloc>
     </GUI>
   </transform>
   <transform_error_handling>

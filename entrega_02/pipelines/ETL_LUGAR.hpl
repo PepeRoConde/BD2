@@ -21,11 +21,6 @@
   </notepads>
   <order>
     <hop>
-      <from>Sort rows</from>
-      <to>Unique rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Filter rows</from>
       <to>Sort rows</to>
       <enabled>Y</enabled>
@@ -46,18 +41,18 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>CSV file input</from>
-      <to>Formula</to>
+      <from>Unique rows</from>
+      <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Formula</from>
+      <from>CSV file input</from>
       <to>Select values</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Unique rows</from>
-      <to>Table output</to>
+      <from>Sort rows</from>
+      <to>Unique rows</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -87,6 +82,17 @@
     <newline_possible>N</newline_possible>
     <encoding/>
     <fields>
+      <field>
+        <name>PLACE_ID</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group>.</group>
+        <length>29</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
       <field>
         <name>STREET</name>
         <type>String</type>
@@ -167,14 +173,6 @@
             <conditions>
 </conditions>
             <function>IS NOT NULL</function>
-            <leftvalue>PLACE_ID</leftvalue>
-            <negated>N</negated>
-            <operator>-</operator>
-          </condition>
-          <condition>
-            <conditions>
-</conditions>
-            <function>IS NOT NULL</function>
             <leftvalue>COUNTRY</leftvalue>
             <negated>N</negated>
             <operator>AND</operator>
@@ -211,33 +209,6 @@
     </GUI>
   </transform>
   <transform>
-    <name>Formula</name>
-    <type>Formula</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <formulas>
-      <formula>
-        <field_name>PLACE_ID</field_name>
-        <formula>SUBSTITUTE([STREET]&amp;"_"&amp;[CITY]&amp;"_"&amp;[COUNTRY]," ","")</formula>
-        <set_na>N</set_na>
-        <value_length>-1</value_length>
-        <value_precision>-1</value_precision>
-        <value_type>2</value_type>
-      </formula>
-    </formulas>
-    <attributes/>
-    <GUI>
-      <xloc>160</xloc>
-      <yloc>208</yloc>
-    </GUI>
-  </transform>
-  <transform>
     <name>Select values</name>
     <type>SelectValues</type>
     <description/>
@@ -249,6 +220,11 @@
       <schema_name/>
     </partitioning>
     <fields>
+      <field>
+        <length>-2</length>
+        <name>PLACE_ID</name>
+        <precision>-2</precision>
+      </field>
       <field>
         <length>-2</length>
         <name>STREET</name>
@@ -264,27 +240,6 @@
         <name>COUNTRY</name>
         <precision>-2</precision>
       </field>
-      <field>
-        <length>-2</length>
-        <name>LATITUD</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>LONGITUD</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>PLACE_ID</name>
-        <precision>-2</precision>
-      </field>
-      <remove>
-        <name>LONGITUD</name>
-      </remove>
-      <remove>
-        <name>LATITUD</name>
-      </remove>
       <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
@@ -331,21 +286,13 @@
         <name>COUNTRY</name>
         <presorted>N</presorted>
       </field>
-      <field>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <name>PLACE_ID</name>
-        <presorted>N</presorted>
-      </field>
     </fields>
     <sort_prefix>out</sort_prefix>
     <sort_size>1000000</sort_size>
     <unique_rows>N</unique_rows>
     <attributes/>
     <GUI>
-      <xloc>640</xloc>
+      <xloc>608</xloc>
       <yloc>208</yloc>
     </GUI>
   </transform>
@@ -395,7 +342,7 @@
     <use_batch>Y</use_batch>
     <attributes/>
     <GUI>
-      <xloc>928</xloc>
+      <xloc>1088</xloc>
       <yloc>208</yloc>
     </GUI>
   </transform>
@@ -432,7 +379,7 @@
     <reject_duplicate_row>N</reject_duplicate_row>
     <attributes/>
     <GUI>
-      <xloc>784</xloc>
+      <xloc>800</xloc>
       <yloc>208</yloc>
     </GUI>
   </transform>
