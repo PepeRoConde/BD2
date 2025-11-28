@@ -89,7 +89,34 @@
 
 \section{Introdución}
 
-blablabla
+Este proxecto constitúe a segunda e última fase da práctica sobre deseño e
+implementación de sistemas de Data Warehouse. Tras completar a primeira entrega,
+onde se estableceu a arquitectura conceptual e o modelo dimensional inicial,
+esta segunda parte aborda a construción completa do sistema.
+
+O obxectivo principal é transformar un conxunto de datos reais procedentes de
+Airbnb nunha infraestrutura analítica funcional e optimizada. Para iso, o
+traballo estrutúrase en tres partes:
+
+\begin{itemize}
+	\item \textbf{Deseño e implementación do modelo lógico:} Realización do
+	modelo en Oracle coas decisións arquitectónicas tomadas para optimizar tanto
+	a complexidade como o rendemento das consultas, incluíndo dimensións, feitos
+	e táboas ponte.
+	\item \textbf{Desenvolvemento do proceso ETL:} Automatización completa da
+	extracción, limpeza e carga dos datos dende os ficheiros fonte ata o Data
+	Warehouse mediante Apache Hop, garantindo a calidade e trazabilidade dos
+	datos.
+	\item \textbf{Explotación analítica:} Análise do sistema mediante consultas
+	SQL relevantes e visualizacións interactivas en Power BI que permitan
+	extraer coñecementos e Información.
+\end{itemize}
+
+Ao longo desta entrega, documéntase non só o código e as estruturas xeradas,
+senón tamén as decisións de deseño adoptadas, os problemas resoltos e as
+funcionalidades avanzadas implementadas. Isto permite non só obter un sistema
+funcional, senón tamén comprender os fundamentos e as prácticas recomendadas no
+eido dos Data Warehouses e a inteligencia de negocios.
 
 \section{Diseño del modelo lógico e implementación del DW en Oracle}
 
@@ -101,7 +128,7 @@ y crear las tablas resultantes en Oracle.
 	\item Crear las tablas necesarias en Oracle.
 \end{itemize}}
 
-\subsection{Rediseño do modelo da práctica anterior}
+\subsection{Redeseño do modelo da práctica anterior}
 
 
 Despóis da corrección da entrega anterior modificamos o DFM do seguinte xeito:
@@ -112,7 +139,7 @@ Despóis da corrección da entrega anterior modificamos o DFM do seguinte xeito:
 	\item Cambios sobre o resto de atributos para buscala coherencia co informe anterior.
 \end{itemize}
 
-Estos cambios pódense ver reflictidos na Figura \ref{fig:dfm}. Na seguinte subsección veremos como implementar estos cambios.
+Estos cambios pódense ver reflictidos na Figura \ref{fig:dfm-orixinal}. Na seguinte subsección veremos como implementar estos cambios.
 
 \begin{figure}[]
     \centering
@@ -120,7 +147,6 @@ Estos cambios pódense ver reflictidos na Figura \ref{fig:dfm}. Na seguinte subs
     \begin{subfigure}[l]{0.8\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../../entrega_01/memoria/diagramas/multidimensional.drawio.png}
-        \caption{DFM Orixinal}
         \label{fig:dfm-orixinal}
     \end{subfigure}
     \hfill
@@ -151,7 +177,7 @@ FROM dim_eventos e
 JOIN dim_lugar l ON e.lugar_id = l.lugar_id
 WHERE e.evento_data = DATE '2024-11-10'
   AND l.cidade = 'Madrid';\end{lstlisting}
-sexan veloces, e xustamente son ese tipo de consultas ás que nos interesan (os eventos ocurren nun momento nunha cidade) (ver \cite{index}).
+sexan veloces, e xustamente son ese tipo de consultas ás que nos interesan (os eventos ocurren nun momento nunha cidade) (ver ).
 	\item Os atributos \texttt{comodidade} e \texttt{accesibilidade} ó seren multievaluados teñen que ser modelados cunha táboa ponte. Por tanto merecen a súa dimensión propia (ademáis da ponte).
 	\item A dimensión \texttt{Chuvia} é dexenerada pois a única métrica que aporta son os mm de precipitacion. Polo tanto ben a podemos incluir na táboa de feitos.
 \end{itemize}

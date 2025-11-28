@@ -248,7 +248,7 @@
         <field>
           <variable_name>PROJECT_HOME</variable_name>
           <variable_type>CURRENT_WORKFLOW</variable_type>
-          <variable_value>F:/repos/BD2/entrega_02</variable_value>
+          <variable_value>C:\Users\marce\Desktop\euu\cuarto\apaad\BD2\entrega_02</variable_value>
         </field>
         <field>
           <variable_name>DATASETS_PATH</variable_name>
@@ -289,12 +289,7 @@
       <type>CHECK_DB_CONNECTIONS</type>
       <attributes/>
       <connections>
-        <connection>
-          <name>docencia</name>
-          <waitfor>0</waitfor>
-          <waittime>millisecond</waittime>
-        </connection>
-      </connections>
+</connections>
       <parallel>N</parallel>
       <xloc>240</xloc>
       <yloc>144</yloc>

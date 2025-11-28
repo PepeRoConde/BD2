@@ -86,6 +86,7 @@
     <header>Y</header>
     <buffer_size>50000</buffer_size>
     <schemaDefinition/>
+    <ignoreFields>N</ignoreFields>
     <lazy_conversion>Y</lazy_conversion>
     <add_filename_result>N</add_filename_result>
     <parallel>N</parallel>
@@ -463,8 +464,13 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <add_columns>N</add_columns>
+    <always_drop_and_recreate>N</always_drop_and_recreate>
+    <auto_update_table_structure>N</auto_update_table_structure>
+    <change_column_types>N</change_column_types>
     <commit>1000</commit>
     <connection>docencia</connection>
+    <drop_columns>N</drop_columns>
     <fields>
       <field>
         <column_name>DATE_KEY</column_name>
@@ -495,14 +501,11 @@
     <only_when_have_rows>N</only_when_have_rows>
     <partitioning_daily>N</partitioning_daily>
     <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
     <partitioning_monthly>Y</partitioning_monthly>
-    <return_field/>
     <return_keys>N</return_keys>
     <schema>"pablo.chantada"</schema>
     <specify_fields>Y</specify_fields>
     <table>dim_tempo</table>
-    <tablename_field/>
     <tablename_in_field>N</tablename_in_field>
     <tablename_in_table>Y</tablename_in_table>
     <truncate>Y</truncate>
