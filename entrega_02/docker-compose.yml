@@ -9,8 +9,6 @@ services:
       - "1521:1521"
     environment:
       - ORACLE_PASSWORD=1234
-    tmpfs:
-      - /opt/oracle/oradata  # Datos en memoria, se pierden al reiniciar
-    # O usa un directorio local en lugar de volumen:
+    
     volumes:
       - ./oracle_data:/opt/oracle/oradata  # Más estable que volumes
