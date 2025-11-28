@@ -41,8 +41,7 @@
 }
 
 % Información del documento
-\title{Entrega Final\\ 
-\large - APAAD - }
+\title{\textsc{Entrega Final}}
 \author{Marcelo Ferreiro Sánchez\\ Pablo Chantada Saborido\\  Gillermo García Engelmo\\ Pepe Romero Conde}
 \date{\today}
 
@@ -120,14 +119,6 @@ eido dos Data Warehouses e a inteligencia de negocios.
 
 \section{Diseño del modelo lógico e implementación del DW en Oracle}
 
-\textcolor{red}{
-\begin{itemize}
-	\item Proponer el diagrama del modelo lógico para el diseño realizado (normalmente será un modelo
-sencillo, en estrella o en copo de nieve), incluyendo una breve explicación de las decisiones tomadas
-y crear las tablas resultantes en Oracle.
-	\item Crear las tablas necesarias en Oracle.
-\end{itemize}}
-
 \subsection{Redeseño do modelo da práctica anterior}
 
 
@@ -139,83 +130,83 @@ Despóis da corrección da entrega anterior modificamos o DFM do seguinte xeito:
 	\item Cambios sobre o resto de atributos para buscala coherencia co informe anterior.
 \end{itemize}
 
-Estos cambios pódense ver reflictidos na Figura \ref{fig:dfm-orixinal}. Na seguinte subsección veremos como implementar estos cambios.
+Estos cambios pódense ver reflictidos na Figura \ref{fig:DFM}. Na seguinte subsección veremos como implementar estos cambios.
 
 \begin{figure}[]
     \centering
 
     \begin{subfigure}[l]{0.8\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../../entrega_01/memoria/diagramas/multidimensional.drawio.png}
+        \includegraphics[width=\textwidth]{diagramas/multidimensional_antes.png}
+        \caption{DFM Orixinal, en copo de neve}
         \label{fig:dfm-orixinal}
     \end{subfigure}
     \hfill
 
     \begin{subfigure}[r]{0.8\textwidth}
         \centering
-	\includegraphics[width=\textwidth]{./diagramas/multidimensional.drawio.png}
-        \caption{DFM Modificado}
+	\includegraphics[width=\textwidth]{diagramas/multidimensional_despues.drawio.png}
+        \caption{DFM Modificado, en estrela}
         \label{fig:dfm-modificado}
     \end{subfigure}
 
   \caption{Diagrama do Modelo de Feitos Dimensional (\emph{DFM}) antes e despóis da corrección}
-  \label{fig:dfm}
+  \label{fig:DFM}
 \end{figure}
 
 
 \subsection{Toma de decisións}
 
-Con todo resulta un modelo en estrela. Onde:
+Con todo, resulta un modelo en estrela onde:
 \begin{itemize}
 	\item A dimensión \texttt{Tempo} está denormalizada, para que en vez de estar representada de forma xerárquica, sea tipo Estrela. Ademáis, como proposto nas teóricas usamos o atributo \texttt{data} como chave primaria (identifica o que ten que identificar).
-	\item Á dimensión \texttt{Lugar} tivemos que crearlle unha chave primaria \emph{surrogada} pois pode haber, por exemplo, máis dun barrio \emph{chinés}. Con todo, si forzamos a non duplicidade das ternas \texttt{(barrio, cidade, pais)} con \texttt{UNIQUE KEY}.
-	\item A dimensión \texttt{Hospedaxe} ten dos atributos multievaluados (\texttt{Comodidades} e \texttt{Accesibilidade}, que describen prestacións do aloxsmento e formas de chegar a él, respectivamente) e modelarasen con Táboas Ponte.
-	\item A dimensión \texttt{Eventos} usa chaves foráneas para asegurar coherencia e restriccións para asegurar que os valores categóricos son os esperados e para evitar duplicados. Ademáis inclúe un índice (\texttt{INDEX}) para que as consultas do tipo: 
-		\begin{lstlisting}
-SELECT e.evento_id, e.evento_nome, e.impacto
-FROM dim_eventos e
-JOIN dim_lugar l ON e.lugar_id = l.lugar_id
-WHERE e.evento_data = DATE '2024-11-10'
-  AND l.cidade = 'Madrid';\end{lstlisting}
-sexan veloces, e xustamente son ese tipo de consultas ás que nos interesan (os eventos ocurren nun momento nunha cidade) (ver ).
-	\item Os atributos \texttt{comodidade} e \texttt{accesibilidade} ó seren multievaluados teñen que ser modelados cunha táboa ponte. Por tanto merecen a súa dimensión propia (ademáis da ponte).
+	\item Á dimensión \texttt{Lugar} tivemos que crearlle unha chave primaria \emph{surrogada} pois pode haber, por exemplo, máis dun barrio \emph{chinés}. Con todo, si forzamos a non duplicidade das ternas \texttt{(barrio, cidade, pais)} con \texttt{UNIQUE KEY} \footnote{Non esperamos, en cambio, dous barrios chineses na mesma cidade}.
+	\item A dimensión \texttt{Hospedaxe} ten dos atributos multievaluados (\texttt{Comodidades} e \texttt{Accesibilidade}, que describen prestacións e estancias) e modelarasen con Táboas Ponte.
+	\item A dimensión \texttt{Eventos} usa chaves foráneas para asegurar coherencia e restriccións para asegurar que os valores categóricos son os esperados e para evitar duplicados.
+	\item Os atributos \texttt{comodidade} e \texttt{accesibilidade} ó seren multievaluados teñen que ser modelados cunha táboa ponte. Por tanto cada un merece a súa dimensión propia (ademáis da ponte).
 	\item A dimensión \texttt{Chuvia} é dexenerada pois a única métrica que aporta son os mm de precipitacion. Polo tanto ben a podemos incluir na táboa de feitos.
+	\item A dimensión \texttt{Hospedador} non ten a restricción de non nulidade porque hai hospedadores que levan poucos días e non teñen reseñas.
+	\item A dimensión \texttt{Valorador} esixe unha restricción para o sexo: ten que ser Home, Muller, Descoñecido ou Outros. Deste xeito rexistramos a posibilidade de non saber ou ter incertedume sen ter nulos no DW (ver paso de \ref{fig:dfm-orixinal} a \ref{fig:dfm-modificado})
+	\item As SCD, no noso caso Valorador e Hospedador as implementamos a través de engadir as columnas: \texttt{actual}, \texttt{data\_valida\_comenzo} \texttt{data\_valida\_fin}. Estas permiten conservar as \emph{filas} anteriores de xeito que sepamos cando estivo vixente cada unha.
 \end{itemize}
 
 
 \subsection{Creación das Táboas}
 
-A continuación mostrase as instruccións SQL para crealas táboas. Agrupadas segundo o tipo.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/diseno_logico.drawio.png}
+  \caption{Diseño lóxico}
+  \label{fig:diseno_logico}
+\end{figure}
+A continuación móstranse as instruccións SQL para crealas táboas. Agrupadas segundo o tipo.
 
 \subsubsection{Táboas de dimensión}
 
 \begin{lstlisting}
 CREATE TABLE dim_tempo (
-    data DATE PRIMARY KEY,
+    data DATE_KEY PRIMARY KEY,
     dia NUMBER NOT NULL,
     mes NUMBER NOT NULL,
     ano NUMBER NOT NULL,
     estacion VARCHAR2(10) NOT NULL,
-    tempada_alta NUMBER(1) NOT NULL -- 1=TRUE, 0=FALSE
-);
+    tempada_alta NUMBER(1) NOT NULL -- 1=TRUE, 0=FALSE);
 \end{lstlisting}
 
 \begin{lstlisting}
 CREATE TABLE dim_lugar (
-    lugar_id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    lugar_id VARCHAR2(100) PRIMARY KEY,
     barrio VARCHAR2(100) NOT NULL,
     cidade VARCHAR2(100) NOT NULL,
     pais VARCHAR2(100) NOT NULL,
-    CONSTRAINT uk_lugar UNIQUE (barrio, cidade, pais)
-);
+    CONSTRAINT uk_lugar UNIQUE (barrio, cidade, pais));
 \end{lstlisting}
 
 \begin{lstlisting}
 CREATE TABLE dim_hospedaxe (
-    hospedaxe_id NUMBER PRIMARY KEY, -- Xa a tiñamos na OLTP
+	hospedaxe_id NUMBER PRIMARY KEY, -- Xa a tiñamos na OLTP
     precio_noite NUMBER(10,2) NOT NULL,
-    tipo VARCHAR2(50) NOT NULL
-);
+    tipo VARCHAR2(50) NOT NULL);
 \end{lstlisting}
 
 \begin{lstlisting}
@@ -230,32 +221,25 @@ CREATE TABLE dim_eventos (
     CONSTRAINT chk_impacto CHECK (impacto IN ('Bajo', 'Medio', 'Alto')),
     CONSTRAINT uk_evento UNIQUE (evento_nome, lugar_id, evento_data)
 
-    -- Chaves Foraneas
     CONSTRAINT fk_evento_lugar FOREIGN KEY (lugar_id) 
         REFERENCES dim_lugar(lugar_id),
     CONSTRAINT fk_evento_tempo FOREIGN KEY (evento_data) 
-        REFERENCES dim_tempo(data),
-    
-
-);
--- Index en Oracle faise fóra do CREATE TABLE:
-CREATE INDEX idx_evento_data_cidade ON dim_eventos(evento_data, lugar_id);
+        REFERENCES dim_tempo(data_key),
 \end{lstlisting}
 
-\subsubsection{Táboas de dimensión que cambian lentamente, implementadas con SCD tipo 2}
+\subsubsection{Táboas de dimensión SCD}
 
 \begin{lstlisting}
 CREATE TABLE dim_valorador (
     valorador_chave NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- Chave surrogada
     valorador_id NUMBER NOT NULL, -- ID do OLTP
     idade NUMBER NOT NULL,
-    sexo CHAR(1) DEFAULT 'D' NOT NULL, -- H=Home, M=Muller, D=Descoñecido O=Outro
+    sexo CHAR(1) DEFAULT "D" NOT NULL, -- H=Home, M=Muller, D=Descoñecido O=Outro
     data_nacemento DATE NOT NULL,
     data_empezou_valer DATE NOT NULL,
     data_deixou_valer DATE,
     actual NUMBER(1) DEFAULT 1 NOT NULL, -- 1=TRUE, 0=FALSE
-    CONSTRAINT chk_sexo CHECK (sexo IN ('H','M','D','O'))
-);
+    CONSTRAINT chk_sexo CHECK (sexo IN ('H','M','D','O')));
 \end{lstlisting}
 
 \begin{lstlisting}
@@ -263,11 +247,12 @@ CREATE TABLE dim_hospedador (
     hospedador_chave NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- Chave surrogada
     hospedador_id NUMBER NOT NULL, -- ID do OLTP
     tempo_resposta VARCHAR2(50) NOT NULL,
-    score_medio NUMBER(3,2),
+    score_medio NUMBER(3,2), 
     numero_hospedaxes NUMBER NOT NULL,
     e_superhost NUMBER(1) DEFAULT 0 NOT NULL, -- 1=TRUE, 0=FALSE
-    actual NUMBER(1) DEFAULT 1 NOT NULL -- 1=TRUE, 0=FALSE
-);
+    data_empezou_valer DATE NOT NULL,
+    data_deixou_valer DATE,
+    actual NUMBER(1) DEFAULT 1 NOT NULL -- 1=TRUE, 0=FALSE);
 \end{lstlisting}
 
 \subsubsection{Táboas ponte}
@@ -279,8 +264,7 @@ CREATE TABLE ponte_evento_valoracion (
     peso NUMBER(10,2) NOT NULL, 
     PRIMARY KEY (evento_id, valoracion_id),
     FOREIGN KEY (evento_id) REFERENCES dim_eventos(evento_id),
-    FOREIGN KEY (valoracion_id) REFERENCES feito_valoracion(valoracion_id)
-);
+    FOREIGN KEY (valoracion_id) REFERENCES feito_valoracion(valoracion_id));
 \end{lstlisting}
 
 \begin{lstlisting}
@@ -289,8 +273,7 @@ CREATE TABLE ponte_hospedaxe_commodidade (
     commodidade VARCHAR2(50) NOT NULL,
     peso NUMBER(10,2) NOT NULL, 
     PRIMARY KEY (hospedaxe_id, commodidade),
-    FOREIGN KEY (hospedaxe_id) REFERENCES dim_hospedaxe(hospedaxe_id)
-);
+    FOREIGN KEY (hospedaxe_id) REFERENCES dim_hospedaxe(hospedaxe_id));
 \end{lstlisting}
 
 \begin{lstlisting}
@@ -299,8 +282,7 @@ CREATE TABLE ponte_hospedaxe_accesibilidade (
     accesibilidade VARCHAR2(50) NOT NULL,
     peso NUMBER(10,2) NOT NULL, 
     PRIMARY KEY (hospedaxe_id, accesibilidade),
-    FOREIGN KEY (hospedaxe_id) REFERENCES dim_hospedaxe(hospedaxe_id)
-);
+    FOREIGN KEY (hospedaxe_id) REFERENCES dim_hospedaxe(hospedaxe_id));
 \end{lstlisting}
 
 \subsubsection{Táboa de feitos}
@@ -321,139 +303,188 @@ CREATE TABLE feito_valoracion (
     FOREIGN KEY (lugar_id) REFERENCES dim_lugar(lugar_id),
     FOREIGN KEY (data) REFERENCES dim_tempo(data),
     FOREIGN KEY (valorador_chave) REFERENCES dim_valorador(valorador_chave),
-    FOREIGN KEY (hospedador_chave) REFERENCES dim_hospedador(hospedador_chave)
-);
+    FOREIGN KEY (hospedador_chave) REFERENCES dim_hospedador(hospedador_chave));
 \end{lstlisting}
 
 \section{Diseño e implementación del ETL}
-\textcolor{red}{
-\begin{itemize}
-\item Diseñar e implementar el proceso ETL (Extract, Transform, Load) completo en Apache Hop, que
-permita extraer, depurar/limpiar, transformar y cargar los datos reales de Airbnb en el Data
-Warehouse creado en la tarea 2. El proceso deberá automatizar la carga desde los ficheros fuente
-hasta las tablas destino en Oracle, garantizando la calidad, consistencia y trazabilidad de los datos.
-\item Deberán especificarse los datasets de origen utilizados y documentar las principales
-transformaciones realizadas (limpieza, conversión de tipos, homogeneización de categorías,
-generación de claves sustitutas, etc.). Además, es necesario describir cómo se tratan valores nulos o
-inconsistentes, claves foráneas faltantes, formatos de fecha y moneda, posibles duplicados...
-\item El fichero principal de ejecución debe llamarse: \texttt{etl\_airbnb\_main.hpl} y debe ser ejecutable en Hop sin
-necesidad de editar las rutas internas. El entregable final debe incluir una carpeta datasets (o enlace
-a los ficheros fuente utilizados).
-\item El proyecto de Hop debe incluir al menos: Un job principal (.hpl) que coordine la ejecución completa
-del proceso ETL con varias transformaciones específicas para cada tabla. El pipeline debe ser
-ejecutable de forma completa desde un único job principal.
-\item Todas las rutas de ficheros y conexiones deben configurarse de manera relativa (no absolutas) para
-facilitar su ejecución en otro entorno. La conexión a Oracle debe configurarse mediante variables de
-entorno de Hop (\texttt{\${ORACLE\_HOST}}, \texttt{\${ORACLE\_USER}}, etc.), documentadas en el informe.
-\item Todas las transformaciones deben estar claramente nombradas y documentadas dentro del
-proyecto Hop. También deben utilizarse Hop variables para parametrizar rutas, nombres de archivos
-y credenciales, facilitando la reutilización.
-\item No es requisito mínimo, pero se valorará positivamente la inclusión de al menos una de las
-siguientes funcionalidades avanzadas: Gestión de dimensiones lentamente cambiantes (SCD tipo 1 o
-2), control de carga incremental (detección de nuevos registros o cambios) o mecanismo de logging
-o control de errores mediante variables o salidas de Hop.
-\end{itemize}}
 
+\subsection{Taboas de dimensión}
+
+Para a dimensión Eventos usamos \texttt{events.csv} que xerouse sintéticamente grazas a \texttt{generate\_events.py}. Nesta taboa xeramos de forma aleatoria co script todos os datos. Os nulos os xestionamos por eliminacion de filas. 
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_EVENTOS.jpeg}
+  \caption{ETL Eventos}
+  \label{fig:etl-eventos}
+\end{figure}
+
+Para a dimensión Hospedaxe tivemos que cambiar de formato o \texttt{precio\_noite}, fixemos unha restricción de non duplicidade. Os nulos os xestionamos por eliminacion de filas. 
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_HOSPEDAXE.png}
+  \caption{ETL Hospedaxe}
+  \label{fig:etl-hospedaxe}
+\end{figure}
+
+
+A dimensión de lugar tamén esta xerada sintéticamente. Empregando valores de cidades do csv \texttt{listings.csv}, xeramos as STREETS; os outros dous campos están xerados de forma aleatoria. A chave primaria componse da concatenación dos tres atributos.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_LUGAR.png}
+  \caption{ETL Lugar}
+  \label{fig:etl-lugar}
+\end{figure}
+
+
+Para a dimensión do tempo, creamos filas dende o comezo do dataset ata unos anos máis adelante da última fecha. Desta forma podemos seguir engadindo datos temporales ser ter que modificar a taboa cunha expansión.
+\begin{figure}[h]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_TIEMPO.png}
+  \caption{ETL Tempo}
+  \label{fig:etl-tiempo}
+\end{figure}
+\subsection{Taboas de dimensión SCD}
+
+
+As dimensións de Hospedador e Valorador forón tratadas de forma externa nos arquivos \texttt{generate\_host.py} e \texttt{generate\_reviewers.py}. Para facilitar o precesamento da chaves foráneas e procesos de xeracións de datos para enrriquezer as dimensións. Escollimos Python xa que estes procesos complicabanse demasiado no entorno de Apache Hop.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_HOSPEDADOR.png}
+  \caption{ETL Hospedador}
+  \label{fig:etl-hospedador}
+\end{figure}
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_VALORADOR.jpeg}
+  \caption{ETL Valorador}
+  \label{fig:etl-valorador}
+\end{figure}
+
+
+\subsection{Taboas ponte}
+Para as taboas ponte empregamos dous aspectos únicos a comparaciñon doutras dimensións. Primeiro aplicamos un atributo de \texttt{WEIGHT}, que indica a importacia doutros campos da dimension segundo o contexto (ao ser principalmente campos sintéticos, estes valores foros postos de forma arbitraria). Ademáis, a dimension de comodidades ten un tratamente especial en Python que agrupa comodidades distintas (32' TV vs. 48' TV) baixo un solo tipo (TV). Por último, obtemos os valores das claves foráneas mediante un \textt{Database Lookup}, para relacionar os alugares (Hostings) coas suas respectivas accesibilidades dos seus hosts e comodidades que posuen.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_ACCESIBILIDADES.png}
+  \caption{ETL Ponte Accesibilidades}
+  \label{fig:etl-accesibilidades}
+\end{figure}
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_COMODIDADES.png}
+  \caption{ETL Ponte Comodidades}
+  \label{fig:etl-comodidades}
+\end{figure}
+
+Na ponte de feito-valoracion realizamos un proceso similar ao das pontes anteriores pero empregando un \textt{DATABASE JOIN} para obter os identificadores das reviews.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_PONTE_EVENTO_VALORACIÓN.png}
+  \caption{ETL Ponte Evento Valoración}
+  \label{fig:etl-ponte-evento}
+\end{figure}
+\subsection{Taboa de feitos}
+
+A taboa de feitos é parcialmente sintetica, tanto a chuvia como o score son xerados pornosco. No proceso ETL de Hop obtemos as chaves foráneas mediante \textt{DATABASE LOOKUP} xa que non precisamos aplicar consultas SQL sobre estes datos no entorno de Apache Hop. Por úlitmo, eliminamos as filas con identificadores nulos.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_VALORACION.png}
+  \caption{ETL Valoracion}
+  \label{fig:etl-valoracion}
+\end{figure}
+
+
+
+\begin{figure}[H]
+\subsection{WorkFlow}
+
+No workflow simplemente facemos comporabacións do entorno: comprobación de arquivos, conexión coa base de datos, etc. E a continuación aplicanse os pipelines anteriormente mencionados de forma secuencial. Xerando as taboas correspondientes no proceso. 
+
+  \includegraphics[width=1\textwidth]{diagramas/workflow.png}
+  \caption{ETL Valoracion}
+  \label{fig:etl-valoracion}
+\end{figure}
+
+\subsection{Variables de Entorno}
+Para o desarroio do workflow empregamos a seguintes variables de entorno:
 \begin{itemize}
-	\item \textbf{\emph{Conxunto de datos utilizados:}} 
-	\item \textbf{\emph{Tratamento de nulos/inconsistentes:}} 
-	\item \textbf{\emph{Claves foráneas}} 
-	\item \textbf{\emph{...}} 
+	\item PROJECT\_HOME $\rightarrow$ \texttt{ABSOLUTE\_PATH} (ruta da carpeta)
+	\item DATASETS\_PATH $\rightarrow$ \texttt{PROJECT\_HOME /\ datasets}
+\item ORACLE\_USER $\rightarrow$ \texttt{`pablo.chantada'}
+	\item ORACLE\_PASS $\rightarrow$ \texttt{35634619Y}
+	\item ORACLE\_HOST $\rightarrow$ \texttt{10.8.48.29}
 \end{itemize}
-
 
 \section{Explotación del DW}
 
-\textcolor{red}{
-\begin{itemize}
-\item Se deben plantear y resolver tres consultas analíticas relevantes sobre el DW implementado. Para
-cada consulta, debe incluirse una breve descripción de la consulta (qué hace, y por qué es relevante
-o para qué podría aplicarse), y la sentencia SQL que resuelve dicha consulta sobre el esquema
-seleccionado. Las consultas deben de ser realistas y diferentes (utilizando diferentes tipos de
-consultas analíticas).
-\item Se debe crear un informe en Power BI que muestre visualizaciones interactivas de los datos,
-incluyendo alguna métrica DAX.
-\end{itemize}}
 
 \subsection*{Consulta 1: Influe o número de hospedaxes dun hospedador sobre o seu score medio? Canto?}
 \addcontentsline{toc}{subsection}{Consulta 1}
 
-\emph{Motivación no negocio:} [completar luego]
+Debido á natureza do que significa gráfica é posible creala sen a necesidade dunha consulta SQL. Non será o caso para ó resto de consultas; pero esta resultounos interesante por poder facerse simplemente usando PowerBI. Esto é posible porque ambas métricas son naturais do DW (en cal de derivadas).
 
-\emph{Gráficas:}  x é o numero de hospedaxes que teñen os hospedadores (de 1 a o numero de hospedaxes que ten o hospedador con mais hospedaxes) e y e o score medio (de os hospedadores con ese numero de hospedaxes) reportar r2 y ajustar un polinomio de grado 1 (recta) y 2 (parabola). si es posible reportar el p valor de los coeficientes. el grafico tipo barplot o escaterplot (pienso que mejor barplot)
+\emph{Motivación no negocio:} Esta consulta é importante para saber caracterizar ós bos e malos hospedadores. Observamos que en xeral a maioría deles teñen poucas propiedades e, dentro dos que teñen moitas, teñen un \emph{scrore} medio máis baixo. Probablemente sean cadeas contra particulares. 
 
-\emph{Delfina}: analizais la correlacion entre caracteristicas del anfitrion y sus reseñas, buen punto. Tenéis que ser exhaustivos con las funciones analíticas que le metáis, podéis sacar totales, categorizar a los hosts por numero de hospedajes y media del score, e incluso alguna comparativa entre grupos
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/consulta_valoracion_numero.jpeg}
+  \caption{\emph{Score} medio sobre o número de hospedaxes}
+  \label{fig:consulta_valoracion_numero}
+\end{figure}
 
 
-\begin{lstlisting}
-SELECT 
-    h.numero_hospedaxes,
-    COUNT(DISTINCT h.hospedador_chave) AS num_hospedadores,
-    AVG(v.score) AS score_medio,
-    COUNT(v.valoracion_id) AS total_valoraciones,
-    -- Ratio de superhosts en este grupo
-    SUM(CASE WHEN h.e_superhost = 1 THEN 1 ELSE 0 END) * 100.0 / 
-        COUNT(DISTINCT h.hospedador_chave) AS porcentaje_superhosts
-FROM feito_valoracion v
-JOIN dim_hospedador h ON v.hospedador_chave = h.hospedador_chave
-WHERE h.actual = 1
-GROUP BY h.numero_hospedaxes
-HAVING COUNT(v.valoracion_id) >= 10  -- Filtrar grupos con pocas valoraciones
-ORDER BY h.numero_hospedaxes;
-\end{lstlisting}
-
-\subsection*{Consulta 2: En verán, os barrios con eventos de maior impacto, teñen mellores valoracións que os que menos?}
+\subsection*{Consulta 2: Cantas reseñas hai por estacion?} 
 \addcontentsline{toc}{subsection}{Consulta 2}
 
 
-\emph{Motivación no negocio:} [completar luego]
+\emph{Motivación no negocio:} Esta consulta pode valer para saber como explotar mellor os recursos e prepararse para as tempadas vindeiras. Na gráfica observamos o que esperaríamos por sentido común: que o verán é máis frecuentado e o inverno é o que menos. 
 
-\emph{Gráficas:} x es el impacto medio de los eventos de ese barrio en verano, y es la valoracion media de ese barrio en verano. cada barrio es un punto en un escaterplot. seria brutal: que el tamaño del punto sea cuantos eventos hubo. ajustar recta y parabola, reportar r2 y p valor de los coeficientes
-
-esta consulta la acabo de cambiar porque, sobre la anterior, delfina dijo: analizais la correlacion entre caracteristicas del anfitrion y sus reseñas, buen punto. Tenéis que ser exhaustivos con las funciones analíticas que le metáis, podéis sacar totales, categorizar a los hosts por numero de hospedajes y media del score, e incluso alguna comparativa entre grupos
-
-
-\subsection*{Consulta 3: Entre as comodidades e accesibilidades que pode ter un hospedaxe, cal beneficia máis á valoracion ca súa presencia e cal perxudica máis ca súa ausencia?}
-\addcontentsline{toc}{subsection}{Consulta 3}
-
-\emph{Motivación no negocio:} [completar luego]
-
-\emph{Gráficas:} un scater plot con lineas entre algunos puntos de la siguiente forma. por comodidade hai tres puntos: (1) valoracion media das reseñas que teñen esa comodidade, (si ese valor es $v$, entonces el primer punto es ($v$,1), (2) valoracion media das reseñas (va a ser igual para todas las comodidades) y la presencia ($p$) media de esa comodida, por tanto ($v_{media}$,$p$) (3) valoracion media das reseñas que non teñen esa comodidade ($v'$, 0). Esos tres puntos se unen con correspondientes dos lineas rectas, y se plotea todo en un mismo grafico donde cada color es una comodidad
-
-\emph{Delfina:} me gusta la intención pero no tengo claro cómo la implementaríais, aunque se me ocurren varias formas de hacerlo, depende de vuestras decisiones de implementación, pero en sí la consulta me gusta
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{diagramas/consulta_valoracions_tempada.jpeg}
+    \caption{Número total de valoracións por estación}
+  \label{fig:consulta_valoracions_tempada}
+\end{figure}
 
 \begin{lstlisting}
--- Top 5 comodidades que MÁS BENEFICIAN (mayor score con ellas)
-SELECT * FROM (
-    SELECT 
-        commodidade,
-        'Comodidade' AS tipo,
-        ROUND(AVG(v.score), 2) AS score_medio
-    FROM feito_valoracion v
-    JOIN ponte_hospedaxe_commodidade pc ON v.hospedaxe_id = pc.hospedaxe_id
-    GROUP BY commodidade
-    HAVING COUNT(*) >= 10
-    ORDER BY AVG(v.score) DESC
-) WHERE ROWNUM <= 5
+SELECT
+    t.SEASON,
+    COUNT(DISTINCT v.REVIEW_ID) as Total_Reviews,
+    AVG(h.PRICE_NIGHT) as Avg_Price,
+    SUM(v.SCORE) as Total_Score
+FROM FEITO_VALORACION v
+JOIN DIM_TEMPO t ON v.REVIEW_DATE = t.DATE_KEY
+JOIN DIM_HOSPEDAXE h ON v.HOST_ID = h.HOSTING_ID
+GROUP BY t.SEASON
+\end{lstlisting}
 
-UNION ALL
+\subsection*{Consulta 3: Influe a lonxevidade don \emph{hosting} no seu \emph{score} medio?} 
+\addcontentsline{toc}{subsection}{Consulta 3}
 
--- Top 5 accesibilidades cuya AUSENCIA más PERJUDICA (menor score sin ellas)
-SELECT * FROM (
-    SELECT 
-        accesibilidade AS commodidade,
-        'Accesibilidade (ausente)' AS tipo,
-        ROUND(AVG(v.score), 2) AS score_medio_sin_ella
-    FROM feito_valoracion v
-    WHERE NOT EXISTS (
-        SELECT 1 
-        FROM ponte_hospedaxe_accesibilidade pa
-        WHERE pa.hospedaxe_id = v.hospedaxe_id
-    )
-    GROUP BY accesibilidade
-    HAVING COUNT(*) >= 10
-    ORDER BY AVG(v.score) ASC
-) WHERE ROWNUM <= 5;
+\emph{Motivación no negocio:} Podería ser interesante no caso, por exemplo dun host que teña moitos hosts na plataforma (e.g. unha inmobiliria en cal dun particular) para saber cando podería reformar a propiedade, e volvela anunciar como hosting coa esperanza de aumentar o \emph{score} medio.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{diagramas/consulta_activo_score.jpeg}
+    \caption{Días activos por \emph{Score} medio.}
+  \label{fig:consulta_activo_score}
+\end{figure}
+
+\begin{lstlisting}
+SELECT
+    ho.HOST_ID,
+    COUNT(DISTINCT ha.HOSTING_ID) as Total_Properties,
+    AVG(v.SCORE) as Avg_Rating,
+    DATEDIFF(day, ho.DATE_START_VALID, GETDATE()) as Days_Active,
+    ho.SUPERHOST
+FROM DIM_HOSPEDADOR ho
+JOIN DIM_HOSPEDAXE ha ON ho.HOST_ID = ha.HOSTING_ID
+JOIN FEITO_VALORACION v ON ha.HOSTING_ID = v.HOSTING_ID
+GROUP BY ho.HOST_ID, ho.DATE_START_VALID, ho.SUPERHOST
+HAVING AVG(v.SCORE) > 4.5
+ORDER BY Avg_Rating DESC
 \end{lstlisting}
 
 \newpage
