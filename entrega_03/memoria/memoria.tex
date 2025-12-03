@@ -1,0 +1,99 @@
+\documentclass[12pt,a4paper]{article}
+
+% Paquetes básicos
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{epigraph}
+\usepackage{cite}
+\usepackage{listings}
+\usepackage[listings]{tcolorbox}
+\tcbuselibrary{listings, skins, breakable}
+\lstloadlanguages{SQL}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage{url}
+
+% Configurar márgenes
+\geometry{
+    top=2.5cm,
+    bottom=2.5cm,
+    left=3cm,
+    right=3cm
+}
+
+% Configurar listings
+\lstset{
+    basicstyle=\small\ttfamily,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    captionpos=b
+}
+
+% Información del documento
+\title{\textsc{Entrega 3: ADE \& MongoDB}}
+\author{Marcelo Ferreiro Sánchez, Pablo Chantada Saborido\\  Gillermo García Engelmo \& Pepe Romero Conde}
+\date{\today}
+
+
+\lstdefinelanguage{SQL}{
+  morekeywords={
+    SELECT,FROM,WHERE,AND,OR,INSERT,INTO,VALUES,UPDATE,SET,DELETE,CREATE,TABLE,
+    ALTER,DROP,JOIN,INNER,LEFT,RIGHT,FULL,ON,AS,ORDER,BY,GROUP,HAVING,DESC,ASC,
+    DISTINCT,COUNT,SUM,AVG,MIN,MAX,IN,IS,NOT,NULL,LIKE,BETWEEN,EXISTS,UNION
+  },
+  sensitive=false,
+  morecomment=[l]{--},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\definecolor{azulito}{RGB}{186,200,211}
+\definecolor{azul_oscuro}{RGB}{35,68,93}
+\definecolor{turquesa}{RGB}{174,143,171}
+
+\lstset{
+  language=SQL,
+  basicstyle=\color{azul_oscuro}\ttfamily\small,
+  keywordstyle=\color{white}\bfseries,
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{turquesa},
+  backgroundcolor=\color{azulito},
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  breaklines=true,
+  tabsize=2
+}
+
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Introdución}
+
+
+\newpage
+
+\bibliographystyle{IEEEtran}
+\bibliography{referencias}
+
+
+\end{document}
+
