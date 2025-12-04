@@ -1,0 +1,34 @@
+{
+  "variables" : [ {
+    "name" : "ORACLE_HOST",
+    "value" : "10.8.48.29",
+    "description" : "La IP o el nombre del host de tu servidor Oracle."
+  }, {
+    "name" : "ORACLE_PORT",
+    "value" : "1521",
+    "description" : "El puerto del listener de Oracle."
+  }, {
+    "name" : "ORACLE_HOST_NAME",
+    "value" : "docencia",
+    "description" : "El SID o Service Name de tu base de datos."
+  }, {
+    "name" : "ORACLE_USER",
+    "value" : "pablo.chantada",
+    "description" : "El usuario con permisos sobre el Data Warehouse."
+  }, {
+    "name" : "ORACLE_PASSWORD",
+    "value" : "35634619Y",
+    "description" : "La contraseña del usuario."
+  }, {
+    "name" : "CITY_NAME",
+    "value" : "Madrid",
+    "description" : ""
+  }, {
+    "name" : "COUNTRY",
+    "value" : "ES",
+    "description" : ""
+  } ],
+  "metadata" : [ ],
+  "name" : "develop",
+  "description" : "Entorno de desarrollo para el DW de Airbnb"
+}

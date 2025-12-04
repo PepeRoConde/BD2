@@ -1,0 +1,14 @@
+# Usar tmpfs para evitar corrupción (datos en RAM, más estable)
+version: '3.8'
+
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim-faststart
+    container_name: oracle-xe-21c
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PASSWORD=1234
+    
+    volumes:
+      - ./oracle_data:/opt/oracle/oradata  # Más estable que volumes

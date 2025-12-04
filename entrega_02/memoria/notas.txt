@@ -1,0 +1,30 @@
+-- Reviewer Dimension (SCD Type 2)
+
+-- Events Dimension
+
+-- ============================================
+-- FACT TABLE
+-- ============================================
+
+
+-- Bridge Table: Review - Events (Many-to-Many)
+-- A review can be associated with 0 or more events happening at that time/place
+
+-- ============================================
+-- INDEXES FOR OPTIMIZATION
+-- ============================================
+
+-- Additional indexes for SCD lookups
+CREATE INDEX idx_reviewer_lookup ON dim_reviewer(reviewer_id, effective_date, end_date);
+CREATE INDEX idx_host_lookup ON dim_host(host_id, effective_date, end_date);
+
+-- ============================================
+-- COMMENTS
+-- ============================================
+
+-- Notes:
+-- 1. dim_time.time_id can be formatted as YYYYMMDD (e.g., 20241110 for Nov 10, 2024)
+-- 2. SCD Type 2: Always query with is_current = TRUE for latest version
+-- 3. To find historical version: JOIN on business_id and review_date BETWEEN effective_date AND COALESCE(end_date, '9999-12-31')
+-- 4. rain_mm is a degenerate dimension (stored in fact table)
+-- 5. Bridge tables handle many-to-many relationships
