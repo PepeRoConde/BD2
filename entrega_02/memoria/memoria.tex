@@ -1,0 +1,496 @@
+\documentclass[12pt,a4paper]{article}
+
+% Paquetes básicos
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{epigraph}
+\usepackage{cite}
+\usepackage{listings}
+\usepackage[listings]{tcolorbox}
+\tcbuselibrary{listings, skins, breakable}
+\lstloadlanguages{SQL}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage{url}
+
+% Configurar márgenes
+\geometry{
+    top=2.5cm,
+    bottom=2.5cm,
+    left=3cm,
+    right=3cm
+}
+
+% Configurar listings
+\lstset{
+    basicstyle=\small\ttfamily,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    captionpos=b
+}
+
+% Información del documento
+\title{\textsc{Entrega Final}}
+\author{Marcelo Ferreiro Sánchez\\ Pablo Chantada Saborido\\  Gillermo García Engelmo\\ Pepe Romero Conde}
+\date{\today}
+
+
+\lstdefinelanguage{SQL}{
+  morekeywords={
+    SELECT,FROM,WHERE,AND,OR,INSERT,INTO,VALUES,UPDATE,SET,DELETE,CREATE,TABLE,
+    ALTER,DROP,JOIN,INNER,LEFT,RIGHT,FULL,ON,AS,ORDER,BY,GROUP,HAVING,DESC,ASC,
+    DISTINCT,COUNT,SUM,AVG,MIN,MAX,IN,IS,NOT,NULL,LIKE,BETWEEN,EXISTS,UNION
+  },
+  sensitive=false,
+  morecomment=[l]{--},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\definecolor{azulito}{RGB}{186,200,211}
+\definecolor{azul_oscuro}{RGB}{35,68,93}
+\definecolor{turquesa}{RGB}{174,143,171}
+
+\lstset{
+  language=SQL,
+  basicstyle=\color{azul_oscuro}\ttfamily\small,
+  keywordstyle=\color{white}\bfseries,
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{turquesa},
+  backgroundcolor=\color{azulito},
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  breaklines=true,
+  tabsize=2
+}
+
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Introdución}
+
+Este proxecto constitúe a segunda e última fase da práctica sobre deseño e
+implementación de sistemas de Data Warehouse. Tras completar a primeira entrega,
+onde se estableceu a arquitectura conceptual e o modelo dimensional inicial,
+esta segunda parte aborda a construción completa do sistema.
+
+O obxectivo principal é transformar un conxunto de datos reais procedentes de
+Airbnb nunha infraestrutura analítica funcional e optimizada. Para iso, o
+traballo estrutúrase en tres partes:
+
+\begin{itemize}
+	\item \textbf{Deseño e implementación do modelo lógico:} Realización do
+	modelo en Oracle coas decisións arquitectónicas tomadas para optimizar tanto
+	a complexidade como o rendemento das consultas, incluíndo dimensións, feitos
+	e táboas ponte.
+	\item \textbf{Desenvolvemento do proceso ETL:} Automatización completa da
+	extracción, limpeza e carga dos datos dende os ficheiros fonte ata o Data
+	Warehouse mediante Apache Hop, garantindo a calidade e trazabilidade dos
+	datos.
+	\item \textbf{Explotación analítica:} Análise do sistema mediante consultas
+	SQL relevantes e visualizacións interactivas en Power BI que permitan
+	extraer coñecementos e Información.
+\end{itemize}
+
+Ao longo desta entrega, documéntase non só o código e as estruturas xeradas,
+senón tamén as decisións de deseño adoptadas, os problemas resoltos e as
+funcionalidades avanzadas implementadas. Isto permite non só obter un sistema
+funcional, senón tamén comprender os fundamentos e as prácticas recomendadas no
+eido dos Data Warehouses e a inteligencia de negocios.
+
+\section{Diseño del modelo lógico e implementación del DW en Oracle}
+
+\subsection{Redeseño do modelo da práctica anterior}
+
+
+Despóis da corrección da entrega anterior modificamos o DFM do seguinte xeito:
+\begin{itemize}
+	\item Baixamos as dimensións de \texttt{Hospedador} e \texttt{Lugar} ó nivel de \texttt{Hospedaxe} para evitar o modelo \emph{Copo de neve}, o cal atopamos vantaxoso por gañar simpleza do modelo e velocidade das consultas (ver \cite{evitarSnowflake}).  
+	\item Actualizamos o DFM cos atributos da dimensión \texttt{Eventos} especificados no informe.
+	\item Cambiamos as SCD a tipo 2 para conservar os datos do pasado e poder analizalos (dimensións \texttt{Hospedador} e \texttt{Valorador}).	
+	\item Cambios sobre o resto de atributos para buscala coherencia co informe anterior.
+\end{itemize}
+
+Estos cambios pódense ver reflictidos na Figura \ref{fig:DFM}. Na seguinte subsección veremos como implementar estos cambios.
+
+\begin{figure}[]
+    \centering
+
+    \begin{subfigure}[l]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{diagramas/multidimensional_antes.png}
+        \caption{DFM Orixinal, en copo de neve}
+        \label{fig:dfm-orixinal}
+    \end{subfigure}
+    \hfill
+
+    \begin{subfigure}[r]{0.8\textwidth}
+        \centering
+	\includegraphics[width=\textwidth]{diagramas/multidimensional_despues.drawio.png}
+        \caption{DFM Modificado, en estrela}
+        \label{fig:dfm-modificado}
+    \end{subfigure}
+
+  \caption{Diagrama do Modelo de Feitos Dimensional (\emph{DFM}) antes e despóis da corrección}
+  \label{fig:DFM}
+\end{figure}
+
+
+\subsection{Toma de decisións}
+
+Con todo, resulta un modelo en estrela onde:
+\begin{itemize}
+	\item A dimensión \texttt{Tempo} está denormalizada, para que en vez de estar representada de forma xerárquica, sea tipo Estrela. Ademáis, como proposto nas teóricas usamos o atributo \texttt{data} como chave primaria (identifica o que ten que identificar).
+	\item Á dimensión \texttt{Lugar} tivemos que crearlle unha chave primaria \emph{surrogada} pois pode haber, por exemplo, máis dun barrio \emph{chinés}. Con todo, si forzamos a non duplicidade das ternas \texttt{(barrio, cidade, pais)} con \texttt{UNIQUE KEY} \footnote{Non esperamos, en cambio, dous barrios chineses na mesma cidade}.
+	\item A dimensión \texttt{Hospedaxe} ten dos atributos multievaluados (\texttt{Comodidades} e \texttt{Accesibilidade}, que describen prestacións e estancias) e modelarasen con Táboas Ponte.
+	\item A dimensión \texttt{Eventos} usa chaves foráneas para asegurar coherencia e restriccións para asegurar que os valores categóricos son os esperados e para evitar duplicados.
+	\item Os atributos \texttt{comodidade} e \texttt{accesibilidade} ó seren multievaluados teñen que ser modelados cunha táboa ponte. Por tanto cada un merece a súa dimensión propia (ademáis da ponte).
+	\item A dimensión \texttt{Chuvia} é dexenerada pois a única métrica que aporta son os mm de precipitacion. Polo tanto ben a podemos incluir na táboa de feitos.
+	\item A dimensión \texttt{Hospedador} non ten a restricción de non nulidade porque hai hospedadores que levan poucos días e non teñen reseñas.
+	\item A dimensión \texttt{Valorador} esixe unha restricción para o sexo: ten que ser Home, Muller, Descoñecido ou Outros. Deste xeito rexistramos a posibilidade de non saber ou ter incertedume sen ter nulos no DW (ver paso de \ref{fig:dfm-orixinal} a \ref{fig:dfm-modificado})
+	\item As SCD, no noso caso Valorador e Hospedador as implementamos a través de engadir as columnas: \texttt{actual}, \texttt{data\_valida\_comenzo} \texttt{data\_valida\_fin}. Estas permiten conservar as \emph{filas} anteriores de xeito que sepamos cando estivo vixente cada unha.
+\end{itemize}
+
+
+\subsection{Creación das Táboas}
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/diseno_logico.drawio.png}
+  \caption{Diseño lóxico}
+  \label{fig:diseno_logico}
+\end{figure}
+A continuación móstranse as instruccións SQL para crealas táboas. Agrupadas segundo o tipo.
+
+\subsubsection{Táboas de dimensión}
+
+\begin{lstlisting}
+CREATE TABLE dim_tempo (
+    data DATE_KEY PRIMARY KEY,
+    dia NUMBER NOT NULL,
+    mes NUMBER NOT NULL,
+    ano NUMBER NOT NULL,
+    estacion VARCHAR2(10) NOT NULL,
+    tempada_alta NUMBER(1) NOT NULL -- 1=TRUE, 0=FALSE);
+\end{lstlisting}
+
+\begin{lstlisting}
+CREATE TABLE dim_lugar (
+    lugar_id VARCHAR2(100) PRIMARY KEY,
+    barrio VARCHAR2(100) NOT NULL,
+    cidade VARCHAR2(100) NOT NULL,
+    pais VARCHAR2(100) NOT NULL,
+    CONSTRAINT uk_lugar UNIQUE (barrio, cidade, pais));
+\end{lstlisting}
+
+\begin{lstlisting}
+CREATE TABLE dim_hospedaxe (
+	hospedaxe_id NUMBER PRIMARY KEY, -- Xa a tiñamos na OLTP
+    precio_noite NUMBER(10,2) NOT NULL,
+    tipo VARCHAR2(50) NOT NULL);
+\end{lstlisting}
+
+\begin{lstlisting}
+CREATE TABLE dim_eventos (
+    evento_id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    evento_nome VARCHAR2(200) NOT NULL,
+    evento_tipo VARCHAR2(50) NOT NULL,
+    impacto VARCHAR2(20) NOT NULL,
+    lugar_id NUMBER NOT NULL,
+    evento_data DATE NOT NULL
+
+    CONSTRAINT chk_impacto CHECK (impacto IN ('Bajo', 'Medio', 'Alto')),
+    CONSTRAINT uk_evento UNIQUE (evento_nome, lugar_id, evento_data)
+
+    CONSTRAINT fk_evento_lugar FOREIGN KEY (lugar_id) 
+        REFERENCES dim_lugar(lugar_id),
+    CONSTRAINT fk_evento_tempo FOREIGN KEY (evento_data) 
+        REFERENCES dim_tempo(data_key),
+\end{lstlisting}
+
+\subsubsection{Táboas de dimensión SCD}
+
+\begin{lstlisting}
+CREATE TABLE dim_valorador (
+    valorador_chave NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- Chave surrogada
+    valorador_id NUMBER NOT NULL, -- ID do OLTP
+    idade NUMBER NOT NULL,
+    sexo CHAR(1) DEFAULT "D" NOT NULL, -- H=Home, M=Muller, D=Descoñecido O=Outro
+    data_nacemento DATE NOT NULL,
+    data_empezou_valer DATE NOT NULL,
+    data_deixou_valer DATE,
+    actual NUMBER(1) DEFAULT 1 NOT NULL, -- 1=TRUE, 0=FALSE
+    CONSTRAINT chk_sexo CHECK (sexo IN ('H','M','D','O')));
+\end{lstlisting}
+
+\begin{lstlisting}
+CREATE TABLE dim_hospedador (
+    hospedador_chave NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- Chave surrogada
+    hospedador_id NUMBER NOT NULL, -- ID do OLTP
+    tempo_resposta VARCHAR2(50) NOT NULL,
+    score_medio NUMBER(3,2), 
+    numero_hospedaxes NUMBER NOT NULL,
+    e_superhost NUMBER(1) DEFAULT 0 NOT NULL, -- 1=TRUE, 0=FALSE
+    data_empezou_valer DATE NOT NULL,
+    data_deixou_valer DATE,
+    actual NUMBER(1) DEFAULT 1 NOT NULL -- 1=TRUE, 0=FALSE);
+\end{lstlisting}
+
+\subsubsection{Táboas ponte}
+
+\begin{lstlisting}
+CREATE TABLE ponte_evento_valoracion (
+    evento_id NUMBER NOT NULL,
+    valoracion_id NUMBER NOT NULL,
+    peso NUMBER(10,2) NOT NULL, 
+    PRIMARY KEY (evento_id, valoracion_id),
+    FOREIGN KEY (evento_id) REFERENCES dim_eventos(evento_id),
+    FOREIGN KEY (valoracion_id) REFERENCES feito_valoracion(valoracion_id));
+\end{lstlisting}
+
+\begin{lstlisting}
+CREATE TABLE ponte_hospedaxe_commodidade (
+    hospedaxe_id NUMBER NOT NULL,
+    commodidade VARCHAR2(50) NOT NULL,
+    peso NUMBER(10,2) NOT NULL, 
+    PRIMARY KEY (hospedaxe_id, commodidade),
+    FOREIGN KEY (hospedaxe_id) REFERENCES dim_hospedaxe(hospedaxe_id));
+\end{lstlisting}
+
+\begin{lstlisting}
+CREATE TABLE ponte_hospedaxe_accesibilidade (
+    hospedaxe_id NUMBER NOT NULL,
+    accesibilidade VARCHAR2(50) NOT NULL,
+    peso NUMBER(10,2) NOT NULL, 
+    PRIMARY KEY (hospedaxe_id, accesibilidade),
+    FOREIGN KEY (hospedaxe_id) REFERENCES dim_hospedaxe(hospedaxe_id));
+\end{lstlisting}
+
+\subsubsection{Táboa de feitos}
+
+\begin{lstlisting}
+CREATE TABLE feito_valoracion (
+    valoracion_id NUMBER PRIMARY KEY, -- Do OLTP
+    hospedaxe_id NUMBER NOT NULL,
+    lugar_id NUMBER NOT NULL,
+    data DATE NOT NULL,
+    valorador_chave NUMBER NOT NULL, -- Chave surrogada (SCD Tipo 2)
+    hospedador_chave NUMBER NOT NULL, -- Chave surrogada (SCD Tipo 2)
+    score NUMBER(3,2) NOT NULL,
+    chuvia_mm NUMBER(5,2) DEFAULT 0 NOT NULL, -- Dimensión dexenerada
+    
+    -- Chaves Foraneas
+    FOREIGN KEY (hospedaxe_id) REFERENCES dim_hospedaxe(hospedaxe_id),
+    FOREIGN KEY (lugar_id) REFERENCES dim_lugar(lugar_id),
+    FOREIGN KEY (data) REFERENCES dim_tempo(data),
+    FOREIGN KEY (valorador_chave) REFERENCES dim_valorador(valorador_chave),
+    FOREIGN KEY (hospedador_chave) REFERENCES dim_hospedador(hospedador_chave));
+\end{lstlisting}
+
+\section{Diseño e implementación del ETL}
+
+\subsection{Taboas de dimensión}
+
+Para a dimensión Eventos usamos \texttt{events.csv} que xerouse sintéticamente grazas a \texttt{generate\_events.py}. Nesta taboa xeramos de forma aleatoria co script todos os datos. Os nulos os xestionamos por eliminacion de filas. 
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_EVENTOS.jpeg}
+  \caption{ETL Eventos}
+  \label{fig:etl-eventos}
+\end{figure}
+
+Para a dimensión Hospedaxe tivemos que cambiar de formato o \texttt{precio\_noite}, fixemos unha restricción de non duplicidade. Os nulos os xestionamos por eliminacion de filas. 
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_HOSPEDAXE.png}
+  \caption{ETL Hospedaxe}
+  \label{fig:etl-hospedaxe}
+\end{figure}
+
+
+A dimensión de lugar tamén esta xerada sintéticamente. Empregando valores de cidades do csv \texttt{listings.csv}, xeramos as STREETS; os outros dous campos están xerados de forma aleatoria. A chave primaria componse da concatenación dos tres atributos.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_LUGAR.png}
+  \caption{ETL Lugar}
+  \label{fig:etl-lugar}
+\end{figure}
+
+
+Para a dimensión do tempo, creamos filas dende o comezo do dataset ata unos anos máis adelante da última fecha. Desta forma podemos seguir engadindo datos temporales ser ter que modificar a taboa cunha expansión.
+\begin{figure}[h]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_TIEMPO.png}
+  \caption{ETL Tempo}
+  \label{fig:etl-tiempo}
+\end{figure}
+\subsection{Taboas de dimensión SCD}
+
+
+As dimensións de Hospedador e Valorador forón tratadas de forma externa nos arquivos \texttt{generate\_host.py} e \texttt{generate\_reviewers.py}. Para facilitar o precesamento da chaves foráneas e procesos de xeracións de datos para enrriquezer as dimensións. Escollimos Python xa que estes procesos complicabanse demasiado no entorno de Apache Hop.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_HOSPEDADOR.png}
+  \caption{ETL Hospedador}
+  \label{fig:etl-hospedador}
+\end{figure}
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_VALORADOR.jpeg}
+  \caption{ETL Valorador}
+  \label{fig:etl-valorador}
+\end{figure}
+
+
+\subsection{Taboas ponte}
+Para as taboas ponte empregamos dous aspectos únicos a comparaciñon doutras dimensións. Primeiro aplicamos un atributo de \texttt{WEIGHT}, que indica a importacia doutros campos da dimension segundo o contexto (ao ser principalmente campos sintéticos, estes valores foros postos de forma arbitraria). Ademáis, a dimension de comodidades ten un tratamente especial en Python que agrupa comodidades distintas (32' TV vs. 48' TV) baixo un solo tipo (TV). Por último, obtemos os valores das claves foráneas mediante un \textt{Database Lookup}, para relacionar os alugares (Hostings) coas suas respectivas accesibilidades dos seus hosts e comodidades que posuen.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_ACCESIBILIDADES.png}
+  \caption{ETL Ponte Accesibilidades}
+  \label{fig:etl-accesibilidades}
+\end{figure}
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_COMODIDADES.png}
+  \caption{ETL Ponte Comodidades}
+  \label{fig:etl-comodidades}
+\end{figure}
+
+Na ponte de feito-valoracion realizamos un proceso similar ao das pontes anteriores pero empregando un \textt{DATABASE JOIN} para obter os identificadores das reviews.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_PONTE_EVENTO_VALORACIÓN.png}
+  \caption{ETL Ponte Evento Valoración}
+  \label{fig:etl-ponte-evento}
+\end{figure}
+\subsection{Taboa de feitos}
+
+A taboa de feitos é parcialmente sintetica, tanto a chuvia como o score son xerados pornosco. No proceso ETL de Hop obtemos as chaves foráneas mediante \textt{DATABASE LOOKUP} xa que non precisamos aplicar consultas SQL sobre estes datos no entorno de Apache Hop. Por úlitmo, eliminamos as filas con identificadores nulos.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/ETL_VALORACION.png}
+  \caption{ETL Valoracion}
+  \label{fig:etl-valoracion}
+\end{figure}
+
+
+
+\begin{figure}[H]
+\subsection{WorkFlow}
+
+No workflow simplemente facemos comporabacións do entorno: comprobación de arquivos, conexión coa base de datos, etc. E a continuación aplicanse os pipelines anteriormente mencionados de forma secuencial. Xerando as taboas correspondientes no proceso. 
+
+  \includegraphics[width=1\textwidth]{diagramas/workflow.png}
+  \caption{ETL Valoracion}
+  \label{fig:etl-valoracion}
+\end{figure}
+
+\subsection{Variables de Entorno}
+Para o desarroio do workflow empregamos a seguintes variables de entorno:
+\begin{itemize}
+	\item PROJECT\_HOME $\rightarrow$ \texttt{ABSOLUTE\_PATH} (ruta da carpeta)
+	\item DATASETS\_PATH $\rightarrow$ \texttt{PROJECT\_HOME /\ datasets}
+\item ORACLE\_USER $\rightarrow$ \texttt{`pablo.chantada'}
+	\item ORACLE\_PASS $\rightarrow$ \texttt{35634619Y}
+	\item ORACLE\_HOST $\rightarrow$ \texttt{10.8.48.29}
+\end{itemize}
+
+\section{Explotación del DW}
+
+
+\subsection*{Consulta 1: Influe o número de hospedaxes dun hospedador sobre o seu score medio? Canto?}
+\addcontentsline{toc}{subsection}{Consulta 1}
+
+Debido á natureza do que significa gráfica é posible creala sen a necesidade dunha consulta SQL. Non será o caso para ó resto de consultas; pero esta resultounos interesante por poder facerse simplemente usando PowerBI. Esto é posible porque ambas métricas son naturais do DW (en cal de derivadas).
+
+\emph{Motivación no negocio:} Esta consulta é importante para saber caracterizar ós bos e malos hospedadores. Observamos que en xeral a maioría deles teñen poucas propiedades e, dentro dos que teñen moitas, teñen un \emph{scrore} medio máis baixo. Probablemente sean cadeas contra particulares. 
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1\textwidth]{diagramas/consulta_valoracion_numero.jpeg}
+  \caption{\emph{Score} medio sobre o número de hospedaxes}
+  \label{fig:consulta_valoracion_numero}
+\end{figure}
+
+
+\subsection*{Consulta 2: Cantas reseñas hai por estacion?} 
+\addcontentsline{toc}{subsection}{Consulta 2}
+
+
+\emph{Motivación no negocio:} Esta consulta pode valer para saber como explotar mellor os recursos e prepararse para as tempadas vindeiras. Na gráfica observamos o que esperaríamos por sentido común: que o verán é máis frecuentado e o inverno é o que menos. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{diagramas/consulta_valoracions_tempada.jpeg}
+    \caption{Número total de valoracións por estación}
+  \label{fig:consulta_valoracions_tempada}
+\end{figure}
+
+\begin{lstlisting}
+SELECT
+    t.SEASON,
+    COUNT(DISTINCT v.REVIEW_ID) as Total_Reviews,
+    AVG(h.PRICE_NIGHT) as Avg_Price,
+    SUM(v.SCORE) as Total_Score
+FROM FEITO_VALORACION v
+JOIN DIM_TEMPO t ON v.REVIEW_DATE = t.DATE_KEY
+JOIN DIM_HOSPEDAXE h ON v.HOST_ID = h.HOSTING_ID
+GROUP BY t.SEASON
+\end{lstlisting}
+
+\subsection*{Consulta 3: Influe a lonxevidade don \emph{hosting} no seu \emph{score} medio?} 
+\addcontentsline{toc}{subsection}{Consulta 3}
+
+\emph{Motivación no negocio:} Podería ser interesante no caso, por exemplo dun host que teña moitos hosts na plataforma (e.g. unha inmobiliria en cal dun particular) para saber cando podería reformar a propiedade, e volvela anunciar como hosting coa esperanza de aumentar o \emph{score} medio.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{diagramas/consulta_activo_score.jpeg}
+    \caption{Días activos por \emph{Score} medio.}
+  \label{fig:consulta_activo_score}
+\end{figure}
+
+\begin{lstlisting}
+SELECT
+    ho.HOST_ID,
+    COUNT(DISTINCT ha.HOSTING_ID) as Total_Properties,
+    AVG(v.SCORE) as Avg_Rating,
+    DATEDIFF(day, ho.DATE_START_VALID, GETDATE()) as Days_Active,
+    ho.SUPERHOST
+FROM DIM_HOSPEDADOR ho
+JOIN DIM_HOSPEDAXE ha ON ho.HOST_ID = ha.HOSTING_ID
+JOIN FEITO_VALORACION v ON ha.HOSTING_ID = v.HOSTING_ID
+GROUP BY ho.HOST_ID, ho.DATE_START_VALID, ho.SUPERHOST
+HAVING AVG(v.SCORE) > 4.5
+ORDER BY Avg_Rating DESC
+\end{lstlisting}
+
+\newpage
+
+\bibliographystyle{IEEEtran}
+\bibliography{referencias}
+
+
+\end{document}

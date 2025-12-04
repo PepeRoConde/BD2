@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow>
+  <name>workflow</name>
+  <name_sync_with_filename>Y</name_sync_with_filename>
+  <description/>
+  <extended_description/>
+  <workflow_version/>
+  <created_user>-</created_user>
+  <created_date>2025/11/11 20:09:01.125</created_date>
+  <modified_user>-</modified_user>
+  <modified_date>2025/11/11 20:09:01.125</modified_date>
+  <parameters>
+    </parameters>
+  <actions>
+    <action>
+      <name>Start</name>
+      <description/>
+      <type>SPECIAL</type>
+      <attributes/>
+      <DayOfMonth>1</DayOfMonth>
+      <doNotWaitOnFirstExecution>N</doNotWaitOnFirstExecution>
+      <hour>12</hour>
+      <intervalMinutes>60</intervalMinutes>
+      <intervalSeconds>0</intervalSeconds>
+      <minutes>0</minutes>
+      <repeat>N</repeat>
+      <schedulerType>0</schedulerType>
+      <weekDay>1</weekDay>
+      <parallel>N</parallel>
+      <xloc>16</xloc>
+      <yloc>288</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_HOSPEDAXE.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_HOSPEDAXE.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>400</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_LUGAR.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_LUGAR.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>272</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_PONTE_ACCESIBILIDADES.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_ACCESIBILIDADES.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>1072</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_EVENTOS.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_EVENTOS.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>528</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_HOSPEDADOR_SCD2.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_HOSPEDADOR_SCD2.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>784</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_VALORADOR_SCD2.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_VALORADOR_SCD2.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>656</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_PONTE_COMODIDADES.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_COMODIDADES.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>928</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_TEMPO.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_TEMPO.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>144</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Set variables</name>
+      <description/>
+      <type>SET_VARIABLES</type>
+      <attributes/>
+      <fields>
+        <field>
+          <variable_name>PROJECT_HOME</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>C:\Users\marce\Desktop\euu\cuarto\apaad\BD2\entrega_02</variable_value>
+        </field>
+        <field>
+          <variable_name>DATASETS_PATH</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>${PROJECT_HOME}/datasets</variable_value>
+        </field>
+        <field>
+          <variable_name>LOGS_PATH</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>${PROJECT_HOME}/logs</variable_value>
+        </field>
+        <field>
+          <variable_name>ORACLE_USER</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>pablo.chantada</variable_value>
+        </field>
+        <field>
+          <variable_name>ORACLE_PASS</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>35634619Y</variable_value>
+        </field>
+        <field>
+          <variable_name>ORACLE_HOST</variable_name>
+          <variable_type>CURRENT_WORKFLOW</variable_type>
+          <variable_value>10.8.48.29</variable_value>
+        </field>
+      </fields>
+      <file_variable_type>CURRENT_WORKFLOW</file_variable_type>
+      <replacevars>Y</replacevars>
+      <parallel>N</parallel>
+      <xloc>112</xloc>
+      <yloc>288</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Check DB connections</name>
+      <description/>
+      <type>CHECK_DB_CONNECTIONS</type>
+      <attributes/>
+      <connections>
+</connections>
+      <parallel>N</parallel>
+      <xloc>240</xloc>
+      <yloc>144</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_VALORACION.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_VALORACION.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>1216</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>ETL_PONTE_EVENTO_VALORACION.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>${PROJECT_HOME}/pipelines/ETL_PONTE_EVENTO_VALORACION.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>1344</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Checks if files exist</name>
+      <description/>
+      <type>FILES_EXIST</type>
+      <attributes/>
+      <fields>
+        <field>
+          <name>${DATASETS_PATH}/listings.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/reviews.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/amenities_normalized.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/dim_accesibilidade.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/dim_commodity.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/dim_hospedador_scd2.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/dim_valorador_scd2.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/reviews_enriched.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/places.csv</name>
+        </field>
+        <field>
+          <name>${DATASETS_PATH}/neighbourhoods.csv</name>
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <xloc>240</xloc>
+      <yloc>288</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>1344</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Success</name>
+      <description/>
+      <type>SUCCESS</type>
+      <attributes/>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>1584</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (9)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>1072</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (5)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}
+</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>528</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (6)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>656</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (7)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>784</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (8)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>928</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (3)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}
+</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>272</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (4)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>400</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (10)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>1216</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log (2)</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Falló la carga de ${ETL_NAME}. Detalles: ${ERROR_DETAIL}
+
+</logmessage>
+      <logsubject>Error en ${ETL_NAME}</logsubject>
+      <parallel>N</parallel>
+      <xloc>816</xloc>
+      <yloc>144</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log 2</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Nothing</loglevel>
+      <logmessage>ETL Process completed succesfully
+</logmessage>
+      <logsubject>Carga completada</logsubject>
+      <parallel>N</parallel>
+      <xloc>608</xloc>
+      <yloc>1472</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (2)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>144</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (3)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>272</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (4)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>400</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (5)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>528</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (6)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>656</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (7)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>784</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (8)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>928</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (9)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>1072</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (10)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>1216</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow (11)</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>1344</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log 3</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Error</loglevel>
+      <logmessage>Failed to connect to database using:
+${ORACLE_HOST} = localhost:1521
+${ORACLE_SID} = ORCL
+${ORACLE_USER} = airbnb_dw
+${ORACLE_PASSWORD} = &lt;password>
+${DATA_PATH} = ${Internal.Entry.Current.Directory}/datasets
+${LOG_PATH} = ${Internal.Entry.Current.Directory}/logs
+</logmessage>
+      <logsubject>Error en conexión a la base de datos</logsubject>
+      <parallel>N</parallel>
+      <xloc>240</xloc>
+      <yloc>32</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Abort workflow</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>N</always_log_rows>
+      <parallel>N</parallel>
+      <xloc>384</xloc>
+      <yloc>32</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Write to log 4</name>
+      <description/>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <loglevel>Basic</loglevel>
+      <logmessage>ERROR: No se encuentran los archivos en la ruta: ${DATASETS_PATH}</logmessage>
+      <logsubject>Carga de variables</logsubject>
+      <parallel>N</parallel>
+      <xloc>240</xloc>
+      <yloc>400</yloc>
+      <attributes_hac/>
+    </action>
+  </actions>
+  <hops>
+    <hop>
+      <from>Checks if files exist</from>
+      <to>Check DB connections</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Set variables</from>
+      <to>Checks if files exist</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Start</from>
+      <to>Set variables</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_TEMPO.hpl</from>
+      <to>Write to log (2)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_LUGAR.hpl</from>
+      <to>Write to log (3)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_HOSPEDAXE.hpl</from>
+      <to>Write to log (4)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_EVENTOS.hpl</from>
+      <to>Write to log (5)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_VALORADOR_SCD2.hpl</from>
+      <to>Write to log (6)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_HOSPEDADOR_SCD2.hpl</from>
+      <to>Write to log (7)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_PONTE_COMODIDADES.hpl</from>
+      <to>Write to log (8)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_PONTE_ACCESIBILIDADES.hpl</from>
+      <to>Write to log (9)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_VALORACION.hpl</from>
+      <to>Write to log (10)</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_PONTE_EVENTO_VALORACION.hpl</from>
+      <to>Write to log</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_TEMPO.hpl</from>
+      <to>ETL_LUGAR.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_LUGAR.hpl</from>
+      <to>ETL_HOSPEDAXE.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_HOSPEDAXE.hpl</from>
+      <to>ETL_EVENTOS.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_EVENTOS.hpl</from>
+      <to>ETL_VALORADOR_SCD2.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_VALORADOR_SCD2.hpl</from>
+      <to>ETL_HOSPEDADOR_SCD2.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_HOSPEDADOR_SCD2.hpl</from>
+      <to>ETL_PONTE_COMODIDADES.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_PONTE_COMODIDADES.hpl</from>
+      <to>ETL_PONTE_ACCESIBILIDADES.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_PONTE_ACCESIBILIDADES.hpl</from>
+      <to>ETL_VALORACION.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_VALORACION.hpl</from>
+      <to>ETL_PONTE_EVENTO_VALORACION.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>ETL_PONTE_EVENTO_VALORACION.hpl</from>
+      <to>Write to log 2</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log 2</from>
+      <to>Success</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log</from>
+      <to>Abort workflow (11)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (10)</from>
+      <to>Abort workflow (10)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (9)</from>
+      <to>Abort workflow (9)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (8)</from>
+      <to>Abort workflow (8)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (7)</from>
+      <to>Abort workflow (7)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (6)</from>
+      <to>Abort workflow (6)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (5)</from>
+      <to>Abort workflow (5)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (4)</from>
+      <to>Abort workflow (4)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (3)</from>
+      <to>Abort workflow (3)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log (2)</from>
+      <to>Abort workflow (2)</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Write to log 3</from>
+      <to>Abort workflow</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Checks if files exist</from>
+      <to>Write to log 4</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Check DB connections</from>
+      <to>Write to log 3</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Check DB connections</from>
+      <to>ETL_TEMPO.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+  </hops>
+  <notepads>
+  </notepads>
+  <attributes/>
+</workflow>
