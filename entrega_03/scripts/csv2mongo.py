@@ -3,29 +3,39 @@ import pandas as pd
 from pymongo import MongoClient
 import ast  # to safely parse amenities list
 
-DATA_FILE = "dataset/final_imputed.csv"
+DATA_FILE = "dataset/final.csv"
 
 # MongoDB connection
 MONGO_URI = "mongodb://localhost:27017/"
 DB_NAME = "airbnb"
 COLLECTION_NAME = "listings"
 
-# Define columns for embedded documents
+# Define columns for embedded documents (without prefixes)
 HOST_COLS = [
-    "host_since", "host_location", "host_response_time",
-    "host_response_rate", "host_acceptance_rate", "host_is_superhost",
-    "host_total_listings_count", "host_has_profile_pic", "host_identity_verified"
+    ("host_since", "since"),
+    ("host_location", "location"),
+    ("host_response_time", "response_time"),
+    ("host_response_rate", "response_rate"),
+    ("host_acceptance_rate", "acceptance_rate"),
+    ("host_is_superhost", "is_superhost"),
+    ("host_total_listings_count", "total_listings_count"),
+    ("host_has_profile_pic", "has_profile_pic"),
+    ("host_identity_verified", "identity_verified")
 ]
 
 SCORE_COLS = [
-    "review_scores_rating", "review_scores_accuracy", "review_scores_cleanliness",
-    "review_scores_checkin", "review_scores_communication", "review_scores_location",
-    "review_scores_value"
+    ("review_scores_rating", "rating"),
+    ("review_scores_accuracy", "accuracy"),
+    ("review_scores_cleanliness", "cleanliness"),
+    ("review_scores_checkin", "checkin"),
+    ("review_scores_communication", "communication"),
+    ("review_scores_location", "location"),
+    ("review_scores_value", "value")
 ]
 
 # Remaining columns for top-level attributes
 TOP_LEVEL_COLS = [
-    "description","neighbourhood","latitude","longitude","property_type",
+    "description","neighbourhood_group_cleansed","latitude","longitude","property_type",
     "accommodates","bathrooms","bedrooms","beds","price","number_of_reviews",
     "number_of_reviews_l30d","availability_eoy","instant_bookable","reviews_per_month","city"
 ]
@@ -48,11 +58,21 @@ def main():
     collection = db[COLLECTION_NAME]
 
     documents = []
-    for _, row in df.iterrows():
+    for i, row in df.iterrows():
+        # Top level columns
         doc = {col: row[col] for col in TOP_LEVEL_COLS}
-        doc["host"] = {col: row[col] for col in HOST_COLS}
-        doc["score"] = {col: row[col] for col in SCORE_COLS}
+        
+        # Host embedded document (without "host_" prefix)
+        doc["host"] = {new_col: row[old_col] for old_col, new_col in HOST_COLS}
+        
+        # Score embedded document (without "review_scores_" prefix)
+        doc["score"] = {new_col: row[old_col] for old_col, new_col in SCORE_COLS}
+        
+        # Amenities list
         doc["amenities"] = parse_amenities(row["amenities"])
+        
+        doc["row_id"] = i
+
         documents.append(doc)
 
     # Insert into MongoDB
@@ -62,4 +82,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

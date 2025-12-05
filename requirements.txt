@@ -3,3 +3,4 @@ polars
 seaborn
 matplotlib
 scikit-learn
+pymongo

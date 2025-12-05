@@ -4,7 +4,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
-\usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{hyperref}
@@ -14,11 +13,9 @@
 \usepackage{float}
 \usepackage{epigraph}
 \usepackage{cite}
-\usepackage{listings}
 \usepackage[listings]{tcolorbox}
 \tcbuselibrary{listings, skins, breakable}
 \lstloadlanguages{SQL}
-\usepackage{xcolor}
 \usepackage{subcaption}
 \usepackage{url}
 
@@ -93,11 +90,11 @@ Como nas prácticas anteriores, traballamos sobre o conxunto de datos de AirB\&B
 \section{Modelo de Datos}
 \label{sec:modeloDatos}
 
-Nesta ocasión non nos limitamos a usar os \texttt{.csv}s de unha cidade, con motivo de enriquezer as estadísticas. Dende un principio observamos que o porcentaxe de nulos non era ó meso ó longo das cidades, por eso con varias cidades esperamos unha respresentación máis fiel da realidade. As primeiras manipulacións que  tivemos que facerlle ós datos foi a de eliminar as columnas que non nos interesasen, engadir a columna de ``cidade'' e apilar todo nun \texttt{csv}. Fixemos ese traballo ca librería Pandas de Python (ver \texttt{sripts/clean\_csvs.py}).  
+Nesta ocasión non nos limitamos a usar os \texttt{.csv}s de unha cidade, con motivo de enriquezer as estadísticas. Dende un principio observamos que o porcentaxe de nulos non era ó meso ó longo das cidades, por eso con varias cidades esperamos unha respresentación máis fiel da realidade. As primeiras manipulacións que  tivemos que facerlle ós datos foi a de eliminar as columnas que non nos interesasen, engadir a columna de ``cidade'' e apilar todo nun \texttt{csv}. Fixemos ese traballo ca librería Pandas \cite{pandas_license} de Python \cite{cpython_license} (ver \texttt{sripts/clean\_csvs.py}).  
 
 As columnas elexidas \textcolor{red}{[FALAR DAS COLUMNAS ELIXIDAS, A ELECCION]}
 
-As cidades elixidas foron: Barcelona, Euskadi, Girona, Lisboa, Madrid, Malaga, Mallora, Menorca, Porto, Sevilla e Valencia. O Modelo de Datos co porcentaxe de nulos reportado para estas cidades pode verse na figura \ref{fig:modeloDatos}.
+As cidades elixidas foron: Barcelona, Euskadi, Girona, Lisboa, Madrid, Malaga, Mallora, Menorca, Porto, Sevilla e Valencia. O Modelo de Datos co porcentaxe de nulos reportado para estas cidades pode verse na Figura \ref{fig:modeloDatos}.
 
 
 
@@ -132,7 +129,7 @@ oversampling, filtrado de ruido, etc. (Opcional, solo si es pertinente en caso d
 \subsection{Análisis exploratorio del dataset}
 \subsection{Tratamiento de nulos}
 
-En canto o tratamento de nulos, dicir que todos son de tipo númerico. Isto condiciona as opcións de imputación. Ademáis pódense que os nulos divídense en tres grupos: os relacionados co inmobiliario (baños, habitacións e camas), os valores de \epmh{Score} e o número de hospedaxes. Unha primera idea de encher os nulos dun grupo con valores do mesmo (e.g. imputar o \emph{score} de comunicación co resto de \emph{scores}) desmantelouse á vista da Figura \ref{fig:nulos}
+En canto o tratamento de nulos, dicir que todos son de tipo númerico. Isto condiciona as opcións de imputación. Ademáis pódense que os nulos divídense en tres grupos: os relacionados co inmobiliario (baños, habitacións e camas), os valores de \emph{Score} e o número de hospedaxes. Unha primera idea de encher os nulos dun grupo con valores do mesmo (e.g. imputar o \emph{score} de comunicación co resto de \emph{scores}) desmantelouse á vista da Figura \ref{fig:nulos}
 
 
 
@@ -163,9 +160,11 @@ MongoDB, en la que se importarán los datos usando una de las tres formas:
 \subitem Exportación en formato JSON y carga mediante MongoDB Compass.
 \subitem Exportación en formato JSON e importación mediante mongoimport desde terminal.
 \item Explicar detalladamente la estructura de los documentos (anidar objetos, arrays, decisiones de
-normalización o desnormalización). Justificar el modelo elegido y posibles alternativas.
+normalización o desnormalización). Xustificar el modelo elegido y posibles alternativas.
 	\end{itemize}
 }
+
+Unha vez que temos o \texttt{csv} con as columnas que queremos (e solo esas) e os valores limpos, é un bo momento de cargar os datos en MongoDB (licencia en \cite{mongodb_license})
 
 \section{Explotación de la Base de Datos}
 \textcolor{red}{Cada grupo deberá implementar 4 consultas que respondan a preguntas analíticas relevantes dentro de su
@@ -184,18 +183,53 @@ Agora que hemos definido e implementado a nosa Base de Datos,
 \subsection*{Consulta 1: Obter un índice de centralidade (dentro da cidade) para cada hospedaxe} 
 \addcontentsline{toc}{subsection}{Consulta 1}
 
-\emph{Justificación:}
+\emph{Xustificación:} como verase na sección \ref{sec:nulosAA}, imos usar este valor para facer prediccións sobre o precio de cada hospedaxe. Ademáis parecíanos un bo uso das funcións nativas de MongoDB.
 
-\emph{Resultados:}
+Para levar acabo esta consulta precisamos calcular os centroides de cada cidade e logo, para cada hospedaxe calcularemos a distacia ó centroide. O seguinte código crea ditos centroides, agragando os hospedaxes por cidade e facendo a media das súas coordenadas.
+
 
 \begin{lstlisting}
-SELECT
+const centroides = db.listings.aggregate([
+  {
+    $group: {
+      _id: "$city",
+      avg_lat: { $avg: "$latitude" },
+      avg_lon: { $avg: "$longitude" }
+    }
+  }
+]).toArray();
 \end{lstlisting}
+
+Agora que temos eso só nos queda facer un \texttt{updateMany} no que por cada centroide, collemos os hospedaxes desa cidade e calculamos a distacia euclidea do centroide ó hospedaxe. Malia seren moitas liñas, as liñas 8-13 correspóndense co cálculo.
+
+\begin{lstlisting}
+centroides.forEach(c => {
+  db.listings.updateMany(
+    { city: c._id },     // filtro
+    [
+      {
+        $set: {
+          centrality: {
+            $sqrt: {
+              $add: [
+                { $pow: [{ $subtract: ["$latitude", c.avg_lat] }, 2] },
+                { $pow: [{ $subtract: ["$longitude", c.avg_lon] }, 2] }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  );
+});
+\end{lstlisting}
+
+\emph{Resultados:} Tal cual o fixemos cambia a base de datos, non devolve. Para ver o efecto podemos facer unha mini-consulta de comprobación como \texttt{db.listings.findOne()} e ver que xa figura o novo atributo.
 
 \subsection*{Consulta 2: Cales son os barrios con hospedadores máis novos? Para cada cidade} 
 \addcontentsline{toc}{subsection}{Consulta 2}
 
-\emph{Justificación:}
+\emph{Xustificación:}
 
 \emph{Resultados:}
 
@@ -206,18 +240,61 @@ SELECT
 \subsection*{Consulta 3: Influe foto de perfil no prezo medio?} 
 \addcontentsline{toc}{subsection}{Consulta 3}
 
-\emph{Justificación:}
+\emph{Xustificación:} de ser certo, AirBnB debería exisir ós seus hospedadores que se poñan foto, ou mesmo saldría deles. Tamén é interesante dende o punto de vista sociolóxico.
 
-\emph{Resultados:}
+Esta consulta é sinxela, só hai que agrupar por valor de \texttt{host.has\_profile\_pic}, agregando o precio
 
 \begin{lstlisting}
-SELECT
+db.listings.aggregate([
+  {
+    $group: {
+      _id: "$host.has_profile_pic",
+      avg_price: { $avg: "$price" },
+      min_price: { $min: "$price" },
+      max_price: { $max: "$price" },
+      std_dev_price: { $stdDevSamp: "$price" },
+      count: { $sum: 1 }
+    }
+  },
+  {
+    $project: {
+      has_profile_pic: "$_id",
+      avg_price: { $round: ["$avg_price", 2] },
+      min_price: 1,
+      max_price: 1,
+      std_dev_price: 1,
+      count: 1,
+      _id: 0
+    }
+  },
+  { $sort: { has_profile_pic: 1 } }
+])
+\end{lstlisting}
+
+\emph{Resultados:} como pode verse os resultados obtidos (ver abaixo) son algo significativos, posto que ainda que as medias son distintas as desviacións estandar solápanse. En calquera caso, análise de distribucións é algo que debería facerse en R \cite{r_license}, Julia \cite{julia_license} ou Python pero non en MongoDB.
+\begin{lstlisting}
+{
+  min_price: 8,
+  max_price: 18000,
+  std_dev_price: 407.5147249606762,
+  count: 4682,
+  has_profile_pic: false,
+  avg_price: 161.12
+},
+{
+  min_price: 8,
+  max_price: 92150,
+  std_dev_price: 1500.7666758984817,
+  count: 154072,
+  has_profile_pic: true,
+  avg_price: 366.86
+}
 \end{lstlisting}
 
 \subsection*{Consulta 4: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?} 
 \addcontentsline{toc}{subsection}{Consulta 4}
 
-\emph{Justificación:}
+\emph{Xustificación:}
 
 \emph{Resultados:}
 
@@ -229,7 +306,7 @@ SELECT
 \subsection*{Consulta 5: Que \epmh{score} é o que máis fluctua?} 
 \addcontentsline{toc}{subsection}{Consulta 5}
 
-\emph{Justificación:}
+\emph{Xustificación:}
 
 \emph{Resultados:}
 
@@ -240,7 +317,7 @@ SELECT
 \subsection*{Consulta 6: Cales son os hospedaxes con hospedadores fóra desa cidade?}
 \addcontentsline{toc}{subsection}{Consulta 6}
 
-\emph{Justificación:}
+\emph{Xustificación:}
 
 \emph{Resultados:}
 
@@ -251,15 +328,125 @@ SELECT
 \subsection*{Consulta 7: Cales son os hospedaxes que estan a facer un bo último mes?}
 \addcontentsline{toc}{subsection}{Consulta 7}
 
-\emph{Justificación:}
+\emph{Xustificación:} esta consula é de carácter moi xeral e o interese pode vir de moitos lados, os hospedadores poden querer estudar que fan eses hospedaxes tan bos; tamén AirBnB pódese ver beneficiado se é capaz de caracterizar tendencias, ou premiar ós mellores hospedaxes.
+
+
+\begin{lstlisting}
+db.listings.aggregate([
+  {
+    $match: {
+      number_of_reviews_l30d: { $gt: 0 },
+      reviews_per_month: { $gt: 0 }
+    }
+  },
+  {
+    $project: {
+      _id: 1,
+      description: 1,
+      city: 1,
+      neighbourhood_group_cleansed: 1,
+      price: 1,
+      "score.rating": 1,
+      number_of_reviews_l30d: 1,
+      reviews_per_month: 1,
+      performance_score: {
+        $add: [
+          { $multiply: ["$number_of_reviews_l30d", 2] },
+          { $multiply: ["$reviews_per_month", 1.5] },
+          { $multiply: ["$score.rating", 10] }
+        ]
+      },
+      recent_popularity: {
+        $multiply: ["$number_of_reviews_l30d", 10]
+      }
+    }
+  },
+  {
+    $match: {
+      performance_score: { $gt: 40 }
+    }
+  },
+  {
+    $sort: {
+      performance_score: -1,
+      recent_popularity: -1
+    }
+  },
+  {
+    $project: {
+      _id: 1,
+      description: 1,
+      city: 1,
+      neighbourhood: "$neighbourhood_group_cleansed",
+      price: 1,
+      rating: "$score.rating",
+      reviews_last_30d: "$number_of_reviews_l30d",
+      reviews_per_month: 1,
+      performance_score: { $round: ["$performance_score", 2] },
+      status: {
+        $switch: {
+          branches: [
+            { case: { $gte: ["$performance_score", 70] }, then: "Excellent" },
+            { case: { $gte: ["$performance_score", 50] }, then: "Good" },
+            { case: { $gte: ["$performance_score", 40] }, then: "Average" }
+          ],
+          default: "Below Average"
+        }
+      }
+    }
+  },
+  { $limit: 15 }
+])
+\end{lstlisting}
 
 \emph{Resultados:}
 
 \begin{lstlisting}
-SELECT
+  {
+    _id: ObjectId('693348dc7269f26612df5898'),
+    description: 'Ideal room to share stories and experiences with capacity for up to 8 people. It has 4 bunk beds. Includes a private bathroom, two sinks, air conditioning, free wifi, bed linen and an individual space to store your luggage. All beds have USB connection to charge your devices. Unite has rooms with bathroom adapted for the disabled according to availability.<br />The establishment is cashless.<br />Unite is cashless',
+    price: 33,
+    reviews_per_month: 94.77,
+    city: 'barcelona',
+    neighbourhood: 'Sant Martí',
+    rating: 4.43,
+    reviews_last_30d: 121,
+    performance_score: 428.45,
+    status: 'Excellent'
+  },
+  {
+    _id: ObjectId('693348dc7269f26612e06f70'),
+    description: 'This bright and cosy double room comes with a double bed, air-conditioning, wall-mounted TV and free Wi-Fi. All rooms in easyHotel Madrid Alcala offer comfort and cleanliness at a budget price to allow you to spend time exploring our great city outside of your hotel room. Room size 12 sqm.',
+    price: 128,
+    reviews_per_month: 82.94,
+    city: 'madrid',
+    neighbourhood: 'San Blas - Canillejas',
+    rating: 4.82,
+    reviews_last_30d: 116,
+    performance_score: 404.61,
+    status: 'Excellent'
+  },
+  {
+    _id: ObjectId('693348dc7269f26612df3f4f'),
+    description: 'Flawless time with the whole family in this stylish accommodation! <br /><br />The apartments have three bedrooms, a bathroom, and a toilet. The master bedroom has a double bed, the second bedroom has two single beds and the third bedroom has a single bed. <br /><br />Enjoy the freedom and privacy of having your own apartment in the city center.',
+    price: 324,
+    reviews_per_month: 61.23,
+    city: 'barcelona',
+    neighbourhood: 'Eixample',
+    rating: 4.72,
+    reviews_last_30d: 100,
+    performance_score: 339.05,
+    status: 'Excellent'
+  },
+
+...
+
 \end{lstlisting}
 
+
 \section{Recheo de nulos usando Aprendizaxe Automático}
+\label{sec:nulosAA}
+
 \textcolor{red}{De forma opcional y rápida, entrenar un modelo de aprendizaje automático utilizando los datos almacenados
 en MongoDB (por ejemplo, regresión, clasificación, …). Debe explicarse brevemente el objetivo del modelo,
 las variables utilizadas y los resultados principales.}
