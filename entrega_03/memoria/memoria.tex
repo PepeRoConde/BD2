@@ -85,17 +85,21 @@
 
 \section{Introdución}
 
-Como nas prácticas anteriores, traballamos sobre o conxunto de datos de AirB\&B. Neste caso truncamos o punto de vista ou a aplicación. Se ben anteriormente o foco era na explotación analítica de o feito \texttt{valoración} agora centrámosnos nos \texttt{hospedaxes}. O diseño da Base de datos terá lugar na sección \ref{sec:deseño}, e será realizado sobre os datos expostos en \ref{sec:modeloDatos}.
+Como nas prácticas anteriores, traballamos sobre o conxunto de datos de AirBnB. Neste caso truncamos o punto de vista ou a aplicación. Se ben anteriormente o foco era na explotación analítica do feito \texttt{valoración} agora centrámosnos nos \texttt{hospedaxes}. O diseño da Base de datos terá lugar na sección \ref{sec:deseño}, e será realizado sobre os datos expostos en \ref{sec:modeloDatos}.
 
 \section{Modelo de Datos}
 \label{sec:modeloDatos}
 
-Nesta ocasión non nos limitamos a usar os \texttt{.csv}s de unha cidade, con motivo de enriquezer as estadísticas. Dende un principio observamos que o porcentaxe de nulos non era ó meso ó longo das cidades, por eso con varias cidades esperamos unha respresentación máis fiel da realidade. As primeiras manipulacións que  tivemos que facerlle ós datos foi a de eliminar as columnas que non nos interesasen, engadir a columna de ``cidade'' e apilar todo nun \texttt{csv}. Fixemos ese traballo ca librería Pandas \cite{pandas_license} de Python \cite{cpython_license} (ver \texttt{sripts/clean\_csvs.py}).  
+Nesta ocasión non nos limitamos a usar os \texttt{.csv}s de unha cidade, con motivo de facer máis diversas as estadísticas e os resultados en xeral. Dende un principio observamos que o porcentaxe de nulos para a mesma columna non era ó meso ó longo das cidades, por eso con varias cidades esperamos unha representación máis fiel da realidade (e.g a cidade de Girona ten 100\% de nulos para a columna \texttt{neighbourhood\_group\_cleansed} mentras que Lisboa ten un 0\%). As primeiras manipulacións que  tivemos que facerlle ós datos foi a de eliminar as columnas que non nos interesasen, engadir a columna de ``cidade'' e apilar todo nun \texttt{csv}. Fixemos ese traballo ca librería Pandas \cite{pandas_license} de Python \cite{cpython_license}, xa que os campos de texto libre, como \texttt{description}, contiñan caracteres de salto de carro \texttt{\^{}M} que dificultaban a tarea a \emph{oneliners} en AWK \cite{gpl3_license}  (ver o programa adxunto \texttt{src/merge\_csvs.py} e a Figura \ref{fig:merge}).  
 
-As columnas elexidas \textcolor{red}{[FALAR DAS COLUMNAS ELIXIDAS, A ELECCION]}
+As columnas elexidas pódense ver na Figura \ref{fig:modeloDatos}. A eleción foi un compromiso entre expresividade e tamaño, pensamos que cas columnas elixidas podemos facer bos análisis e consultas sen ten que cargar con todo o peso dos \texttt{.csv}s orixinais. Ademáis, o teren tipos de datos distintos e mesmo unha estructura xerárquica implícita, supoñen unha interesante materia prima. A estructura implícita a modelamos como: unha única coleción de hospedaxes na que cada documento ten embebidos outros dous (o hospedador e máis o \emph{Score}) e un arranxo, as prestacións.
 
-As cidades elixidas foron: Barcelona, Euskadi, Girona, Lisboa, Madrid, Malaga, Mallora, Menorca, Porto, Sevilla e Valencia. O Modelo de Datos co porcentaxe de nulos reportado para estas cidades pode verse na Figura \ref{fig:modeloDatos}.
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{../diagramas/merge.drawio.png}
+    \caption{A primeira transformación e xuntar os datos de distintas cidades e quitar as columnas que non nos interesen. Aproveitamos a ocasión para facer unha imputación sinxela, \emph{vaninilla} dos datos}
+  \label{fig:merge}
+\end{figure}
 
 
 \begin{figure}[H]
@@ -126,10 +130,13 @@ oversampling, filtrado de ruido, etc. (Opcional, solo si es pertinente en caso d
 \end{itemize}
 }
 
+
 \subsection{Análisis exploratorio del dataset}
 \subsection{Tratamiento de nulos}
 
-En canto o tratamento de nulos, dicir que todos son de tipo númerico. Isto condiciona as opcións de imputación. Ademáis pódense que os nulos divídense en tres grupos: os relacionados co inmobiliario (baños, habitacións e camas), os valores de \emph{Score} e o número de hospedaxes. Unha primera idea de encher os nulos dun grupo con valores do mesmo (e.g. imputar o \emph{score} de comunicación co resto de \emph{scores}) desmantelouse á vista da Figura \ref{fig:nulos}
+Como logo temos que volcar os datos a MongoDB (licencia en \cite{mongodb_license}), o noso programa xa limpia os datos cunha imputación sinxela  pero apropiada para o tipo de datos (o exisido pola práctica), non obstante podemos desactivala e observar os nulos do arquivo mergeado, o porcentaxe está dispoñibel na Figura \ref{fig:modeloDatos}. Ademáis do porcentaxe é interesante o tipo de dato e o rol que desempeña esa columna.  
+\subsubsection{Nulos núericos}
+Dende logo o tipo de dato condiciona as opcións de imputación. Ademáis pódese dicir que estos nulos divídense en tres grupos: os relacionados co inmobiliario (baños, habitacións e camas), os valores de \emph{Score} e o número de hospedaxes. Unha primera idea de encher os nulos dun grupo con valores do mesmo (e.g. imputar o \emph{score} de comunicación co resto de \emph{scores}) desmantelouse á vista da Figura \ref{fig:nulos}
 
 
 
@@ -147,15 +154,16 @@ En canto o tratamento de nulos, dicir que todos son de tipo númerico. Isto cond
   \label{fig:vale_pena_Knn}
 \end{figure}
 
+\subsubsection{Outros nulos}
 \subsection{Otras operaciones de procesado}
 
-\section{Definición e implementación de la Base de Datos}
+\section{Definición e implementación da Base de Datos}
 \label{sec:deseño}
 
 \textcolor{red}{
 	\begin{itemize}
 		\item Deberá crearse una base de datos específica para el dominio en una instalación propia de
-MongoDB, en la que se importarán los datos usando una de las tres formas:
+MongoDB, en la que se importarán los datos usando una das tres formas:
 \subitem Pymongo para importación directa desde Python.
 \subitem Exportación en formato JSON y carga mediante MongoDB Compass.
 \subitem Exportación en formato JSON e importación mediante mongoimport desde terminal.
@@ -166,7 +174,7 @@ normalización o desnormalización). Xustificar el modelo elegido y posibles alt
 
 Unha vez que temos o \texttt{csv} con as columnas que queremos (e solo esas) e os valores limpos, é un bo momento de cargar os datos en MongoDB (licencia en \cite{mongodb_license})
 
-\section{Explotación de la Base de Datos}
+\section{Explotación da Base de Datos}
 \textcolor{red}{Cada grupo deberá implementar 4 consultas que respondan a preguntas analíticas relevantes dentro de su
 dominio. Se valorará positivamente el uso del pipeline de agregación.
 Algunos ejemplos de categorías válidas serían: cálculo de estadísticas numéricas, agrupaciones por barrio/tipo
@@ -174,9 +182,9 @@ de habitación/host/país, ranking (top de precios/valoraciones), detección de 
 evolución temporal.
 Cada consulta debe incluir:
 \begin{itemize}
-	\item Enunciado claro de la pregunta analítica que quiere responder.
+	\item Enunciado claro da pregunta analítica que quiere responder.
 	\item Consulta completa o pipeline en sintaxis MongoDB.
-\item Resultados resumidos o capturas de la salida, acompañados de una breve explicación de la salida.
+\item Resultados resumidos o capturas da salida, acompañados de una breve explicación da salida.
 \end{itemize}}
 Agora que hemos definido e implementado a nosa Base de Datos, 
 
@@ -303,7 +311,7 @@ SELECT
 \end{lstlisting}
 
 
-\subsection*{Consulta 5: Que \epmh{score} é o que máis fluctua?} 
+\subsection*{Consulta 5: Que \emph{score} é o que máis fluctua?} 
 \addcontentsline{toc}{subsection}{Consulta 5}
 
 \emph{Xustificación:}
@@ -408,9 +416,7 @@ db.listings.aggregate([
     price: 33,
     reviews_per_month: 94.77,
     city: 'barcelona',
-    neighbourhood: 'Sant Martí',
-    rating: 4.43,
-    reviews_last_30d: 121,
+    neighbourhood: 'San Marti',
     performance_score: 428.45,
     status: 'Excellent'
   },
@@ -456,8 +462,9 @@ Como a columna \texttt{price} nos \texttt{.csv}s orixinais tiña un 10\% de nulo
 \newpage
 
 \bibliographystyle{IEEEtran}
-\bibliography{referencias}
+\bibliography{licencias}
 
 
 \end{document}
+
 
