@@ -3,20 +3,38 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pathlib import Path
+from matplotlib import rcParams
+
+# Custom colors matching the LaTeX definitions
+AZULITO = '#BAC8D3'      # RGB(186,200,211) - light blue
+AZUL_OSCURO = '#23445D'  # RGB(35,68,93) - dark blue
+TURQUESA = '#AE8FAB'     # RGB(174,143,171) - purple-ish
+
+# Configure Seaborn and Matplotlib
+sns.set_style("whitegrid")
+
+# Font settings
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans']
+rcParams['axes.titleweight'] = 'bold'
+rcParams['axes.labelweight'] = 'semibold'
+rcParams['figure.titlesize'] = 14
+rcParams['figure.titleweight'] = 'bold'
 
 # Input dataset
 DATA_FILE = "dataset/merged.csv"
 FIG_DIR = Path("diagramas")
 FIG_DIR.mkdir(exist_ok=True)
 
-# Columns of interest (moderate + low nulls + review_scores)
-MODERATE_LOW_NULL_COLS = ["bathrooms", "beds", "bedrooms", "host_total_listings_count"]
-REVIEW_SCORE_COLS = [c for c in pd.read_csv(DATA_FILE, nrows=0).columns if c.startswith("review_scores_")]
-ALL_COLS = MODERATE_LOW_NULL_COLS + REVIEW_SCORE_COLS
+# Columns of interest
+MODERATE_LOW_NULL_COLS = ["bathrooms", "beds", "bedrooms", "price", "host_acceptance_rate", 
+                          "host_response_rate", "host_total_listings_count", "reviews_per_month"]
 
 def load_data():
-    df = pd.read_csv(DATA_FILE)
-    return df
+    return pd.read_csv(DATA_FILE)
+
+def get_review_cols(df):
+    return [c for c in df.columns if c.startswith("review_scores_")]
 
 def null_percentage(df, cols):
     null_pct = df[cols].isnull().mean() * 100
@@ -26,42 +44,49 @@ def null_percentage(df, cols):
 
 def plot_null_counts(df, cols):
     null_counts = df[cols].isnull().sum().sort_values(ascending=False)
+    
     plt.figure(figsize=(12, 6))
-    sns.barplot(x=null_counts.index, y=null_counts.values)
-    plt.xticks(rotation=45)
+    bars = plt.bar(range(len(null_counts)), null_counts.values, 
+                   color=AZUL_OSCURO, edgecolor='white', linewidth=2)
+    
+    plt.xticks(range(len(null_counts)), null_counts.index, rotation=45, ha='right')
     plt.ylabel("Number of Nulls")
-    plt.title("Null Counts per Column")
+    plt.title("Null Counts per Column", color=AZUL_OSCURO)
     plt.tight_layout()
-    plt.savefig(FIG_DIR / "null_counts_per_column.png")
+    plt.savefig(FIG_DIR / "null_counts_per_column.png", dpi=150)
     plt.close()
 
 def plot_null_correlation(df, cols):
     null_df = df[cols].isnull()
     corr = null_df.corr()
+    
     plt.figure(figsize=(12, 10))
-    sns.heatmap(corr, annot=True, cmap="coolwarm", center=0)
-    plt.title("Correlacion de valores nulos")
+    
+    # Custom colormap
+    cmap = sns.diverging_palette(220, 20, as_cmap=True)
+    
+    sns.heatmap(corr, annot=True, fmt='.2f', cmap=cmap, center=0, 
+                square=True, linewidths=1, linecolor='white')
+    
+    plt.title("Correlacion de valores nulos", color=AZUL_OSCURO)
     plt.tight_layout()
-    plt.savefig(FIG_DIR / "null_correlation_heatmap.png")
+    plt.savefig(FIG_DIR / "null_correlation_heatmap.png", dpi=150)
     plt.close()
 
-def plot_null_pairplot(df, cols):
-    # Only do pairplot if <= 10 columns (otherwise too busy)
-    if len(cols) <= 10:
-        null_df = df[cols].isnull().astype(int)
-        pairplot = sns.pairplot(null_df)
-        pairplot.fig.suptitle("Pairplot of Null Indicators", y=1.02)
-        pairplot.fig.tight_layout()
-        pairplot.savefig(FIG_DIR / "null_pairplot.png")
-        plt.close()
-
 def main():
+    print("Analisis de valores nulos")
+    print(f"Cargando datos desde: {DATA_FILE}")
+    print(f"Guardando figuras en: {FIG_DIR}")
+    
     df = load_data()
-    null_percentage(df, ALL_COLS)
+    review_cols = get_review_cols(df)
+    ALL_COLS = MODERATE_LOW_NULL_COLS + review_cols
+    
+    null_pct = null_percentage(df, ALL_COLS)
     plot_null_counts(df, ALL_COLS)
     plot_null_correlation(df, ALL_COLS)
-    plot_null_pairplot(df, MODERATE_LOW_NULL_COLS)  # smaller set for readability
+    
+    print("Analisis completado")
 
 if __name__ == "__main__":
     main()
-

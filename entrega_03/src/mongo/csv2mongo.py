@@ -3,7 +3,7 @@ import pandas as pd
 from pymongo import MongoClient
 import ast  # to safely parse amenities list
 
-DATA_FILE = "dataset/final.csv"
+DATA_FILE = "dataset/merged.csv"
 
 # MongoDB connection
 MONGO_URI = "mongodb://localhost:27017/"
