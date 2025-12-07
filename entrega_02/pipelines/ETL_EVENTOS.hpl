@@ -13,9 +13,9 @@
     <transform_performance_capturing_delay>1000</transform_performance_capturing_delay>
     <transform_performance_capturing_size_limit>100</transform_performance_capturing_size_limit>
     <created_user>-</created_user>
-    <created_date>2025/11/11 21:33:37.237</created_date>
+    <created_date>2025/11/27 14:17:33.891</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2025/11/11 21:33:37.237</modified_date>
+    <modified_date>2025/11/27 14:17:33.891</modified_date>
   </info>
   <notepads>
   </notepads>
@@ -26,32 +26,17 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Select values</from>
-      <to>Database lookup</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Database lookup</from>
-      <to>Filter rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Filter rows</from>
       <to>Write to log</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
+      <from>Select values</from>
+      <to>Filter rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
       <from>Filter rows</from>
-      <to>Database lookup 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Database lookup 2</from>
-      <to>Select values 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Select values 2</from>
       <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
@@ -76,6 +61,7 @@
     <header>Y</header>
     <buffer_size>50000</buffer_size>
     <schemaDefinition/>
+    <ignoreFields>N</ignoreFields>
     <lazy_conversion>N</lazy_conversion>
     <add_filename_result>N</add_filename_result>
     <parallel>N</parallel>
@@ -140,87 +126,8 @@
     </fields>
     <attributes/>
     <GUI>
-      <xloc>64</xloc>
-      <yloc>192</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Database lookup</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <connection>docencia</connection>
-    <lookup>
-      <eat_row_on_failure>Y</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-      <key>
-        <condition>=</condition>
-        <field>PLACE_ID</field>
-        <name>PLACE_ID</name>
-      </key>
-      <schema>"pablo.chantada"</schema>
-      <table>dim_lugar</table>
-      <value>
-        <name>PLACE_ID</name>
-        <rename>PLACE_ID</rename>
-        <trim_type>none</trim_type>
-        <type>String</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>384</xloc>
-      <yloc>192</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Database lookup 2</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>5000</cache_size>
-    <connection>docencia</connection>
-    <lookup>
-      <eat_row_on_failure>Y</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-      <key>
-        <condition>=</condition>
-        <field>DATE_KEY</field>
-        <name>EVENT_DATE</name>
-        <name2/>
-      </key>
-      <orderby/>
-      <schema>"pablo.chantada"</schema>
-      <table>dim_tempo</table>
-      <value>
-        <default/>
-        <name>DATE_KEY</name>
-        <rename>DATE_KEY</rename>
-        <trim_type>none</trim_type>
-        <type>Timestamp</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>656</xloc>
-      <yloc>192</yloc>
+      <xloc>288</xloc>
+      <yloc>144</yloc>
     </GUI>
   </transform>
   <transform>
@@ -251,22 +158,6 @@
                 <conditions>
 </conditions>
                 <function>IS NOT NULL</function>
-                <leftvalue>EVENT_NAME</leftvalue>
-                <negated>N</negated>
-                <operator>AND</operator>
-              </condition>
-              <condition>
-                <conditions>
-</conditions>
-                <function>IS NOT NULL</function>
-                <leftvalue>PLACE_ID</leftvalue>
-                <negated>N</negated>
-                <operator>AND</operator>
-              </condition>
-              <condition>
-                <conditions>
-</conditions>
-                <function>IS NOT NULL</function>
                 <leftvalue>EVENT_DATE</leftvalue>
                 <negated>N</negated>
                 <operator>AND</operator>
@@ -287,6 +178,14 @@
                   <type>String</type>
                 </value>
               </condition>
+              <condition>
+                <conditions>
+</conditions>
+                <function>IS NOT NULL</function>
+                <leftvalue>EVENT_NAME</leftvalue>
+                <negated>N</negated>
+                <operator>AND</operator>
+              </condition>
             </conditions>
             <function>IS NOT NULL</function>
             <leftvalue>EVENT_TYPE</leftvalue>
@@ -301,11 +200,11 @@
       </condition>
     </compare>
     <send_false_to>Write to log</send_false_to>
-    <send_true_to>Database lookup 2</send_true_to>
+    <send_true_to>Table output</send_true_to>
     <attributes/>
     <GUI>
-      <xloc>528</xloc>
-      <yloc>192</yloc>
+      <xloc>592</xloc>
+      <yloc>144</yloc>
     </GUI>
   </transform>
   <transform>
@@ -324,30 +223,36 @@
         <length>-2</length>
         <name>EVENT_NAME</name>
         <precision>-2</precision>
+        <rename/>
       </field>
       <field>
         <length>-2</length>
         <name>EVENT_TYPE</name>
         <precision>-2</precision>
+        <rename/>
       </field>
       <field>
         <length>-2</length>
         <name>IMPACT</name>
         <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>PLACE_ID</name>
-        <precision>-2</precision>
+        <rename/>
       </field>
       <field>
         <length>-2</length>
         <name>EVENT_DATE</name>
         <precision>-2</precision>
+        <rename/>
       </field>
       <meta>
+        <conversion_mask/>
+        <currency_symbol/>
         <date_format_lenient>N</date_format_lenient>
-        <length>38</length>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <decimal_symbol/>
+        <encoding/>
+        <grouping_symbol/>
+        <length>41</length>
         <lenient_string_to_number>N</lenient_string_to_number>
         <name>EVENT_NAME</name>
         <precision>-2</precision>
@@ -357,7 +262,14 @@
         <type>String</type>
       </meta>
       <meta>
+        <conversion_mask/>
+        <currency_symbol/>
         <date_format_lenient>N</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <decimal_symbol/>
+        <encoding/>
+        <grouping_symbol/>
         <length>10</length>
         <lenient_string_to_number>N</lenient_string_to_number>
         <name>EVENT_TYPE</name>
@@ -368,7 +280,14 @@
         <type>String</type>
       </meta>
       <meta>
+        <conversion_mask/>
+        <currency_symbol/>
         <date_format_lenient>N</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <decimal_symbol/>
+        <encoding/>
+        <grouping_symbol/>
         <length>6</length>
         <lenient_string_to_number>N</lenient_string_to_number>
         <name>IMPACT</name>
@@ -379,19 +298,14 @@
         <type>String</type>
       </meta>
       <meta>
+        <conversion_mask/>
+        <currency_symbol/>
         <date_format_lenient>N</date_format_lenient>
-        <length>29</length>
-        <lenient_string_to_number>N</lenient_string_to_number>
-        <name>PLACE_ID</name>
-        <precision>-2</precision>
-        <rename>PLACE_ID</rename>
-        <roundingType>half_even</roundingType>
-        <storage_type/>
-        <type>String</type>
-      </meta>
-      <meta>
-        <conversion_mask>yyyy-MM-dd HH:mm:ss</conversion_mask>
-        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <decimal_symbol/>
+        <encoding/>
+        <grouping_symbol/>
         <length>-2</length>
         <lenient_string_to_number>N</lenient_string_to_number>
         <name>EVENT_DATE</name>
@@ -405,53 +319,8 @@
     </fields>
     <attributes/>
     <GUI>
-      <xloc>224</xloc>
-      <yloc>192</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Select values 2</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <length>-2</length>
-        <name>EVENT_NAME</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>EVENT_TYPE</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>IMPACT</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>PLACE_ID</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>EVENT_DATE</name>
-        <precision>-2</precision>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <GUI>
-      <xloc>800</xloc>
-      <yloc>192</yloc>
+      <xloc>448</xloc>
+      <yloc>144</yloc>
     </GUI>
   </transform>
   <transform>
@@ -465,8 +334,13 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <add_columns>N</add_columns>
+    <always_drop_and_recreate>N</always_drop_and_recreate>
+    <auto_update_table_structure>N</auto_update_table_structure>
+    <change_column_types>N</change_column_types>
     <commit>1000</commit>
     <connection>docencia</connection>
+    <drop_columns>N</drop_columns>
     <fields>
       <field>
         <column_name>EVENT_NAME</column_name>
@@ -481,10 +355,6 @@
         <stream_name>IMPACT</stream_name>
       </field>
       <field>
-        <column_name>PLACE_ID</column_name>
-        <stream_name>PLACE_ID</stream_name>
-      </field>
-      <field>
         <column_name>EVENT_DATE</column_name>
         <stream_name>EVENT_DATE</stream_name>
       </field>
@@ -493,19 +363,22 @@
     <only_when_have_rows>N</only_when_have_rows>
     <partitioning_daily>N</partitioning_daily>
     <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
     <partitioning_monthly>Y</partitioning_monthly>
+    <return_field/>
     <return_keys>N</return_keys>
     <schema>"pablo.chantada"</schema>
     <specify_fields>Y</specify_fields>
     <table>dim_eventos</table>
+    <tablename_field/>
     <tablename_in_field>N</tablename_in_field>
     <tablename_in_table>Y</tablename_in_table>
     <truncate>Y</truncate>
     <use_batch>Y</use_batch>
     <attributes/>
     <GUI>
-      <xloc>912</xloc>
-      <yloc>192</yloc>
+      <xloc>752</xloc>
+      <yloc>144</yloc>
     </GUI>
   </transform>
   <transform>
@@ -527,8 +400,8 @@
     <loglevel>Basic</loglevel>
     <attributes/>
     <GUI>
-      <xloc>528</xloc>
-      <yloc>336</yloc>
+      <xloc>592</xloc>
+      <yloc>288</yloc>
     </GUI>
   </transform>
   <transform_error_handling>

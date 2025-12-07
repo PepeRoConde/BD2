@@ -2,8 +2,6 @@ import pandas as pd
 import os
 import numpy as np
 
-# --- 1. Definición de Datos Base y Generación ---
-
 # Ciudades base para simulación (Albany es la real)
 CITIES = ['Albany', 'Albany', 'Albany', 'Schenectady', 'Troy']
 COUNTRIES = ['USA']
@@ -61,7 +59,6 @@ data_final = {
 
 df = pd.DataFrame(data_final)
 
-# --- 3. Generación del CSV ---
 output_file = 'datasets/places.csv'
 
 try:

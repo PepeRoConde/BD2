@@ -2,9 +2,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-# ============================================
-# 1. LEER CSVs ORIGINALES
-# ============================================
+
 print("Leyendo datasets...")
 df_listings = pd.read_csv('datasets/listings.csv')
 df_reviews = pd.read_csv('datasets/reviews.csv')
@@ -12,9 +10,6 @@ df_reviews = pd.read_csv('datasets/reviews.csv')
 print(f"Listings: {len(df_listings)}")
 print(f"Reviews: {len(df_reviews)}")
 
-# ============================================
-# 2. EXTRAER DATOS BASE DE HOSPEDADORES
-# ============================================
 # Seleccionar campos relevantes y eliminar duplicados por host_id
 df_hosts = df_listings[[
     'host_id', 
@@ -26,9 +21,6 @@ df_hosts = df_listings[[
 
 print(f"\nHospedadores únicos: {len(df_hosts)}")
 
-# ============================================
-# 3. CALCULAR AVG_SCORE POR HOST
-# ============================================
 # Obtener mapping listing_id -> host_id
 listing_to_host = df_listings[['id', 'host_id']].rename(columns={'id': 'listing_id'})
 
@@ -71,9 +63,6 @@ df_hosts = df_hosts.merge(avg_scores, on='host_id', how='left')
 # Hosts sin reviews: score NULL
 df_hosts['avg_score'] = df_hosts['avg_score'].round(2)
 
-# ============================================
-# 4. LIMPIAR Y NORMALIZAR DATOS
-# ============================================
 # Response time: normalizar valores
 def normalizar_response_time(value):
     if pd.isna(value):
@@ -101,9 +90,6 @@ df_hosts['superhost'] = df_hosts['host_is_superhost'].apply(convertir_superhost)
 # Total hostings
 df_hosts['total_hostings'] = df_hosts['calculated_host_listings_count'].fillna(1).astype(int)
 
-# ============================================
-# 5. SIMULAR CAMBIOS TEMPORALES (SCD2)
-# ============================================
 # Obtener fechas de reviews para cada host
 host_review_dates = df_reviews_with_host.groupby('host_id')['date'].agg(['min', 'max']).reset_index()
 host_review_dates.columns = ['host_id', 'fecha_primera_review', 'fecha_ultima_review']
@@ -121,9 +107,6 @@ df_hosts['anos_activo'] = (
 
 df_hosts['anos_activo'] = df_hosts['anos_activo'].fillna(0)
 
-# ============================================
-# 6. CREAR VERSIONES SCD2
-# ============================================
 df_scd2 = []
 
 for _, row in df_hosts.iterrows():
@@ -178,9 +161,6 @@ for _, row in df_hosts.iterrows():
 
 df_final = pd.DataFrame(df_scd2)
 
-# ============================================
-# 7. FORMATEAR Y EXPORTAR
-# ============================================
 # Convertir fechas a string
 df_final['data_empezou_valer'] = pd.to_datetime(df_final['data_empezou_valer'], errors='coerce').dt.strftime('%Y-%m-%d %H:%M:%S')
 df_final['data_deixou_valer'] = pd.to_datetime(df_final['data_deixou_valer'], errors='coerce').dt.strftime('%Y-%m-%d %H:%M:%S')

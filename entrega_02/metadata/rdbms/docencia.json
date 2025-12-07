@@ -2,13 +2,13 @@
   "virtualPath": "",
   "rdbms": {
     "ORACLE": {
-      "databaseName": "docencia ",
+      "databaseName": "${ORACLE_NAME}",
       "pluginId": "ORACLE",
       "accessType": 0,
-      "hostname": "10.8.48.29",
-      "password": "Encrypted 2be98afc86aa7f2d1ff48fb288cc4fde8",
+      "hostname": "${ORACLE_HOST}",
+      "password": "Encrypted 2be98afc86aa7f2d7fe4ffd2488c3f6e3",
       "pluginName": "Oracle",
-      "port": "1521",
+      "port": "${ORACLE_PORT}",
       "attributes": {
         "SUPPORTS_TIMESTAMP_DATA_TYPE": "Y",
         "QUOTE_ALL_FIELDS": "N",
@@ -20,7 +20,7 @@
         "PREFERRED_SCHEMA_NAME": ""
       },
       "manualUrl": "",
-      "username": "\"marcelo.fsanchez\""
+      "username": "\"pablo.chantada\""
     }
   },
   "name": "docencia"

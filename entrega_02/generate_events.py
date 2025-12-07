@@ -2,15 +2,13 @@ import csv
 import random
 from datetime import date, timedelta
 
-# ---------------- CONFIG ---------------- #
 
-INPUT_PLACES_CSV = "datasets/places.csv"      # tu fichero con STREET,CITY,COUNTRY,LATITUD,LONGITUD
+INPUT_PLACES_CSV = "datasets/places.csv"     
 OUTPUT_EVENTS_CSV = "datasets/events.csv"
 
 MIN_EVENTS_PER_PLACE = 0
 MAX_EVENTS_PER_PLACE = 2
 
-# ¡AJUSTADO AL RANGO REAL DE dim_tempo!
 START_DATE = date(2014, 7, 1)   # MIN(DATES)
 END_DATE   = date(2025, 9, 5)   # MAX(DATES)
 
@@ -56,7 +54,6 @@ def main():
             city   = (row["CITY"] or "").strip()
             country= (row["COUNTRY"] or "").strip()
 
-            # Mismo PLACE_ID que en Hop: SUBSTITUTE([STREET]&"_"&[CITY]&"_"&[COUNTRY]," ","")
             place_id = f"{street}_{city}_{country}".replace(" ", "")
 
             row["PLACE_ID"] = place_id

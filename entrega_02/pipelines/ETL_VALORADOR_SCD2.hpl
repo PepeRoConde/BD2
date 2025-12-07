@@ -51,6 +51,7 @@
     <header>Y</header>
     <buffer_size>50000</buffer_size>
     <schemaDefinition/>
+    <ignoreFields>N</ignoreFields>
     <lazy_conversion>N</lazy_conversion>
     <add_filename_result>N</add_filename_result>
     <parallel>N</parallel>
@@ -168,125 +169,44 @@
         <length>-2</length>
         <name>reviewer_id</name>
         <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>reviewer_name</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>idade</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>sexo</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>data_nacemento</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>data_empezou_valer</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>data_deixou_valer</name>
-        <precision>-2</precision>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>actual</name>
-        <precision>-2</precision>
-      </field>
-      <meta>
-        <date_format_lenient>N</date_format_lenient>
-        <length>15</length>
-        <lenient_string_to_number>N</lenient_string_to_number>
-        <name>reviewer_id</name>
-        <precision>0</precision>
         <rename>REVIEWER_ID</rename>
-        <roundingType>half_even</roundingType>
-        <storage_type/>
-        <type>Integer</type>
-      </meta>
-      <meta>
-        <date_format_lenient>N</date_format_lenient>
-        <length>15</length>
-        <lenient_string_to_number>N</lenient_string_to_number>
+      </field>
+      <field>
+        <length>-2</length>
         <name>idade</name>
-        <precision>0</precision>
+        <precision>-2</precision>
         <rename>AGE</rename>
-        <roundingType>half_even</roundingType>
-        <storage_type/>
-        <type>Integer</type>
-      </meta>
-      <meta>
-        <date_format_lenient>N</date_format_lenient>
-        <length>1</length>
-        <lenient_string_to_number>N</lenient_string_to_number>
+      </field>
+      <field>
+        <length>-2</length>
         <name>sexo</name>
         <precision>-2</precision>
         <rename>SEX</rename>
-        <roundingType>half_even</roundingType>
-        <storage_type/>
-        <type>String</type>
-      </meta>
-      <meta>
-        <conversion_mask>yyyy-MM-dd</conversion_mask>
-        <date_format_lenient>N</date_format_lenient>
+      </field>
+      <field>
         <length>-2</length>
-        <lenient_string_to_number>N</lenient_string_to_number>
         <name>data_nacemento</name>
         <precision>-2</precision>
         <rename>BIRTH_DATE</rename>
-        <roundingType>half_even</roundingType>
-        <storage_type/>
-        <type>Date</type>
-      </meta>
-      <meta>
-        <conversion_mask>yyyy-MM-dd HH:mm:ss</conversion_mask>
-        <date_format_lenient>N</date_format_lenient>
+      </field>
+      <field>
         <length>-2</length>
-        <lenient_string_to_number>N</lenient_string_to_number>
         <name>data_empezou_valer</name>
         <precision>-2</precision>
         <rename>DATE_START_VALID</rename>
-        <roundingType>half_even</roundingType>
-        <storage_type/>
-        <type>Date</type>
-      </meta>
-      <meta>
-        <conversion_mask>yyyy-MM-dd HH:mm:ss</conversion_mask>
-        <date_format_lenient>N</date_format_lenient>
+      </field>
+      <field>
         <length>-2</length>
-        <lenient_string_to_number>N</lenient_string_to_number>
         <name>data_deixou_valer</name>
         <precision>-2</precision>
         <rename>DATE_STOPPED_VALID</rename>
-        <roundingType>half_even</roundingType>
-        <storage_type/>
-        <type>Date</type>
-      </meta>
-      <meta>
-        <date_format_lenient>N</date_format_lenient>
-        <length>15</length>
-        <lenient_string_to_number>N</lenient_string_to_number>
+      </field>
+      <field>
+        <length>-2</length>
         <name>actual</name>
-        <precision>0</precision>
+        <precision>-2</precision>
         <rename>ACTUAL</rename>
-        <roundingType>half_even</roundingType>
-        <storage_type/>
-        <type>Integer</type>
-      </meta>
-      <remove>
-        <name>reviewer_name</name>
-      </remove>
+      </field>
       <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
@@ -306,8 +226,13 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <add_columns>N</add_columns>
+    <always_drop_and_recreate>N</always_drop_and_recreate>
+    <auto_update_table_structure>N</auto_update_table_structure>
+    <change_column_types>N</change_column_types>
     <commit>1000</commit>
     <connection>docencia</connection>
+    <drop_columns>N</drop_columns>
     <fields>
       <field>
         <column_name>REVIEWER_ID</column_name>
@@ -342,11 +267,14 @@
     <only_when_have_rows>N</only_when_have_rows>
     <partitioning_daily>N</partitioning_daily>
     <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
     <partitioning_monthly>Y</partitioning_monthly>
+    <return_field/>
     <return_keys>N</return_keys>
     <schema>"pablo.chantada"</schema>
     <specify_fields>Y</specify_fields>
     <table>dim_valorador</table>
+    <tablename_field/>
     <tablename_in_field>N</tablename_in_field>
     <tablename_in_table>Y</tablename_in_table>
     <truncate>Y</truncate>

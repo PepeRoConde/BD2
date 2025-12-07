@@ -93,7 +93,7 @@ df_final = pd.DataFrame(df_scd2)
 df_final['data_empezou_valer'] = pd.to_datetime(df_final['data_empezou_valer']).dt.strftime('%Y-%m-%d %H:%M:%S')
 df_final['data_nacemento'] = pd.to_datetime(df_final['data_nacemento']).dt.strftime('%Y-%m-%d')
 
-# CRÍTICO: Manejar NaT correctamente
+# Manejar NaT correctamente
 df_final['data_deixou_valer'] = df_final['data_deixou_valer'].apply(
     lambda x: '' if pd.isna(x) else pd.to_datetime(x).strftime('%Y-%m-%d %H:%M:%S')
 )

@@ -109,31 +109,23 @@ def enrich_reviews(input_reviews, input_listings, input_places, output_file):
     print(f"{len(df_listings)} listings cargados")
     print(f"{len(df_places)} places cargados")
     print(f"\nColumnas reviews originales: {list(df_reviews.columns)}")
-    
-    # ============================================
-    # 1. GENERAR PLACE_ID EN PLACES (CORREGIDO)
-    # ============================================
+
     print("\nGenerando PLACE_IDs...")
-    
-    # ✓ CORRECCIÓN: Crear PLACE_ID SIN duplicación
-    # Formato: STREET_CITY_COUNTRY (sin espacios)
+
     df_places['PLACE_ID'] = (
         df_places['STREET'].str.replace(' ', '', regex=False) + '_' + 
         df_places['CITY'].str.replace(' ', '', regex=False) + '_' + 
         df_places['COUNTRY'].str.replace(' ', '', regex=False)
     )
     
-    print(f"  ✓ {len(df_places)} PLACE_IDs generados")
-    print(f"  ✓ PLACE_IDs únicos: {df_places['PLACE_ID'].nunique()}")
+    print(f"  {len(df_places)} PLACE_IDs generados")
+    print(f"  PLACE_IDs únicos: {df_places['PLACE_ID'].nunique()}")
     
     # Mostrar ejemplos de PLACE_IDs generados
     print(f"\n  Ejemplos de PLACE_IDs generados:")
     for place_id in df_places['PLACE_ID'].head(10):
         print(f"    - {place_id}")
-    
-    # ============================================
-    # 2. AGREGAR HOST_ID
-    # ============================================
+
     print("\nAgregando HOST_ID...")
     
     # Crear mapeo listing_id -> host_id
@@ -146,12 +138,9 @@ def enrich_reviews(input_reviews, input_listings, input_places, output_file):
         how='left'
     )
     
-    print(f"  ✓ Reviews con HOST_ID: {df_enriched['host_id'].notna().sum()}")
-    print(f"  ⚠ Reviews sin HOST_ID: {df_enriched['host_id'].isna().sum()}")
-    
-    # ============================================
-    # 3. AGREGAR PLACE_ID (ALEATORIO DE LA LISTA)
-    # ============================================
+    print(f"Reviews con HOST_ID: {df_enriched['host_id'].notna().sum()}")
+    print(f"Reviews sin HOST_ID: {df_enriched['host_id'].isna().sum()}")
+
     print("\nAsignando PLACE_ID aleatorio...")
     
     # Obtener lista de PLACE_IDs disponibles
@@ -161,24 +150,15 @@ def enrich_reviews(input_reviews, input_listings, input_places, output_file):
     np.random.seed(42)  # Para reproducibilidad
     df_enriched['PLACE_ID'] = np.random.choice(place_ids, size=len(df_enriched))
     
-    print(f"  ✓ PLACE_IDs asignados: {len(df_enriched)}")
-    print(f"  ✓ Places únicos usados: {df_enriched['PLACE_ID'].nunique()}")
-    
-    # ============================================
-    # 4. CALCULAR SCORE
-    # ============================================
+    print(f"  PLACE_IDs asignados: {len(df_enriched)}")
+    print(f"  Places únicos usados: {df_enriched['PLACE_ID'].nunique()}")
+
     print("\nCalculando scores de sentimiento...")
     df_enriched['score'] = df_enriched['comments'].apply(calculate_sentiment_score)
-    
-    # ============================================
-    # 5. GENERAR RAIN_MM
-    # ============================================
+
     print("Generando datos de lluvia...")
     df_enriched['rain_mm'] = df_enriched['date'].apply(generate_rain_mm)
-    
-    # ============================================
-    # 6. FORMATEAR Y GUARDAR
-    # ============================================
+
     # Convertir date a string
     df_enriched['date'] = df_enriched['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
     
@@ -212,21 +192,15 @@ def enrich_reviews(input_reviews, input_listings, input_places, output_file):
     
     # Guardar CSV enriquecido
     df_enriched.to_csv(output_file, index=False)
-    print(f"\n✓ Archivo reviews guardado: {output_file}")
+    print(f"\nArchivo reviews guardado: {output_file}")
     
-    # ============================================
-    # 7. ACTUALIZAR PLACES.CSV CON PLACE_ID
-    # ============================================
     # Reordenar columnas de places para que PLACE_ID sea la primera
     df_places = df_places[['PLACE_ID', 'STREET', 'CITY', 'COUNTRY', 'LATITUD', 'LONGITUD']]
     
     # Guardar places actualizado
     df_places.to_csv(input_places, index=False)
-    print(f"✓ Archivo places actualizado: {input_places}")
-    
-    # ============================================
-    # 8. ESTADÍSTICAS
-    # ============================================
+    print(f"Archivo places actualizado: {input_places}")
+
     print("\n" + "="*60)
     print("ESTADÍSTICAS GENERADAS")
     print("="*60)
@@ -304,7 +278,7 @@ if __name__ == "__main__":
     df_enriched = enrich_reviews(INPUT_REVIEWS, INPUT_LISTINGS, INPUT_PLACES, OUTPUT_FILE)
     
     print("\n" + "="*60)
-    print("✓ PROCESO COMPLETADO EXITOSAMENTE")
+    print("PROCESO COMPLETADO EXITOSAMENTE")
     print("="*60)
     print(f"Archivo reviews listo: {OUTPUT_FILE}")
     print(f"Archivo places actualizado: {INPUT_PLACES}")

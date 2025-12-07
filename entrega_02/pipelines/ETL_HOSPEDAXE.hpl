@@ -39,7 +39,7 @@
 $70.00
 LO PASAMOS A:
 70 (ELIMINANDO EL .00 Y EL $)</note>
-      <width>183</width>
+      <width>186</width>
     </notepad>
   </notepads>
   <order>
@@ -94,6 +94,7 @@ LO PASAMOS A:
     <header>Y</header>
     <buffer_size>50000</buffer_size>
     <schemaDefinition/>
+    <ignoreFields>N</ignoreFields>
     <lazy_conversion>Y</lazy_conversion>
     <add_filename_result>N</add_filename_result>
     <parallel>N</parallel>
@@ -1118,8 +1119,13 @@ LO PASAMOS A:
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <add_columns>N</add_columns>
+    <always_drop_and_recreate>N</always_drop_and_recreate>
+    <auto_update_table_structure>N</auto_update_table_structure>
+    <change_column_types>N</change_column_types>
     <commit>1000</commit>
     <connection>docencia</connection>
+    <drop_columns>N</drop_columns>
     <fields>
       <field>
         <column_name>HOSTING_ID</column_name>

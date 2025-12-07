@@ -4,6 +4,21 @@
   "dataSetsCsvFolder" : "${PROJECT_HOME}/datasets",
   "enforcingExecutionInHome" : true,
   "config" : {
-    "variables" : [ ]
+    "variables" : [ {
+      "name" : "ORACLE_HOST_VALUE",
+      "value" : "10.8.48.29"
+    }, {
+      "name" : "ORACLE_PASS_VALUE",
+      "value" : "54158262r"
+    }, {
+      "name" : "ORACLE_PORT",
+      "value" : "1521"
+    }, {
+      "name" : "ORACLE_NAME",
+      "value" : "docencia"
+    }, {
+      "name" : "ABSOLUTE_PATH",
+      "value" : "C:\\Users\\marce\\Desktop\\euu\\cuarto\\apaad\\BD2\\entrega_02"
+    } ]
   }
 }

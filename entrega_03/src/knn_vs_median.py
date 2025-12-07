@@ -5,7 +5,7 @@ from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 
-DATA_FILE = "dataset/final.csv"
+DATA_FILE = "dataset/merged.csv"
 
 # Columns to test (moderate-null, non-review_scores)
 TEST_COLS = ["bathrooms", "beds", "host_total_listings_count", "bedrooms"]
@@ -69,9 +69,33 @@ def kfold_imputation_test(df, col, n_splits=2, knn_neighbors=3):
 
 def main():
     df = load_data()
+    results = []
+
     for col in TEST_COLS:
         mse_med, mse_knn = kfold_imputation_test(df, col)
-        print(f"{col}: Median MSE={mse_med:.4f}, KNN MSE={mse_knn:.4f}")
+        results.append((col, mse_med, mse_knn))
+
+    # ---- Build LaTeX table ----
+    latex = []
+    latex.append(r"\begin{table}[H]")
+    latex.append(r"\centering")
+    latex.append(r"\caption{Comparación de MSE: Imputación por Mediana vs KNN}")
+    latex.append(r"\label{tab:knnVsMedian}")
+    latex.append(r"\begin{tabular}{lcc}")
+    latex.append(r"\toprule")
+    latex.append(r"Variable & MSE Mediana & MSE KNN \\")
+    latex.append(r"\midrule")
+
+    for col, mse_med, mse_knn in results:
+        latex.append(f"{col} & {mse_med:.4f} & {mse_knn:.4f} \\\\")
+
+    latex.append(r"\bottomrule")
+    latex.append(r"\end{tabular}")
+    latex.append(r"\end{table}")
+
+    # ---- Write to file ----
+    with open("../tablas/knnVsMedian.tex", "w") as f:
+        f.write("\n".join(latex))
 
 if __name__ == "__main__":
     main()
