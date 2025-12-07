@@ -106,7 +106,7 @@ Nesta ocasión non nos limitamos a usar os \texttt{.csv}s de unha cidade, con mo
 
 As columnas elexidas pódense ver na Figura \ref{fig:modeloDatos}. A eleción foi un compromiso entre expresividade e tamaño, pensamos que cas columnas elixidas podemos facer bos análisis e consultas sen ten que cargar con todo o peso dos \texttt{.csv}s orixinais. Ademáis, o teren tipos de datos distintos e mesmo unha estructura xerárquica implícita, supoñen unha interesante materia prima. A estructura implícita a modelamos como: unha única coleción de hospedaxes na que cada documento ten embebidos outros dous (o hospedador e máis o \emph{Score}) e un arranxo, as prestacións.
 
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/merge.drawio.png}
     \caption{A primeira transformación e xuntar os datos de distintas cidades e quitar as columnas que non nos interesen. Aproveitamos a ocasión para facer unha imputación sinxela, \emph{vaninilla} dos datos}
@@ -114,7 +114,7 @@ As columnas elexidas pódense ver na Figura \ref{fig:modeloDatos}. A eleción fo
 \end{figure}
 
 
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/modeloDatos.drawio.png}
     \caption{Diagrama do Modelo de Datos}
@@ -123,45 +123,30 @@ As columnas elexidas pódense ver na Figura \ref{fig:modeloDatos}. A eleción fo
 
 \section{Preprocesado de datos}
 
-\textcolor{red}{
-\begin{itemize}
-	\item Análisis exploratorio inicial. Mostrar forma y tamaño del dataset, identificar tipos de datos,
-	identificar valores nulos y detectar posibles outliers.
-	\item Tratamiento de valores faltantes. Aplicar al menos dos estrategias diferentes, justificadas según
-	el tipo de variable: eliminar registros con demasiados nulos, rellenar variables numéricas (media,
-	mediana, etc.), rellenar categóricos (utilizando la moda o una categoría especial), sustituir
-	mediante reglas específicas del dominio.
-\item Transformaciones adicionales. Según proceda en el dominio, deben aplicarse al menos dos
-	transformaciones tales como:
-		\subitem Normalización o estandarización de variables numéricas.
-		\subitem Codificación simple de valores categóricos.
-		\subitem Limpieza de texto simple (trim, lowercase, …).
-		\subitem Agrupaciones o reducción de categorías (por ejemplo, High, Medium, Low).
-	\item Balanceo de datos. Si el dominio lo requiere deben aplicarse técnicas de undersampling,
-oversampling, filtrado de ruido, etc. (Opcional, solo si es pertinente en caso de hacer tarea 4)
-\end{itemize}
-}
-
-
 \subsection{Análisis exploratorio del dataset}	
 
-
+Comenzamos a análise co obxecto de estudo da Consulta 1 e da sección \ref{sec:nulosAA}, o prezo das vivendas. Vemos que en xeral a distribución $p(\$=X)$ ten as colas moi longas (aunque por exemplo $p(\$=X|\text{cidade=Madrid})$ non tanto). Vemos que as dous cidades con maiores abanicos son as ínsuas, que efectivamente hai unha correlación entre o que custa un hospedaxe e a xente que cabe nel (ver Consulta 4) e que o logaritmo é unha mellor forma de representar o precio.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/eda_02_analise_prezos.png}
-    \caption{}
+    %\caption{}
   \label{fig:edaPrezos}
 \end{figure}
+  No gráfico de abaixo podemos ver o esparcidos que están os hospedaxes nas cidades, o cal repercutirá no índice de centralidade, ver Consulta 1. Parécenos curioso que Mallorca está tan plagada de turismo que pódese recoñecer a forma insuar dende este gráfico.
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{../diagramas/eda_07_xeografia_9cidades.png}
-    \caption{}
+    \includegraphics[width=0.8\textwidth]{../diagramas/eda_07_xeografia_9cidades.png}
+    %\caption{}
   \label{fig:eda9cidades}
 \end{figure}
+
+Por último queríamos mostrar as distribucións mas dispersas, tanto que parece que estan cheas de atípicos. Per nos pensamos que non é o caso, que símplemente a realidade é dispersa.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/eda_09_outliers.png}
-    \caption{}
+    %\caption{}
   \label{fig:edaOutliers}
 \end{figure}
 
@@ -175,7 +160,7 @@ Dende logo o tipo de dato condiciona as opcións de imputación. Ademáis pódes
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{../diagramas/null_correlation_heatmap.png}
+    \includegraphics[width=0.8\textwidth]{../diagramas/null_correlation_heatmap.png}
     \caption{Correlación entre os nulos. Pódese apreciar claramente que os \emph{scores} son nulos á vez, igual que cos membros do inmobiliario.}
   \label{fig:nulos}
 \end{figure}
@@ -207,17 +192,6 @@ Se ben o discutido ate agora foi máis ben dos valores en sí, cabe destacar que
 \section{Definición e implementación da Base de Datos}
 \label{sec:deseño}
 
-\textcolor{red}{
-	\begin{itemize}
-		\item Deberá crearse una base de datos específica para el dominio en una instalación propia de
-MongoDB, en la que se importarán los datos usando una das tres formas:
-\subitem Pymongo para importación directa desde Python.
-\subitem Exportación en formato JSON y carga mediante MongoDB Compass.
-\subitem Exportación en formato JSON e importación mediante mongoimport desde terminal.
-\item Explicar detalladamente la estructura de los documentos (anidar objetos, arrays, decisiones de
-normalización o desnormalización). Xustificar el modelo elegido y posibles alternativas.
-	\end{itemize}
-}
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/2mongo.drawio.png}
@@ -318,17 +292,6 @@ airbnb> db.listings.findOne()
 Pódese ver que a operación é exitosa e a consulta da liña 18 e só un exemplo para demostrar o funcionamento. Ademáis pódese ver que ó final do documento hai un atributo de fila, este vai ser útil na sección \ref{sec:nulosAA} pois imos ter que exportar o resultado da primeira consulta de MongoDB a csv de volta, e ter o identificador de fila vainos valer para emparexar fácilmente. Sen identificador de fila teríamos que exportar a base de datos enteira, pero con el, podemos devolver as columnas que creemos en MongoDB ordeadas por \texttt{row\_id} e teremos a certeza de que vai cuadrar ben.
 
 \section{Explotación da Base de Datos}
-\textcolor{red}{Cada grupo deberá implementar 4 consultas que respondan a preguntas analíticas relevantes dentro de su
-dominio. Se valorará positivamente el uso del pipeline de agregación.
-Algunos ejemplos de categorías válidas serían: cálculo de estadísticas numéricas, agrupaciones por barrio/tipo
-de habitación/host/país, ranking (top de precios/valoraciones), detección de anomalías o valores extremos,
-evolución temporal.
-Cada consulta debe incluir:
-\begin{itemize}
-	\item Enunciado claro da pregunta analítica que quiere responder.
-	\item Consulta completa o pipeline en sintaxis MongoDB.
-\item Resultados resumidos o capturas da salida, acompañados de una breve explicación da salida.
-\end{itemize}}
 Agora que hemos definido e implementado a nosa Base de Datos, 
 
 \subsection*{Consulta 1: Obter un índice de centralidade (dentro da cidade) para cada hospedaxe} 
@@ -786,7 +749,7 @@ db.listings.aggregate([
 \subsection*{Consulta 6: Cales son os hospedaxes con hospedadores fóra desa cidade?}
 \addcontentsline{toc}{subsection}{Consulta 6}
 
-\emph{Xustificación:}
+\emph{Xustificación:} Ter un hospedador que vive lonxe (noutra cidade) pode ser un inconveniente tanto para os inquilinos como para o propio AirBnB se é que estos están discontentos. Caracterizalos é importante.
 
 \begin{lstlisting}
 db.listings.aggregate([
@@ -837,7 +800,7 @@ db.listings.aggregate([
 ])
 \end{lstlisting}
 
-\emph{Resultados:}
+\emph{Resultados:} Abaixo podemos ver tres exemplos deste tipo de hospedadores. Curiosamente as tres descripcións están inglés, o cal denota impersonalidade.
 
 \begin{lstlisting}[style=terminal]
     _id: ObjectId('693479ddab134920609d88b9'),
@@ -986,10 +949,6 @@ db.listings.aggregate([
 
 \section{Recheo de nulos usando Aprendizaxe Automático}
 \label{sec:nulosAA}
-
-\textcolor{red}{De forma opcional y rápida, entrenar un modelo de aprendizaje automático utilizando los datos almacenados
-en MongoDB (por ejemplo, regresión, clasificación, …). Debe explicarse brevemente el objetivo del modelo,
-las variables utilizadas y los resultados principales.}
 
 Como a columna \texttt{price} nos \texttt{.csv}s orixinais tiña un 13\% de nulos (ver Figura \ref{fig:modeloDatos}), decidimos adestrar un modelo de Aprendizaxe Automático para \emph{regresar} os valores do prezo. Ademáis, esta tarefa parecíanos interesante de por sí. Para facela cosideramos interesante a columna de centralidade obtida na Consulta 1. Se ben e certo que sae máis a conta calcular esos valores de centralidade directamente en Python, queremos cargar esos valores de MongoDB para simular unha ocasión na que sexa máis doado facer unha consulta. Para esto usamos o arquivo adxunto \texttt{mongo2csv.py} que devolve a devandita columna ordeada polo numero de fila para garanter a coherencia e a engade pola dereita ó csv orixinal. Sobre estes datos hai que realizar algunas modificacións: as columnas de texto libre (como a descripción ou os barrios) eliminanse, as categoricas (como o tempo de resposta ou o tipo de propiedade) codificanse \emph{one hot} e as numericas que estaban en porcentaxe formatéanse. Deste xeito temos uns datos listos para adestrar un modelo con eles. O modelo elixido e un XGBoost que baséase en árbores con Boosting e ten licencia Apache 2 . As tarefas de limpieza e adestramento fannas \texttt{train.py}, quen tamén reporta os resultados de xeito que:
 
