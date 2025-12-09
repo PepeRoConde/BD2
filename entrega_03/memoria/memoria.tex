@@ -98,7 +98,7 @@
 
 \section{Introdución}
 
-Como nas prácticas anteriores, traballamos sobre o conxunto de datos de AirBnB. Neste caso truncamos o punto de vista ou a aplicación. Se ben anteriormente o foco era na explotación analítica do feito \texttt{valoración} agora centrámosnos nos \texttt{hospedaxes}. O diseño da Base de datos terá lugar na sección \ref{sec:deseño}, e será realizado sobre os datos expostos en \ref{sec:modeloDatos}.
+Como nas prácticas anteriores, traballamos sobre o conxunto de datos de AirBnB. Neste caso truncamos o punto de vista ou a aplicación. Se ben anteriormente o foco era na explotación analítica do feito \texttt{valoración} agora centrámosnos nos \texttt{hospedaxes}. O diseño da Base de datos terá lugar na sección \ref{sec:deseño}, e será realizado sobre os datos expostos na sección \ref{sec:modeloDatos}.
 
 \section{Modelo de Datos}
 \label{sec:modeloDatos}
@@ -110,7 +110,7 @@ As columnas elexidas pódense ver na Figura \ref{fig:modeloDatos}. A eleción fo
 \begin{figure}
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/merge.drawio.png}
-    \caption{A primeira transformación e xuntar os datos de distintas cidades e quitar as columnas que non nos interesen. Aproveitamos a ocasión para facer unha imputación sinxela, \emph{vaninilla} dos datos}
+    \caption{A primeira transformación e xuntar os datos de distintas cidades e quitar as columnas que non nos interesen. Aproveitamos a ocasión para facer unha imputación sinxela, \emph{vainilla} dos datos}
   \label{fig:merge}
 \end{figure}
 
@@ -213,7 +213,6 @@ switched to db airbnb
 airbnb> db.listings.findOne()
 {
   _id: ObjectId('693474fcce4ae65c237470e5'),
-  description: '110m2 apartment to rent in Barcelona. Located in the Eixample district, near the Sagrada Familia. It has a small balcony where you can see the temple of Gaudi. Capacity for 8 people. <br /><br />Licence number: HUTB-002062',
   neighbourhood_group_cleansed: 'Eixample',
   latitude: 41.40556,
   longitude: 2.17262,
@@ -744,7 +743,6 @@ db.listings.aggregate([
   {
     $project: {
       _id: 1,
-      description: 1,
       city: 1,
       neighbourhood_group_cleansed: 1,
       host_location: "$host.location",
@@ -776,7 +774,6 @@ db.listings.aggregate([
   {
     $project: {
       _id: 1,
-      description: 1,
       property_city: "$city",
       property_neighbourhood: "$neighbourhood_group_cleansed",
       host_location: 1,
@@ -792,7 +789,6 @@ db.listings.aggregate([
 
 \begin{lstlisting}[style=terminal]
     _id: ObjectId('693479ddab134920609d88b9'),
-    description: 'Beautiful and Spacious Apartment with Large Terrace – Just 5 Minutes from CCIB, 10 Minutes to the Beach and Marina (Port Forum).<br /><br />Enjoy the perfect balance of business and leisure in this modern, family-friendly apartment. <br /><br />Relax on the terrace with dinner, wine, or a cold beer—just a short walk from the sea and Marina, but away from the crowds of central Barcelona.<br /><br />Smart TV, high-speed Wi-Fi, elevator, private parking (on request), and great public transport links.',
     host_location: 'Catalonia, Spain',
     host_city: 'catalonia',
     property_city: 'barcelona',
@@ -800,7 +796,6 @@ db.listings.aggregate([
   },
   {
     _id: ObjectId('693479ddab134920609d88c5'),
-    description: 'Tourist Licence No: ESFCTU00000807300091781600000000000000000HUTB-0000835. <br /><br />Maximum 3 persons.<br />Colourful apartment with a private patio in a lovely local neighbourhood. It has three bedrooms, two with double beds, one with a single bed and a sofa in the living room. Well served by public transport.<br /><br />Barcelona City tax not included in reservation amount.',
     host_location: 'Vilassar de Mar, Spain',
     host_city: 'vilassar de mar',
     property_city: 'barcelona',
@@ -808,7 +803,6 @@ db.listings.aggregate([
   },
   {
     _id: ObjectId('693479ddab134920609d88c7'),
-    description: 'Bedroom with a private bathroom exclusive use for this guests room. <br />Wi-Fi <br />Central apartment. <br />Conected to the airport with a cheap bus. <br />Most of the touristic areas can be visited by walk. <br />Safe area. <br />24h grosery shops around <br />Many  international and local restaurants in the area. <br />Metro and buses on the corner of home. <br />Small room but all is very clean and at night is super calm to have a good rest. <br />You will love to enjoy your stay with our small family but We respect your time and space.',
     host_location: 'Colon, Panama',
     host_city: 'colon',
     property_city: 'barcelona',
@@ -835,7 +829,6 @@ db.listings.aggregate([
   {
     $project: {
       _id: 1,
-      description: 1,
       city: 1,
       neighbourhood_group_cleansed: 1,
       price: 1,
@@ -868,7 +861,6 @@ db.listings.aggregate([
   {
     $project: {
       _id: 1,
-      description: 1,
       city: 1,
       neighbourhood: "$neighbourhood_group_cleansed",
       price: 1,
@@ -897,7 +889,6 @@ db.listings.aggregate([
 \begin{lstlisting}[style=terminal]
   {
     _id: ObjectId('693348dc7269f26612df5898'),
-    description: 'Ideal room to share stories and experiences with capacity for up to 8 people. It has 4 bunk beds. Includes a private bathroom, two sinks, air conditioning, free wifi, bed linen and an individual space to store your luggage. All beds have USB connection to charge your devices. Unite has rooms with bathroom adapted for the disabled according to availability.<br />The establishment is cashless.<br />Unite is cashless',
     price: 33,
     reviews_per_month: 94.77,
     city: 'barcelona',
@@ -907,7 +898,6 @@ db.listings.aggregate([
   },
   {
     _id: ObjectId('693348dc7269f26612e06f70'),
-    description: 'This bright and cosy double room comes with a double bed, air-conditioning, wall-mounted TV and free Wi-Fi. All rooms in easyHotel Madrid Alcala offer comfort and cleanliness at a budget price to allow you to spend time exploring our great city outside of your hotel room. Room size 12 sqm.',
     price: 128,
     reviews_per_month: 82.94,
     city: 'madrid',
@@ -919,7 +909,6 @@ db.listings.aggregate([
   },
   {
     _id: ObjectId('693348dc7269f26612df3f4f'),
-    description: 'Flawless time with the whole family in this stylish accommodation! <br /><br />The apartments have three bedrooms, a bathroom, and a toilet. The master bedroom has a double bed, the second bedroom has two single beds and the third bedroom has a single bed. <br /><br />Enjoy the freedom and privacy of having your own apartment in the city center.',
     price: 324,
     reviews_per_month: 61.23,
     city: 'barcelona',
