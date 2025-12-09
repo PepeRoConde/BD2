@@ -5,6 +5,7 @@ from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import joblib
 import os
+import time
 
 # Carga dos datos
 df = pd.read_csv('dataset/merged.csv')
@@ -78,18 +79,23 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # Modelo XGBoost
+print('Empieza a entrenar')
+inicio = time.time()
 model = XGBRegressor(
-    n_estimators=200,
-    learning_rate=0.05,
-    max_depth=6,
-    min_child_weight=1,
+    n_estimators=1000,
+    learning_rate=0.02,
+    max_depth=8,
+    min_child_weight=3,
     subsample=0.8,
     colsample_bytree=0.8,
+    reg_alpha=0.1,
+    reg_lambda=1.0,
     random_state=42,
     n_jobs=-1,
-    verbosity=0
+    tree_method="hist"
 )
 model.fit(X_train, y_train)
+print(f'Acabó de entrenar, le llevó {time.time() - inicio:.2f} segundos')
 
 # Avaliación
 y_pred = model.predict(X_test)
@@ -100,20 +106,27 @@ r2 = r2_score(y_test, y_pred)
 mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
 prezo_medio = y.mean()
 
-# Táboa de métricas (en galego)
+# Táboa de métricas
 metrics_df = pd.DataFrame({
-    "Métrica": ["MAE", "RMSE", "R²", "MAPE (\\%)", "Prezo medio", "MAE / Prezo medio (\\%)"],
+    "Métrica": [
+        "MAE",
+        "RMSE",
+        "R²",
+        "MAPE (\\%)",
+        "Prezo medio",
+        "MAE / Prezo medio (\\%)"
+    ],
     "Valor": [
-        round(mae, 2),
-        round(rmse, 2),
-        round(r2, 4),
-        round(mape, 1),
-        round(prezo_medio, 2),
-        round(mae / prezo_medio * 100, 1)
+        f"{mae:.2f}",
+        f"{rmse:.2f}",
+        f"{r2:.2f}",
+        f"{mape:.2f}",
+        f"{prezo_medio:.2f}",
+        f"{(mae / prezo_medio * 100):.2f}"
     ]
 })
 
-# Predicións de exemplo
+
 resultados_df = pd.DataFrame({
     'Prezo real': y_test.values[:10],
     'Prezo predicido': y_pred[:10],
@@ -121,27 +134,33 @@ resultados_df = pd.DataFrame({
     'Erro (\\%)': (np.abs(y_test.values[:10] - y_pred[:10]) / y_test.values[:10]) * 100
 })
 
-# Importancia das características
+# Round to 2 decimals for LaTeX
+resultados_df = resultados_df.round(2)
+
+
 importances = model.feature_importances_
 importance_df = pd.DataFrame({
     'Variable': X.columns,
     'Importancia': importances
 }).sort_values('Importancia', ascending=False).head(15)
 
-# Gardado de modelo
+
 joblib.dump(model, 'params/airbnb_price_model.pkl')
 joblib.dump(list(X.columns), 'feature_columns.pkl')
 
-# Exportación de táboas LaTeX en galego
+
 TABLE_DIR = "tablas/"
 os.makedirs(TABLE_DIR, exist_ok=True)
 
 with open(TABLE_DIR + "metricas_modelo.tex", "w") as f:
-    f.write(metrics_df.to_latex(index=False, caption="Métricas do modelo", label="tab:metricas_modelo", escape=True))
+    f.write(metrics_df.to_latex(index=False, caption="Métricas do modelo", 
+                                label="tab:metricas_modelo", escape=True))
 
 with open(TABLE_DIR + "predicions_exemplo.tex", "w") as f:
-    f.write(resultados_df.round(2).to_latex(index=False, caption="Predicións de exemplo", label="tab:predicions_exemplo",escape=True))
+    f.write(resultados_df.to_latex(index=False, caption="Predicións de exemplo", 
+                                   label="tab:predicions_exemplo", escape=True))
 
 with open(TABLE_DIR + "importancia_variables.tex", "w") as f:
-    f.write(importance_df.to_latex(index=False, caption="Importancia das variables", label="tab:importancia_variables",escape=True))
+    f.write(importance_df.to_latex(index=False, caption="Importancia das variables", 
+                                   label="tab:importancia_variables", escape=True))
 
