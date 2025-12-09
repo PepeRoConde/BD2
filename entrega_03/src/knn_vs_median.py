@@ -87,14 +87,14 @@ def main():
     latex.append(r"\midrule")
 
     for col, mse_med, mse_knn in results:
-        latex.append(f"{col} & {mse_med:.4f} & {mse_knn:.4f} \\\\")
+        latex.append(f"{col.replace('_',r'\_')} & {mse_med:.4f} & {mse_knn:.4f} \\\\")
 
     latex.append(r"\bottomrule")
     latex.append(r"\end{tabular}")
     latex.append(r"\end{table}")
 
     # ---- Write to file ----
-    with open("../tablas/knnVsMedian.tex", "w") as f:
+    with open("tablas/knnVsMedian.tex", "w") as f:
         f.write("\n".join(latex))
 
 if __name__ == "__main__":

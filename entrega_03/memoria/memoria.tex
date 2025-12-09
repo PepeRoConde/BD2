@@ -18,6 +18,7 @@
 \lstloadlanguages{SQL}
 \usepackage{subcaption}
 \usepackage{url}
+\usepackage{booktabs}
 
 % Configurar márgenes
 \geometry{
@@ -156,7 +157,7 @@ Por último queríamos mostrar as distribucións mas dispersas, tanto que parece
 
 Como logo temos que volcar os datos a MongoDB (licencia en \cite{mongodb_license}), o noso programa xa limpia os datos cunha imputación sinxela  pero apropiada para o tipo de datos (o exisido pola práctica), non obstante podemos desactivala e observar os nulos do arquivo mergeado, o porcentaxe está dispoñibel na Figura \ref{fig:modeloDatos}. Ademáis do porcentaxe é interesante o tipo de dato e o rol que desempeña esa columna.  
 \subsubsection{Nulos núericos}
-Dende logo o tipo de dato condiciona as opcións de imputación. Ademáis pódese dicir que estos nulos divídense en tres grupos: os relacionados co inmobiliario (baños, habitacións e camas), os valores das reseñas e tres atributos do hospedador. Unha primera idea de encher os nulos dun grupo con valores do mesmo (e.g. imputar o \emph{score} de comunicación co resto de \emph{scores}) desmantelouse á vista da Figura \ref{fig:nulos}, e dicir, non se poden encher os nulos dun grupo con valores dese grupo porque cando un é nulo os otros tamén (alta correlación). Ademáis por curiosidade, fixemos un experimento (ver \texttt{src/knn\_vs\_median.py} ou Figura \ref{fig:vale_pena_Knn}) para ver a diferencia de error se usamos imputación simple (mediana) ou máis sofisticada (adestramento dun KNN non paramétrico) e obervamos que o erro malia ser a metade co método sofisticado, segue estando no mesmo orde de magnitude e ademáis encarece moito computacionalmente. Por todo o dito, e o alcance da práctica, limitámosnos a unha imputación sinxela por mediana.
+Dende logo o tipo de dato condiciona as opcións de imputación. Ademáis pódese dicir que estos nulos divídense en tres grupos: os relacionados co inmobiliario (baños, habitacións e camas), os valores das reseñas e tres atributos do hospedador. Unha primera idea de encher os nulos dun grupo con valores do mesmo (e.g. imputar o \emph{score} de comunicación co resto de \emph{scores}) desmantelouse á vista da Figura \ref{fig:nulos}, e dicir, non se poden encher os nulos dun grupo con valores dese grupo porque cando un é nulo os otros tamén (alta correlación). Ademáis por curiosidade, fixemos un experimento (ver \texttt{src/knn\_vs\_median.py} ou Cadro \ref{fig:vale_pena_Knn}) para ver a diferencia de error se usamos imputación simple (mediana) ou máis sofisticada (adestramento dun KNN non paramétrico) e obervamos que o erro malia ser a metade co método sofisticado, segue estando no mesmo orde de magnitude e ademáis encarece moito computacionalmente. Por todo o dito, e o alcance da práctica, limitámosnos a unha imputación sinxela por mediana.
 
 \begin{figure}[H]
     \centering
@@ -165,21 +166,8 @@ Dende logo o tipo de dato condiciona as opcións de imputación. Ademáis pódes
   \label{fig:nulos}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
 
-\begin{lstlisting}[style=terminal]
-(.venv) > python src/knn_vs_median.py
-
-bathrooms: Median MSE=1.3115, KNN MSE=0.6238
-beds: Median MSE=5.4196, KNN MSE=2.3719
-host_total_listings_count: Median MSE=283499.0809, KNN MSE=191732.6506
-bedrooms: Median MSE=1.9067, KNN MSE=0.9160
-\end{lstlisting}
-
-    \caption{Comparación dos métodos de imputación KNN ($k$=3) e mediana sobre a métrica $\mathcal{L}_2$. Os resultados repórtanse con KFold de $k$=2.}
-  \label{fig:vale_pena_Knn}
-\end{figure}
+\input{../tablas/knnVsMedian.tex}
 
 \subsubsection{Outros nulos}
 
@@ -950,63 +938,16 @@ db.listings.aggregate([
 \section{Recheo de nulos usando Aprendizaxe Automático}
 \label{sec:nulosAA}
 
-Como a columna \texttt{price} nos \texttt{.csv}s orixinais tiña un 13\% de nulos (ver Figura \ref{fig:modeloDatos}), decidimos adestrar un modelo de Aprendizaxe Automático para \emph{regresar} os valores do prezo. Ademáis, esta tarefa parecíanos interesante de por sí. Para facela cosideramos interesante a columna de centralidade obtida na Consulta 1. Se ben e certo que sae máis a conta calcular esos valores de centralidade directamente en Python, queremos cargar esos valores de MongoDB para simular unha ocasión na que sexa máis doado facer unha consulta. Para esto usamos o arquivo adxunto \texttt{mongo2csv.py} que devolve a devandita columna ordeada polo numero de fila para garanter a coherencia e a engade pola dereita ó csv orixinal. Sobre estes datos hai que realizar algunas modificacións: as columnas de texto libre (como a descripción ou os barrios) eliminanse, as categoricas (como o tempo de resposta ou o tipo de propiedade) codificanse \emph{one hot} e as numericas que estaban en porcentaxe formatéanse. Deste xeito temos uns datos listos para adestrar un modelo con eles. O modelo elixido e un XGBoost que baséase en árbores con Boosting e ten licencia Apache 2 . As tarefas de limpieza e adestramento fannas \texttt{train.py}, quen tamén reporta os resultados de xeito que:
 
-\begin{lstlisting}[style=terminal]
-(.venv) entrega_03 (main) > python src/train.py
-
-	...
-
-==================================================
-MODEL EVALUATION
-==================================================
-Mean Absolute Error (MAE): $147.40
-Root Mean Squared Error (RMSE): $670.78
-R2 Score: 0.7923
-Mean Absolute Percentage Error (MAPE): 69.3%
-
-Average Price: $360.79
-MAE as % of average price: 40.9%
-
-==================================================
-SAMPLE PREDICTIONS (First 10)
-==================================================
- Actual_Price  Predicted_Price  Difference  Error_Percent
-         45.0       138.289993      -93.29         207.31
-         68.0       438.220001     -370.22         544.44
-        128.0       127.089996        0.91           0.71
-        275.0       205.940002       69.06          25.11
-        143.0       143.179993       -0.18           0.13
-         77.0       159.039993      -82.04         106.54
-        132.0       116.050003       15.95          12.09
-        180.0       175.669998        4.33           2.41
-        160.0       124.470001       35.53          22.20
-        174.0       444.450012     -270.45         155.43
-
-==================================================
-TOP 15 FEATURE IMPORTANCES
-==================================================
-                             Feature  Importance
-                         city_lisboa    0.271252
-                  host_response_rate    0.053550
-           host_total_listings_count    0.052922
-      host_location_Barcelona, Spain    0.052279
-                host_experience_days    0.052269
-                       city_mallorca    0.034516
-         host_location_Malaga, Spain    0.029934
-                                beds    0.024191
-          host_location_Palma, Spain    0.022844
-host_location_Renswoude, Netherlands    0.020828
-     host_response_time_within a day    0.020798
-   host_response_time_within an hour    0.017689
-              host_identity_verified    0.017307
-    property_type_Room in aparthotel    0.017164
-       host_location_Munich, Germany    0.017116
+Como a columna \texttt{price} nos \texttt{.csv}s orixinais tiña un 13\% de nulos (ver Figura \ref{fig:modeloDatos}), decidimos adestrar un modelo de Aprendizaxe Automático para \emph{regresar} os valores do prezo. Ademáis, esta tarefa parecíanos interesante de por sí. Para facela cosideramos interesante a columna de centralidade obtida na Consulta 1. Se ben e certo que sae máis a conta calcular esos valores de centralidade directamente en Python, queremos cargar esos valores de MongoDB para simular unha ocasión na que sexa máis doado facer unha consulta. Para esto usamos o arquivo adxunto \texttt{mongo2csv.py} que devolve a devandita columna ordeada polo numero de fila para garanter a coherencia e a engade pola dereita ó csv orixinal. Sobre estes datos hai que realizar algunas modificacións: as columnas de texto libre (como a descripción ou os barrios) eliminanse, as categoricas (como o tempo de resposta ou o tipo de propiedade) codificanse \emph{one hot} e as numericas que estaban en porcentaxe formatéanse. Deste xeito temos uns datos listos para adestrar un modelo con eles. O modelo elixido e un XGBoost que baséase en árbores con Boosting e ten licencia Apache 2 . As tarefas de limpieza e adestramento fannas \texttt{train.py}, quen tamén devolve tablas \LaTeX como saída.
 
 
-       ...
+\input{../tablas/metricas_modelo.tex}
+\input{../tablas/predicions_exemplo.tex}
+\input{../tablas/importancia_variables.tex}
 
-\end{lstlisting}
+\section{Conclusións}
+\lipsum
 
 \newpage
 

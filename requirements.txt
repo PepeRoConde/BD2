@@ -6,3 +6,4 @@ scikit-learn
 pymongo
 xgboost
 wordcloud
+Jinja2
