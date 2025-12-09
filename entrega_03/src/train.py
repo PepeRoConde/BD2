@@ -83,8 +83,8 @@ print('Empieza a entrenar')
 inicio = time.time()
 model = XGBRegressor(
     n_estimators=1000,
-    learning_rate=0.02,
-    max_depth=8,
+    learning_rate=0.01,
+    max_depth=10,
     min_child_weight=3,
     subsample=0.8,
     colsample_bytree=0.8,
