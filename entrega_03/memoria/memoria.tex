@@ -45,7 +45,7 @@
 
 % Información del documento
 \title{\textsc{Entrega 3: MongoDB}}
-\author{Marcelo Ferreiro Sánchez, Pablo Chantada Saborido\\  Gillermo García Engelmo \& Pepe Romero Conde}
+\author{Marcelo Ferreiro Sánchez, Pablo Chantada Saborido\\  Guillermo García Engelmo \& Pepe Romero Conde}
 \date{\today}
 
 
@@ -163,7 +163,7 @@ Comenzamos a análise co obxecto de estudo da Consulta 1 e da sección \ref{sec:
   \label{fig:eda9cidades}
 \end{figure}
 
-Por último queríamos mostrar as distribucións mas dispersas, tanto que parece que estan cheas de atípicos. Per nos pensamos que non é o caso, que símplemente a realidade é dispersa.
+Por último queríamos mostrar as distribucións mas dispersas, tanto que parece que estan cheas de atípicos. Per nos pensamos que non é o caso, que símplemente a realidade é dispersa, como veremos en \ref{consulta:atipico}.
 
 \begin{figure}[H]
     \centering
@@ -404,7 +404,290 @@ db.listings.aggregate([
 }
 \end{lstlisting}
 
-\subsection*{Consulta 3: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?} 
+
+\subsection*{Consulta 3: Cal é o hospedaxe que ten 40 habitacións?}
+\addcontentsline{toc}{subsection}{Consulta 3}
+\label{consulta:atipico}
+
+\emph{Xustificación:} É un anómalo realmente? 
+
+\begin{lstlisting}
+airbnb> db.listings.find({bedrooms :  {$gt : 40}}, {bedrooms : 1}).sort({ bedrooms: -1 })
+\end{lstlisting}
+
+
+\begin{lstlisting}[style=terminal]
+[
+  { _id: ObjectId('693479deab134920609e549c'), bedrooms: 43 },
+  { _id: ObjectId('693846ba023c5ca99b6f26e6'), bedrooms: 43 },
+  { _id: ObjectId('693848aca2b4d841d69f4700'), bedrooms: 43 }
+]
+\end{lstlisting}
+
+\begin{lstlisting}
+airbnb> db.listings.find({_id :  693479deab134920609e549c})
+\end{lstlisting}
+
+\emph{Resultados:} Vemos que é un hotel, polo que non poderíamos decir que é un dato erroneo, e esperaríamos máis hoteles polo que quedarnos con él parece lóxico.
+
+\begin{lstlisting}[style=terminal]
+[
+  {
+    _id: ObjectId('693479deab134920609e549c'),
+    description: 'Cascais at your door',
+    neighbourhood_group_cleansed: 'Cascais',
+    latitude: 38.69952,
+    longitude: -9.42015,
+    property_type: 'Room in hotel',
+    accommodates: 3,
+    bathrooms: 1,
+    bedrooms: 43,
+    beds: 2,
+    price: 128,
+    number_of_reviews: 9,
+    number_of_reviews_l30d: 0,
+    availability_eoy: 80,
+    instant_bookable: true,
+    reviews_per_month: 0.14,
+    city: 'lisboa',
+    host: {
+      since: '2020-07-16',
+      location: 'Madrid, Spain',
+      response_time: 'within an hour',
+      response_rate: '100%',
+      acceptance_rate: '100%',
+      is_superhost: true,
+      total_listings_count: 7,
+      has_profile_pic: true,
+      identity_verified: true
+    },
+    score: {
+      rating: 4.67,
+      accuracy: 5,
+      cleanliness: 4.89,
+      checkin: 4.78,
+      communication: 4.78,
+      location: 5,
+      value: 4.44
+    },
+    amenities: [
+      '["Heating',
+      'Smoke alarm',
+      'Essentials',
+      'Private entrance',
+      'Carbon monoxide alarm',
+      'Breakfast',
+      'Self check-in',
+      'Air conditioning',
+      'HDTV',
+      'Shampoo',
+      'Exterior security cameras on property',
+      'Fire extinguisher',
+      'Iron',
+      'Building staff',
+      'Hangers',
+      'Hair dryer',
+      'Wifi"]'
+    ],
+    row_id: 52196,
+    centrality: 0.22156954910595233
+  }
+]
+\end{lstlisting}
+
+\subsection*{Consulta 4: cuales son os barrios con hospedadores máis novos? Para cada cidade} 
+\label{}
+
+\addcontentsline{toc}{subsection}{Consulta 4}
+\emph{Xustificación:} A plataforma de AirBnB podría sinalar que un hospedaxe ten tantas camas como habitacións o cal estaría ben, por exemplo, para viaxes de parella ou grupos. Pero primero, hai tales hospedaxes?
+
+\begin{lstlisting}
+airbnb> db.listings.find(
+|   { beds: { $gt: 5 }, $expr: { $eq: ["$beds", "$bedrooms"] } },
+|   { price: 1, beds: 1 }
+| ).sort({ beds: -1 })
+\end{lstlisting}
+
+\emph{Resultados:} Vemos que sí, Hoteis.
+
+\begin{lstlisting}[style=terminal]
+[
+  { _id: ObjectId('693479deab134920609efe31'), beds: 25, price: 72 },
+  { _id: ObjectId('693848aca2b4d841d6a020f4'), beds: 25, price: 72 },
+  { _id: ObjectId('693846ba023c5ca99b7000da'), beds: 25, price: 72 },
+  { _id: ObjectId('693848ada2b4d841d6a0f3f7'), beds: 20, price: 29 },
+  { _id: ObjectId('693848ada2b4d841d6a0f3f4'), beds: 20, price: 41 },
+  { _id: ObjectId('693479deab134920609fdf9c'), beds: 20, price: 41 },
+  { _id: ObjectId('693479deab134920609fdf9b'), beds: 20, price: 36 },
+  { _id: ObjectId('693479deab134920609fdf98'), beds: 20, price: 36 },
+  { _id: ObjectId('693479deab134920609fdf97'), beds: 20, price: 31 },
+  { _id: ObjectId('693846ba023c5ca99b70d3d9'), beds: 20, price: 36 },
+  { _id: ObjectId('693479deab134920609fdf96'), beds: 20, price: 28 },
+  { _id: ObjectId('693479deab134920609fdf95'), beds: 20, price: 36 },
+  { _id: ObjectId('693479deab134920609fdf94'), beds: 20, price: 37 },
+  { _id: ObjectId('693846ba023c5ca99b70d3e6'), beds: 20, price: 41 },
+  { _id: ObjectId('693846ba023c5ca99b70d3e5'), beds: 20, price: 36 },
+  { _id: ObjectId('693848ada2b4d841d6a0f400'), beds: 20, price: 41 },
+  { _id: ObjectId('693848ada2b4d841d6a0f3ff'), beds: 20, price: 36 },
+  { _id: ObjectId('693846ba023c5ca99b70d3e2'), beds: 20, price: 36 },
+  { _id: ObjectId('693846ba023c5ca99b70d3e1'), beds: 20, price: 31 },
+  { _id: ObjectId('693479deab134920609fdf93'), beds: 20, price: 29 }
+]
+\end{lstlisting}
+
+
+\subsection*{Consulta 4: Cales son os barrios con hospedadores máis novos? Para cada cidade} 
+\addcontentsline{toc}{subsection}{Consulta 2}
+
+\emph{Xustificación:} esta consulta é básica para o análise de tendencias e evolución do mercado inmobiliario.
+
+
+\begin{lstlisting}
+db.listings.aggregate([
+  {
+    $project: {
+      city: 1,
+      neighbourhood_group_cleansed: 1,
+      host_since: "$host.since",
+      year: { $year: { $toDate: "$host.since" } }
+    }
+  },
+  {
+    $group: {
+      _id: {
+        city: "$city",
+        neighbourhood: "$neighbourhood_group_cleansed"
+      },
+      avg_host_year: { $avg: "$year" },
+      count: { $sum: 1 }
+    }
+  },
+  {
+    $sort: { "_id.city": 1, "avg_host_year": -1 }
+  },
+  {
+    $group: {
+      _id: "$_id.city",
+      neighbourhoods: {
+        $push: {
+          neighbourhood: "$_id.neighbourhood",
+          avg_host_year: "$avg_host_year",
+          count: "$count"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      city: "$_id",
+      neighbourhoods: {
+        $slice: [
+          {
+            $sortArray: {
+              input: "$neighbourhoods",
+              sortBy: { avg_host_year: -1 }
+            }
+          },
+          5
+        ]
+      }
+    }
+  }
+])\end{lstlisting}
+
+\emph{Resultados:} se ben non procede mostrar os resultados completos, abaixo pódese ver as cidades con barrios máis novos. O certo e que a forma de mostrar esta consulta non so compara os barrios dentro dunha cidade pero ademáis as cidades entre sí.
+
+\begin{lstlisting}[style=terminal]
+  ...
+
+  {
+    _id: 'euskadi',
+    city: 'euskadi',
+    neighbourhoods: [
+      {
+        neighbourhood: 'Vizcaya',
+        avg_host_year: 2019.032435404068,
+        count: 3638
+      },
+      {
+        neighbourhood: 'Alava',
+        avg_host_year: 2017.819964349376,
+        count: 561
+      },
+      {
+        neighbourhood: 'Guipuzcoa',
+        avg_host_year: 2017.6565040650407,
+        count: 2952
+      }
+    ]
+  },
+  {
+    _id: 'madrid',
+    city: 'madrid',
+    neighbourhoods: [
+      {
+        neighbourhood: 'Vicálvaro',
+        avg_host_year: 2020.0117647058823,
+        count: 85
+      },
+      {
+        neighbourhood: 'Tetuán',
+        avg_host_year: 2019.724836212031,
+        count: 1679
+      },
+      {
+        neighbourhood: 'Villaverde',
+        avg_host_year: 2019.5731707317073,
+        count: 246
+      },
+      {
+        neighbourhood: 'Villa de Vallecas',
+        avg_host_year: 2019.4336283185842,
+        count: 113
+      },
+      {
+        neighbourhood: 'Barajas',
+        avg_host_year: 2019.3680981595091,
+        count: 163
+      }
+    ]
+  },
+  {
+    _id: 'valencia',
+    city: 'valencia',
+    neighbourhoods: [
+      {
+        neighbourhood: 'BENICALAP',
+        avg_host_year: 2020.3698630136987,
+        count: 146
+      },
+      {
+        neighbourhood: 'JESUS',
+        avg_host_year: 2020.0177304964539,
+        count: 282
+      },
+      {
+        neighbourhood: 'RASCANYA',
+        avg_host_year: 2019.9685534591194,
+        count: 159
+      },
+      {
+        neighbourhood: 'ALGIROS',
+        avg_host_year: 2019.9149560117303,
+        count: 341
+      },
+      {
+        neighbourhood: 'PATRAIX',
+        avg_host_year: 2019.864406779661,
+        count: 177
+      }
+    ]
+  }
+\end{lstlisting}
+
+
+
+\subsection*{Consulta 5: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?} 
 \addcontentsline{toc}{subsection}{Consulta 3}
 
 \emph{Xustificación:} esta información é decisiva nun análisis de desigualdade entre territorios, ou mesmo pode ser de interese gobernamental, para o desenvolvemento de leis.
@@ -499,7 +782,7 @@ de reviews do último mes, súas reviews por mes e o seu rating).
 
 
 
-\subsection*{Consulta 4: Cales son os hospedaxes con hospedadores fóra desa cidade?}
+\subsection*{Consulta 6: Cales son os hospedaxes con hospedadores fóra desa cidade?}
 \addcontentsline{toc}{subsection}{Consulta 4}
 
 \emph{Xustificación:} Ter un hospedador que vive lonxe (noutra cidade) pode ser un inconveniente tanto para os inquilinos como para o propio AirBnB se é que estos están discontentos. Caracterizalos é importante.
@@ -578,7 +861,7 @@ db.listings.aggregate([
   ...
 \end{lstlisting}
 
-\subsection*{Consulta 5: Cales son os hospedaxes que estan a facer un bo último mes?}
+\subsection*{Consulta 7: Cales son os hospedaxes que estan a facer un bo último mes?}
 \addcontentsline{toc}{subsection}{Consulta 5}
 
 \emph{Xustificación:} esta consula é de carácter moi xeral e o interese pode vir de moitos lados, os hospedadores poden querer estudar que fan eses hospedaxes tan bos; tamén AirBnB pódese ver beneficiado se é capaz de caracterizar tendencias, ou premiar ós mellores hospedaxes.
