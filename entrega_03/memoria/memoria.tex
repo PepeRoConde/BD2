@@ -9,6 +9,7 @@
 \usepackage{hyperref}
 \usepackage{geometry}
 \usepackage{listings}
+\usepackage{lipsum}
 \usepackage{xcolor}
 \usepackage{float}
 \usepackage{epigraph}
@@ -28,8 +29,12 @@
     right=2cm
 }
 
+
+
 % Configurar listings
 \lstset{
+    extendedchars=true,
+    inputencoding=utf8,
     basicstyle=\small\ttfamily,
     breaklines=true,
     frame=single,
@@ -39,7 +44,7 @@
 }
 
 % Información del documento
-\title{\textsc{Entrega 3: ADE \& MongoDB}}
+\title{\textsc{Entrega 3: MongoDB}}
 \author{Marcelo Ferreiro Sánchez, Pablo Chantada Saborido\\  Gillermo García Engelmo \& Pepe Romero Conde}
 \date{\today}
 
@@ -98,7 +103,23 @@
 
 \section{Introdución}
 
-Como nas prácticas anteriores, traballamos sobre o conxunto de datos de AirBnB. Neste caso truncamos o punto de vista ou a aplicación. Se ben anteriormente o foco era na explotación analítica do feito \texttt{valoración} agora centrámosnos nos \texttt{hospedaxes}. O diseño da Base de datos terá lugar na sección \ref{sec:deseño}, e será realizado sobre os datos expostos na sección \ref{sec:modeloDatos}.
+Na práctica actual, mantemos o conxunto de datos de AirBnB, pero cambiamos o
+foco da explotación analítica. Se ben nas sesións anteriores nos centramos en
+feitos sinxelos como a táboa de \texttt{valoracións}, nesta práctica a nosa
+atención céntrase nos \texttt{hospedaxes}. Este cambio débese á nosa elección de
+empregar \textbf{MongoDB}, unha base de datos NoSQL orientada a documentos, o
+que nos permite un deseño de datos máis flexible e complexo. O obxectivo é
+aproveitar as súas características para demostrar a capacidade dos
+\textbf{documentos anidados} e \emph{arrays} embebidos, como os detalles do
+\texttt{host} dentro do documento do \texttt{hospedaxe}. Deste xeito, eliminamos
+a necesidade de realizar custosas \textbf{unións (\emph{joins})} en tempo de
+consulta, mellorando o desempeño da recuperación e permitindo unha modelaxe máis
+natural dos datos (sempre cando nosas consultas non teñan como obxectivo
+devolver hospedadores, nese caso serían algo máis caras).
+
+O diseño da Base
+de datos terá lugar na sección \ref{sec:deseño}, e será realizado sobre os datos
+expostos na sección \ref{sec:modeloDatos}.
 
 \section{Modelo de Datos}
 \label{sec:modeloDatos}
@@ -287,7 +308,7 @@ Agora que hemos definido e implementado a nosa Base de Datos,
 
 \emph{Xustificación:} como verase na sección \ref{sec:nulosAA}, imos usar este valor para facer prediccións sobre o precio de cada hospedaxe. Ademáis parecíanos un bo uso das funcións nativas de MongoDB.
 
-Para levar acabo esta consulta precisamos calcular os centroides de cada cidade e logo, para cada hospedaxe calcularemos a distacia ó centroide. O seguinte código crea ditos centroides, agragando os hospedaxes por cidade e facendo a media das súas coordenadas.
+Para levar acabo esta consulta precisamos calcular os centroides de cada cidade e logo, para cada hospedaxe calcularemos a distacia ó centroide. O seguinte código crea ditos centroides, agregando os hospedaxes por cidade e facendo a media das súas coordenadas.
 
 
 \begin{lstlisting}
@@ -328,279 +349,9 @@ centroides.forEach(c => {
 
 \emph{Resultados:} Tal cual o fixemos cambia a base de datos, non devolve. Para ver o efecto podemos facer unha mini-consulta de comprobación como \texttt{db.listings.findOne()} e ver que xa figura o novo atributo.
 
-\subsection*{Consulta 2: Cales son os barrios con hospedadores máis novos? Para cada cidade} 
+
+\subsection*{Consulta 2: Influe foto de perfil no prezo medio?} 
 \addcontentsline{toc}{subsection}{Consulta 2}
-
-\emph{Xustificación:}
-\emph{Resultados:} 
-\begin{lstlisting}
-airbnb> db.listings.find(
-|   { beds: { $gt: 5 }, $expr: { $eq: ["$beds", "$bedrooms"] } },
-|   { price: 1, beds: 1 }
-| ).sort({ beds: -1 })
-\end{lstlisting}
-\begin{lstlisting}[style=terminal]
-[
-  { _id: ObjectId('693479deab134920609efe31'), beds: 25, price: 72 },
-  { _id: ObjectId('693848aca2b4d841d6a020f4'), beds: 25, price: 72 },
-  { _id: ObjectId('693846ba023c5ca99b7000da'), beds: 25, price: 72 },
-  { _id: ObjectId('693848ada2b4d841d6a0f3f7'), beds: 20, price: 29 },
-  { _id: ObjectId('693848ada2b4d841d6a0f3f4'), beds: 20, price: 41 },
-  { _id: ObjectId('693479deab134920609fdf9c'), beds: 20, price: 41 },
-  { _id: ObjectId('693479deab134920609fdf9b'), beds: 20, price: 36 },
-  { _id: ObjectId('693479deab134920609fdf98'), beds: 20, price: 36 },
-  { _id: ObjectId('693479deab134920609fdf97'), beds: 20, price: 31 },
-  { _id: ObjectId('693846ba023c5ca99b70d3d9'), beds: 20, price: 36 },
-  { _id: ObjectId('693479deab134920609fdf96'), beds: 20, price: 28 },
-  { _id: ObjectId('693479deab134920609fdf95'), beds: 20, price: 36 },
-  { _id: ObjectId('693479deab134920609fdf94'), beds: 20, price: 37 },
-  { _id: ObjectId('693846ba023c5ca99b70d3e6'), beds: 20, price: 41 },
-  { _id: ObjectId('693846ba023c5ca99b70d3e5'), beds: 20, price: 36 },
-  { _id: ObjectId('693848ada2b4d841d6a0f400'), beds: 20, price: 41 },
-  { _id: ObjectId('693848ada2b4d841d6a0f3ff'), beds: 20, price: 36 },
-  { _id: ObjectId('693846ba023c5ca99b70d3e2'), beds: 20, price: 36 },
-  { _id: ObjectId('693846ba023c5ca99b70d3e1'), beds: 20, price: 31 },
-  { _id: ObjectId('693479deab134920609fdf93'), beds: 20, price: 29 }
-]
-\end{lstlisting}
-
-
-
-\subsection*{Consulta 2: Cales son os barrios con hospedadores máis novos? Para cada cidade} 
-\addcontentsline{toc}{subsection}{Consulta 2}
-\emph{Xustificación:}
-\emph{Resultados:} 
-\begin{lstlisting}
-airbnb> db.listings.find({bedrooms :  {$gt : 40}}, {bedrooms : 1}).sort({ bedrooms: -1 })
-\end{lstlisting}
-\begin{lstlisting}[style=terminal]
-[
-  { _id: ObjectId('693479deab134920609e549c'), bedrooms: 43 },
-  { _id: ObjectId('693846ba023c5ca99b6f26e6'), bedrooms: 43 },
-  { _id: ObjectId('693848aca2b4d841d69f4700'), bedrooms: 43 }
-]
-
-\end{lstlisting}
-
-\begin{lstlisting}
-airbnb> db.listings.find({bedrooms :  {$gt : 40}}, {bedrooms : 1}).sort({ bedrooms: -1 })
-\end{lstlisting}
-\begin{lstlisting}[style=terminal]
-[
-  {
-    _id: ObjectId('693479deab134920609e549c'),
-    description: 'Cascais at your door',
-    neighbourhood_group_cleansed: 'Cascais',
-    latitude: 38.69952,
-    longitude: -9.42015,
-    property_type: 'Room in hotel',
-    accommodates: 3,
-    bathrooms: 1,
-    bedrooms: 43,
-    beds: 2,
-    price: 128,
-    number_of_reviews: 9,
-    number_of_reviews_l30d: 0,
-    availability_eoy: 80,
-    instant_bookable: true,
-    reviews_per_month: 0.14,
-    city: 'lisboa',
-    host: {
-      since: '2020-07-16',
-      location: 'Madrid, Spain',
-      response_time: 'within an hour',
-      response_rate: '100%',
-      acceptance_rate: '100%',
-      is_superhost: true,
-      total_listings_count: 7,
-      has_profile_pic: true,
-      identity_verified: true
-    },
-    score: {
-      rating: 4.67,
-      accuracy: 5,
-      cleanliness: 4.89,
-      checkin: 4.78,
-      communication: 4.78,
-      location: 5,
-      value: 4.44
-    },
-    amenities: [
-      '["Heating',
-      'Smoke alarm',
-      'Essentials',
-      'Private entrance',
-      'Carbon monoxide alarm',
-      'Breakfast',
-      'Self check-in',
-      'Air conditioning',
-      'HDTV',
-      'Shampoo',
-      'Exterior security cameras on property',
-      'Fire extinguisher',
-      'Iron',
-      'Building staff',
-      'Hangers',
-      'Hair dryer',
-      'Wifi"]'
-    ],
-    row_id: 52196,
-    centrality: 0.22156954910595233
-  }
-]
-\end{lstlisting}
-
-\subsection*{Consulta 2: Cales son os barrios con hospedadores máis novos? Para cada cidade} 
-\addcontentsline{toc}{subsection}{Consulta 2}
-
-\emph{Xustificación:} esta consulta é básica para o análise de tendencias e evolución do mercado inmobiliario.
-
-
-\begin{lstlisting}
-db.listings.aggregate([
-  {
-    $project: {
-      city: 1,
-      neighbourhood_group_cleansed: 1,
-      host_since: "$host.since",
-      year: { $year: { $toDate: "$host.since" } }
-    }
-  },
-  {
-    $group: {
-      _id: {
-        city: "$city",
-        neighbourhood: "$neighbourhood_group_cleansed"
-      },
-      avg_host_year: { $avg: "$year" },
-      count: { $sum: 1 }
-    }
-  },
-  {
-    $sort: { "_id.city": 1, "avg_host_year": -1 }
-  },
-  {
-    $group: {
-      _id: "$_id.city",
-      neighbourhoods: {
-        $push: {
-          neighbourhood: "$_id.neighbourhood",
-          avg_host_year: "$avg_host_year",
-          count: "$count"
-        }
-      }
-    }
-  },
-  {
-    $project: {
-      city: "$_id",
-      neighbourhoods: {
-        $slice: [
-          {
-            $sortArray: {
-              input: "$neighbourhoods",
-              sortBy: { avg_host_year: -1 }
-            }
-          },
-          5
-        ]
-      }
-    }
-  }
-])\end{lstlisting}
-
-\emph{Resultados:} se ben non procede mostrar os resultados completos, abaixo pódese ver as cidades con barrios máis novos. O certo e que a forma de mostrar esta consulta non so compara os barrios dentro dunha cidade pero ademáis as cidades entre sí.
-
-\begin{lstlisting}[style=terminal]
-  ...
-
-  {
-    _id: 'euskadi',
-    city: 'euskadi',
-    neighbourhoods: [
-      {
-        neighbourhood: 'Vizcaya',
-        avg_host_year: 2019.032435404068,
-        count: 3638
-      },
-      {
-        neighbourhood: 'Alava',
-        avg_host_year: 2017.819964349376,
-        count: 561
-      },
-      {
-        neighbourhood: 'Guipuzcoa',
-        avg_host_year: 2017.6565040650407,
-        count: 2952
-      }
-    ]
-  },
-  {
-    _id: 'madrid',
-    city: 'madrid',
-    neighbourhoods: [
-      {
-        neighbourhood: 'Vicálvaro',
-        avg_host_year: 2020.0117647058823,
-        count: 85
-      },
-      {
-        neighbourhood: 'Tetuán',
-        avg_host_year: 2019.724836212031,
-        count: 1679
-      },
-      {
-        neighbourhood: 'Villaverde',
-        avg_host_year: 2019.5731707317073,
-        count: 246
-      },
-      {
-        neighbourhood: 'Villa de Vallecas',
-        avg_host_year: 2019.4336283185842,
-        count: 113
-      },
-      {
-        neighbourhood: 'Barajas',
-        avg_host_year: 2019.3680981595091,
-        count: 163
-      }
-    ]
-  },
-  {
-    _id: 'valencia',
-    city: 'valencia',
-    neighbourhoods: [
-      {
-        neighbourhood: 'BENICALAP',
-        avg_host_year: 2020.3698630136987,
-        count: 146
-      },
-      {
-        neighbourhood: 'JESUS',
-        avg_host_year: 2020.0177304964539,
-        count: 282
-      },
-      {
-        neighbourhood: 'RASCANYA',
-        avg_host_year: 2019.9685534591194,
-        count: 159
-      },
-      {
-        neighbourhood: 'ALGIROS',
-        avg_host_year: 2019.9149560117303,
-        count: 341
-      },
-      {
-        neighbourhood: 'PATRAIX',
-        avg_host_year: 2019.864406779661,
-        count: 177
-      }
-    ]
-  }
-\end{lstlisting}
-
-\subsection*{Consulta 3: Influe foto de perfil no prezo medio?} 
-\addcontentsline{toc}{subsection}{Consulta 3}
 
 \emph{Xustificación:} de ser certo, AirBnB debería exisir ós seus hospedadores que se poñan foto, ou mesmo saldría deles. Tamén é interesante dende o punto de vista sociolóxico.
 
@@ -653,8 +404,8 @@ db.listings.aggregate([
 }
 \end{lstlisting}
 
-\subsection*{Consulta 4: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?} 
-\addcontentsline{toc}{subsection}{Consulta 4}
+\subsection*{Consulta 3: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?} 
+\addcontentsline{toc}{subsection}{Consulta 3}
 
 \emph{Xustificación:} esta información é decisiva nun análisis de desigualdade entre territorios, ou mesmo pode ser de interese gobernamental, para o desenvolvemento de leis.
 
@@ -701,7 +452,9 @@ db.listings.aggregate([
 ])
 \end{lstlisting}
 
-\emph{Resultados:}
+\emph{Resultados:} Móstrase abaixo os 3 mellores hospedadores deste mes
+(hospedadores con mellor performance score, composto dunha ponderación do número
+de reviews do último mes, súas reviews por mes e o seu rating).
 
 \begin{lstlisting}[style=terminal]
   {
@@ -744,119 +497,10 @@ db.listings.aggregate([
   ...
 \end{lstlisting}
 
-\subsection*{Consulta 5: Que \emph{score} é o que máis fluctua?} 
-\addcontentsline{toc}{subsection}{Consulta 5}
 
-\emph{Xustificación:}
 
-\begin{lstlisting}
-db.listings.aggregate([
-  {
-    $match: {
-      "score.rating": { $exists: true, $ne: null }
-    }
-  },
-  {
-    $group: {
-      _id: null,
-      avg_accuracy: { $avg: "$score.accuracy" },
-      std_accuracy: { $stdDevSamp: "$score.accuracy" },
-      avg_cleanliness: { $avg: "$score.cleanliness" },
-      std_cleanliness: { $stdDevSamp: "$score.cleanliness" },
-      avg_checkin: { $avg: "$score.checkin" },
-      std_checkin: { $stdDevSamp: "$score.checkin" },
-      avg_communication: { $avg: "$score.communication" },
-      std_communication: { $stdDevSamp: "$score.communication" },
-      avg_location: { $avg: "$score.location" },
-      std_location: { $stdDevSamp: "$score.location" },
-      avg_value: { $avg: "$score.value" },
-      std_value: { $stdDevSamp: "$score.value" }
-    }
-  },
-  {
-    $project: {
-      _id: 0,
-      scores: [
-        { 
-          name: "accuracy", 
-          average: { $round: ["$avg_accuracy", 2] },
-          std_dev: { $round: ["$std_accuracy", 2] }
-        },
-        { 
-          name: "cleanliness", 
-          average: { $round: ["$avg_cleanliness", 2] },
-          std_dev: { $round: ["$std_cleanliness", 2] }
-        },
-        { 
-          name: "checkin", 
-          average: { $round: ["$avg_checkin", 2] },
-          std_dev: { $round: ["$std_checkin", 2] }
-        },
-        { 
-          name: "communication", 
-          average: { $round: ["$avg_communication", 2] },
-          std_dev: { $round: ["$std_communication", 2] }
-        },
-        { 
-          name: "location", 
-          average: { $round: ["$avg_location", 2] },
-          std_dev: { $round: ["$std_location", 2] }
-        },
-        { 
-          name: "value", 
-          average: { $round: ["$avg_value", 2] },
-          std_dev: { $round: ["$std_value", 2] }
-        }
-      ]
-    }
-  },
-  {
-    $unwind: "$scores"
-  },
-  {
-    $sort: { "scores.std_dev": -1 }
-  },
-  {
-    $group: {
-      _id: null,
-      most_fluctuating: { $first: "$scores" },
-      all_scores: { $push: "$scores" }
-    }
-  },
-  {
-    $project: {
-      _id: 0,
-      "O score que máis fluctúa": {
-        name: "$most_fluctuating.name",
-        desviación_típica: "$most_fluctuating.std_dev",
-        media: "$most_fluctuating.average"
-      },
-      "Todos os scores por orde de fluctuación": "$all_scores"
-    }
-  }
-])
-\end{lstlisting}
-
-\emph{Resultados:} os resultados son sociolóxicamente moi interesantes porque as propiedades máis obxetivas e concretas do hospedaxe: a ubicación e a hora de checkin teñen menos fluctuación que as máis subxetivas e xerais como o valor xeral ou a limpieza (que é algo moi persoal).
-
-\begin{lstlisting}[style=terminal]
-[
-  {
-	'O score que máis fluctúa': { name: 'value', 'desviación_típica': 0.45, media: 4.56 },
-    'Todos os scores por orde de fluctuación': [
-      { name: 'value', average: 4.56, std_dev: 0.45 },
-      { name: 'cleanliness', average: 4.68, std_dev: 0.42 },
-      { name: 'accuracy', average: 4.72, std_dev: 0.4 },
-      { name: 'communication', average: 4.78, std_dev: 0.39 },
-      { name: 'checkin', average: 4.78, std_dev: 0.37 },
-      { name: 'location', average: 4.74, std_dev: 0.34 }
-    ]
-  }
-]
-\end{lstlisting}
-
-\subsection*{Consulta 6: Cales son os hospedaxes con hospedadores fóra desa cidade?}
-\addcontentsline{toc}{subsection}{Consulta 6}
+\subsection*{Consulta 4: Cales son os hospedaxes con hospedadores fóra desa cidade?}
+\addcontentsline{toc}{subsection}{Consulta 4}
 
 \emph{Xustificación:} Ter un hospedador que vive lonxe (noutra cidade) pode ser un inconveniente tanto para os inquilinos como para o propio AirBnB se é que estos están discontentos. Caracterizalos é importante.
 
@@ -934,8 +578,8 @@ db.listings.aggregate([
   ...
 \end{lstlisting}
 
-\subsection*{Consulta 7: Cales son os hospedaxes que estan a facer un bo último mes?}
-\addcontentsline{toc}{subsection}{Consulta 7}
+\subsection*{Consulta 5: Cales son os hospedaxes que estan a facer un bo último mes?}
+\addcontentsline{toc}{subsection}{Consulta 5}
 
 \emph{Xustificación:} esta consula é de carácter moi xeral e o interese pode vir de moitos lados, os hospedadores poden querer estudar que fan eses hospedaxes tan bos; tamén AirBnB pódese ver beneficiado se é capaz de caracterizar tendencias, ou premiar ós mellores hospedaxes.
 
@@ -1050,7 +694,25 @@ db.listings.aggregate([
 \label{sec:nulosAA}
 
 
-Como a columna \texttt{price} nos \texttt{.csv}s orixinais tiña un 13\% de nulos (ver Figura \ref{fig:modeloDatos}), decidimos adestrar un modelo de Aprendizaxe Automático para \emph{regresar} os valores do prezo. Ademáis, esta tarefa parecíanos interesante de por sí. Para facela cosideramos interesante a columna de centralidade obtida na Consulta 1. Se ben e certo que sae máis a conta calcular esos valores de centralidade directamente en Python, queremos cargar esos valores de MongoDB para simular unha ocasión na que sexa máis doado facer unha consulta. Para esto usamos o arquivo adxunto \texttt{mongo2csv.py} que devolve a devandita columna ordeada polo numero de fila para garanter a coherencia e a engade pola dereita ó csv orixinal. Sobre estes datos hai que realizar algunas modificacións: as columnas de texto libre (como a descripción ou os barrios) eliminanse, as categoricas (como o tempo de resposta ou o tipo de propiedade) codificanse \emph{one hot} e as numericas que estaban en porcentaxe formatéanse. Deste xeito temos uns datos listos para adestrar un modelo con eles. O modelo elixido e un XGBoost que baséase en árbores con Boosting e ten licencia Apache 2 . As tarefas de limpieza e adestramento fannas \texttt{train.py}, quen tamén devolve tablas \LaTeX como saída.
+Como a columna \texttt{price} nos \texttt{.csv}s orixinais tiña un 13\% de nulos
+(ver Figura \ref{fig:modeloDatos}), decidimos adestrar un modelo de Aprendizaxe
+Automático para \emph{regresar} os valores do prezo. Ademáis, esta tarefa
+parecíanos interesante de por sí. Para facela cosideramos interesante a columna
+de centralidade obtida na Consulta 1. Se ben e certo que sae máis a conta
+calcular esos valores de centralidade directamente en Python, queremos cargar
+esos valores de MongoDB para simular unha ocasión na que sexa máis doado facer
+unha consulta. Para esto usamos o arquivo adxunto \texttt{mongo2csv.py} que
+devolve a devandita columna ordeada polo numero de fila para garanter a
+coherencia e a engade pola dereita ó csv orixinal. Sobre estes datos hai que
+realizar algunas modificacións: as columnas de texto libre (como a descripción
+ou os barrios) eliminanse, as categoricas (como o tempo de resposta ou o tipo de
+propiedade) codificanse \emph{one hot} e as numericas que estaban en porcentaxe
+formatéanse. Deste xeito temos uns datos listos para adestrar un modelo con
+eles. O modelo elixido e un XGBoost que baséase en árbores con Boosting e ten
+licencia Apache 2, polo que podería ter efectivamente un uso comercial por parte
+airbnb ou algunha empresa de hospedaxes xa que a licencia o permite. As tarefas
+de limpieza e adestramento fannas \texttt{train.py}, quen tamén devolve tablas
+\LaTeX como saída.
 
 
 \input{../tablas/metricas_modelo.tex}
@@ -1058,8 +720,28 @@ Como a columna \texttt{price} nos \texttt{.csv}s orixinais tiña un 13\% de nulo
 \input{../tablas/importancia_variables.tex}
 
 \section{Conclusións}
-\lipsum
+Deseñada a base de datos e realizadas as consultas de exemplo, estimamos este
+enfoque do traballo como potencialmente útil para o análise de mercado neste
+sector dos alugueres/turismo. Enforcar a BD hacia os listings permitiunos
+aplicar características clave e moi útiles da plataforma MongoDB (como os xa
+mencionados arrays embebidos e documentos anidados) as cales houberan sido mais
+difíciles de aplicar e mostrar súa utilidade se o enfoque principal da base
+seguera sendo as reviews en sí. \\
 
+Deste modo tamén foi trivial a tarefa de pensar nunha aplicación dun modelo de
+Aprendizaxe Automática, pois pode resolver un problema real, o de suxerir un
+prezo para o usuario que quere publicar un novo listing, ademáis do seu posible
+uso para rechear nulos. \\
+
+Para cerrar esta conclusión gustaríanos sinalar como posible traballo futuro a
+construcción da base de datos tendo as reviews como elemento principal. Isto
+permitiría a construcción dun dataset útil para algúns modelos de Linguaxe
+(estilo BERT). Seu uso principal sería entrenalos sobre todo o texto das reviews
+e que esencialmente realice unha tarefa de análisis de sentimentos sobre eles,
+sendo capaz incluso de asociarlles un rating mais preciso e realista que o do
+propio usuario (xeralmente os ratings dados polos usuarios non seguen a
+distribución normal, senón que teñen picos nos extremos, moitas reviews teñen 0
+e 5 estrelas). 
 \newpage
 
 \bibliographystyle{IEEEtran}
