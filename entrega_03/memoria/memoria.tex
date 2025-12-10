@@ -2,7 +2,9 @@
 
 % Paquetes básicos
 \usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
+\usepackage[spanish, es-tabla]{babel} % es-tabla para que poña "Tabla" ou "Táboa" dependendo da config, galician non está completo ás veces, spanish é seguro para formatos
+\addto\captionsspanish{\renewcommand{\tablename}{Táboa}} % Forzar "Táboa" en galego
+\addto\captionsspanish{\renewcommand{\listtablename}{Índice de táboas}}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -29,8 +31,6 @@
     right=2cm
 }
 
-
-
 % Configurar listings
 \lstset{
     extendedchars=true,
@@ -48,7 +48,6 @@
 \author{Marcelo Ferreiro Sánchez, Pablo Chantada Saborido\\  Guillermo García Engelmo \& Pepe Romero Conde}
 \date{\today}
 
-
 \lstdefinelanguage{SQL}{
   morekeywords={
     SELECT,FROM,WHERE,AND,OR,INSERT,INTO,VALUES,UPDATE,SET,DELETE,CREATE,TABLE,
@@ -65,9 +64,7 @@
 \definecolor{azulito}{RGB}{186,200,211}
 \definecolor{azul_oscuro}{RGB}{35,68,93}
 \definecolor{turquesa}{RGB}{174,143,171}
-
 \definecolor{terminalbg}{RGB}{255,255,255}
-
 
 \lstset{
   language=SQL,
@@ -82,8 +79,6 @@
   breaklines=true,
   tabsize=2
 }
-
-
 
 \lstdefinestyle{terminal}{
     backgroundcolor=\color{terminalbg},
@@ -114,29 +109,29 @@ aproveitar as súas características para demostrar a capacidade dos
 \texttt{host} dentro do documento do \texttt{hospedaxe}. Deste xeito, eliminamos
 a necesidade de realizar custosas \textbf{unións (\emph{joins})} en tempo de
 consulta, mellorando o desempeño da recuperación e permitindo unha modelaxe máis
-natural dos datos (sempre cando nosas consultas non teñan como obxectivo
-devolver hospedadores, nese caso serían algo máis caras).
+natural dos datos (sempre e cando as nosas consultas non teñan como obxectivo
+devolver hospedadores, pois nese caso serían algo máis caras).
 
-O diseño da Base
-de datos terá lugar na sección \ref{sec:deseño}, e será realizado sobre os datos
+O deseño da base
+de datos terá lugar na sección \ref{sec:deseno}, e será realizado sobre os datos
 expostos na sección \ref{sec:modeloDatos}.
 
 \section{Modelo de Datos}
 \label{sec:modeloDatos}
 
-Nesta ocasión non nos limitamos a usar os \texttt{.csv}s de unha cidade, con motivo de facer máis diversas as estadísticas e os resultados en xeral. Dende un principio observamos que o porcentaxe de nulos para a mesma columna non era ó meso ó longo das cidades, por eso con varias cidades esperamos unha representación máis fiel da realidade (e.g a cidade de Girona ten 100\% de nulos para a columna \texttt{neighbourhood\_group\_cleansed} mentras que Lisboa ten un 0\%). As primeiras manipulacións que  tivemos que facerlle ós datos foi a de eliminar as columnas que non nos interesasen, engadir a columna de ``cidade'' e apilar todo nun \texttt{csv}. Fixemos ese traballo ca librería Pandas \cite{pandas_license} de Python \cite{cpython_license}, xa que os campos de texto libre, como \texttt{description}, contiñan caracteres de salto de carro \texttt{\^{}M} que dificultaban a tarea a \emph{oneliners} en AWK \cite{gpl3_license}  (ver o programa adxunto \texttt{src/merge\_csvs.py} e a Figura \ref{fig:merge}).  
+Nesta ocasión non nos limitamos a usar os \texttt{.csv} dunha cidade, co motivo de facer máis diversas as estatísticas e os resultados en xeral. Dende un principio observamos que a porcentaxe de nulos para a mesma columna non era o mesmo ao longo das cidades, por iso con varias cidades esperamos unha representación máis fiel da realidade (e.g. a cidade de Girona ten 100\% de nulos para a columna \texttt{neighbourhood\_group\_cleansed} mentres que Lisboa ten un 0\%). As primeiras manipulacións que tivemos que facerlles aos datos foi a de eliminar as columnas que non nos interesasen, engadir a columna de ``cidade'' e apilar todo nun \texttt{csv}. Fixemos ese traballo coa librería Pandas \cite{pandas_license} de Python \cite{cpython_license}, xa que os campos de texto libre, como \texttt{description}, contiñan caracteres de salto de carro \texttt{\^{}M} que dificultaban a tarefa a \emph{oneliners} en AWK \cite{gpl3_license} (ver o programa adxunto \texttt{src/merge\_csvs.py} e a Figura \ref{fig:merge}).  
 
-As columnas elexidas pódense ver na Figura \ref{fig:modeloDatos}. A eleción foi un compromiso entre expresividade e tamaño, pensamos que cas columnas elixidas podemos facer bos análisis e consultas sen ten que cargar con todo o peso dos \texttt{.csv}s orixinais. Ademáis, o teren tipos de datos distintos e mesmo unha estructura xerárquica implícita, supoñen unha interesante materia prima. A estructura implícita a modelamos como: unha única coleción de hospedaxes na que cada documento ten embebidos outros dous (o hospedador e máis o \emph{Score}) e un arranxo, as prestacións.
+As columnas elixidas pódense ver na Figura \ref{fig:modeloDatos}. A elección foi un compromiso entre expresividade e tamaño; pensamos que coas columnas elixidas podemos facer boas análises e consultas sen ter que cargar con todo o peso dos \texttt{.csv} orixinais. Ademais, ao teren tipos de datos distintos e mesmo unha estrutura xerárquica implícita, supoñen unha interesante materia prima. A estrutura implícita modelámola como: unha única colección de hospedaxes na que cada documento ten embebidos outros dous (o hospedador e mais o \emph{Score}) e un array, as prestacións.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/merge.drawio.png}
-    \caption{A primeira transformación e xuntar os datos de distintas cidades e quitar as columnas que non nos interesen. Aproveitamos a ocasión para facer unha imputación sinxela, \emph{vainilla} dos datos}
+    \caption{A primeira transformación é xuntar os datos de distintas cidades e quitar as columnas que non nos interesen. Aproveitamos a ocasión para facer unha imputación sinxela, \emph{vanilla}, dos datos.}
   \label{fig:merge}
 \end{figure}
 
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/modeloDatos.drawio.png}
     \caption{Diagrama do Modelo de Datos}
@@ -145,40 +140,43 @@ As columnas elexidas pódense ver na Figura \ref{fig:modeloDatos}. A eleción fo
 
 \section{Preprocesado de datos}
 
-\subsection{Análisis exploratorio del dataset}	
+\subsection{Análise exploratoria do conxunto de datos}  
 
-Comenzamos a análise co obxecto de estudo da Consulta 1 e da sección \ref{sec:nulosAA}, o prezo das vivendas. Vemos que en xeral a distribución $p(\$=X)$ ten as colas moi longas (aunque por exemplo $p(\$=X|\text{cidade=Madrid})$ non tanto). Vemos que as dous cidades con maiores abanicos son as ínsuas, que efectivamente hai unha correlación entre o que custa un hospedaxe e a xente que cabe nel (ver Consulta 4) e que o logaritmo é unha mellor forma de representar o precio.
+Comenzamos a análise co obxecto de estudo da Consulta 1 e da sección \ref{sec:nulosAA}, o prezo das vivendas. Vemos que en xeral a distribución $p(\$=X)$ ten as colas moi longas (aínda que por exemplo $p(\$=X|\text{cidade=Madrid})$ non tanto). Vemos que as dúas cidades con maiores abanicos son as insulares, que efectivamente hai unha correlación entre o que custa un hospedaxe e a xente que colle nel (ver Consulta 4) e que o logaritmo é unha mellor forma de representar o prezo.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/eda_02_analise_prezos.png}
-    %\caption{}
+    \caption{Análise de prezos por cidade.}
   \label{fig:edaPrezos}
 \end{figure}
-  No gráfico de abaixo podemos ver o esparcidos que están os hospedaxes nas cidades, o cal repercutirá no índice de centralidade, ver Consulta 1. Parécenos curioso que Mallorca está tan plagada de turismo que pódese recoñecer a forma insuar dende este gráfico.
+  
+No gráfico de abaixo podemos ver o dispersos que están os hospedaxes nas cidades, o cal repercutirá no índice de centralidade (ver Consulta 1). Parécenos curioso que Mallorca estea tan pragada de turismo que se poida recoñecer a forma insular dende este gráfico.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{../diagramas/eda_07_xeografia_9cidades.png}
-    %\caption{}
+    \caption{Distribución xeográfica das 9 cidades.}
   \label{fig:eda9cidades}
 \end{figure}
 
-Por último queríamos mostrar as distribucións mas dispersas, tanto que parece que estan cheas de atípicos. Per nos pensamos que non é o caso, que símplemente a realidade é dispersa, como veremos en \ref{consulta:atipico}.
+Por último queriamos mostrar as distribucións máis dispersas, tanto que parece que están cheas de atípicos. Pero nós pensamos que non é o caso, que simplemente a realidade é dispersa, como veremos en \ref{consulta:atipico}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/eda_09_outliers.png}
-    %\caption{}
+    \caption{Visualización de atípicos.}
   \label{fig:edaOutliers}
 \end{figure}
 
 
 
-\subsection{Tratamiento de nulos}
+\subsection{Tratamento de nulos}
 
-Como logo temos que volcar os datos a MongoDB (licencia en \cite{mongodb_license}), o noso programa xa limpia os datos cunha imputación sinxela  pero apropiada para o tipo de datos (o exisido pola práctica), non obstante podemos desactivala e observar os nulos do arquivo mergeado, o porcentaxe está dispoñibel na Figura \ref{fig:modeloDatos}. Ademáis do porcentaxe é interesante o tipo de dato e o rol que desempeña esa columna.  
-\subsubsection{Nulos núericos}
-Dende logo o tipo de dato condiciona as opcións de imputación. Ademáis pódese dicir que estos nulos divídense en tres grupos: os relacionados co inmobiliario (baños, habitacións e camas), os valores das reseñas e tres atributos do hospedador. Unha primera idea de encher os nulos dun grupo con valores do mesmo (e.g. imputar o \emph{score} de comunicación co resto de \emph{scores}) desmantelouse á vista da Figura \ref{fig:nulos}, e dicir, non se poden encher os nulos dun grupo con valores dese grupo porque cando un é nulo os otros tamén (alta correlación). Ademáis por curiosidade, fixemos un experimento (ver \texttt{src/knn\_vs\_median.py} ou Cadro \ref{fig:vale_pena_Knn}) para ver a diferencia de error se usamos imputación simple (mediana) ou máis sofisticada (adestramento dun KNN non paramétrico) e obervamos que o erro malia ser a metade co método sofisticado, segue estando no mesmo orde de magnitude e ademáis encarece moito computacionalmente. Por todo o dito, e o alcance da práctica, limitámosnos a unha imputación sinxela por mediana.
+Como logo temos que envorcar os datos a MongoDB (licenza en \cite{mongodb_license}), o noso programa xa limpa os datos cunha imputación sinxela pero apropiada para o tipo de datos (o esixido pola práctica); non obstante podemos desactivala e observar os nulos do arquivo unificado. A porcentaxe está dispoñible na Figura \ref{fig:modeloDatos}. Ademais da porcentaxe é interesante o tipo de dato e o rol que desempeña esa columna.  
+
+\subsubsection{Nulos numéricos}
+Dende logo o tipo de dato condiciona as opcións de imputación. Ademais pódese dicir que estes nulos divídense en tres grupos: os relacionados co inmobiliario (baños, habitacións e camas), os valores das reseñas e tres atributos do hospedador. Unha primeira idea de encher os nulos dun grupo con valores do mesmo (e.g. imputar o \emph{score} de comunicación co resto de \emph{scores}) desmantelouse á vista da Figura \ref{fig:nulos}; é dicir, non se poden encher os nulos dun grupo con valores dese grupo porque cando un é nulo os outros tamén o son (alta correlación). Ademais, por curiosidade, fixemos un experimento (ver \texttt{src/knn\_vs\_median.py} ou Táboa \ref{tab:knnVsMedian}) para ver a diferencia de erro se usamos imputación simple (mediana) ou máis sofisticada (adestramento dun KNN non paramétrico) e observamos que o erro, malia ser a metade co método sofisticado, segue estando na mesma orde de magnitude e ademais encarece moito computacionalmente o proceso. Por todo o dito, e polo alcance da práctica, limitámonos a unha imputación sinxela por mediana.
 
 \begin{figure}[H]
     \centering
@@ -192,30 +190,30 @@ Dende logo o tipo de dato condiciona as opcións de imputación. Ademáis pódes
 
 \subsubsection{Outros nulos}
 
-Como pode verse na función \texttt{fillna} do arquivo \texttt{src/merge\_csvs.py}, tanto os Booleanos como os Strings impútanse mediante a moda. Se ben poderíanse levar acabo operacións máis sofisticadas, polo alcance da práctica limitámosnos a esta opción.
+Como pode verse na función \texttt{fillna} do arquivo \texttt{src/merge\_csvs.py}, tanto os Booleanos como os Strings impútanse mediante a moda. Se ben poderíanse levar a cabo operacións máis sofisticadas, polo alcance da práctica limitámonos a esta opción.
 
-\subsection{Outras operaciones de procesado}
+\subsection{Outras operacións de procesado}
 
-Se ben o discutido ate agora foi máis ben dos valores en sí, cabe destacar que para volcar os datos a MongoDB foi necesario un especial arranxo dos datos, en particular para o formato dos dous documentos embebidos e do arranxo de prestacións, estas operacións, en cambio as situamos na fase de carga (\emph{Load}) e por tanto lévanse acabo no arquivo adxunto \texttt{csv2mongo.py}.
+Se ben o discutido ata o de agora foi máis ben dos valores en si, cabe destacar que para envorcar os datos a MongoDB foi necesaria unha disposición especial dos datos, en particular para o formato dos dous documentos embebidos e do array de prestacións. Estas operacións, en cambio, situámolas na fase de carga (\emph{Load}) e por tanto lévanse a cabo no arquivo adxunto \texttt{csv2mongo.py}.
 
 \section{Definición e implementación da Base de Datos}
-\label{sec:deseño}
+\label{sec:deseno}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{../diagramas/2mongo.drawio.png}
-    \caption{Una vez que temos todos os datos nun \texttt{.csv} sobre o cal podemos facer Análisis Exploratorio, estamos listos para pasalos datos a MongoDB, segundo a definición do esquema dada na sección \ref{sec:modeloDatos}}
+    \caption{Unha vez que temos todos os datos nun \texttt{.csv} sobre o cal podemos facer Análise Exploratoria, estamos listos para pasar os datos a MongoDB, segundo a definición do esquema dada na sección \ref{sec:modeloDatos}.}
   \label{fig:2mongo}
 \end{figure}
 
-O modelo de Datos da Figura \ref{fig:modeloDatos} é o ``esquema'' que usaremos en MongoDB. Dado o noso planteamento de centrarnos nos hospedaxes (os protagonistas dos \texttt{csv}s máis grandes e argumentablemente da aplicación enteira de AirBnB) non houbo moitas decisións de diseño dificiles. O arranxo prestacións tiña que ser un arranxo en MongoDB e os \emph{scores} son un documento embebido principalmente por sucre sintáctica \cite{syntacticSugar}; en cambio os hospedadores ben podían ter sido unha colección por si mesma. Tal cousa tería sentido se fixeramos consultas hospedador-centricas, é dicir, se pensasemos os hospedadores como entidades por si mesmas, non foi o noso caso pois pensamos que o hospedador ven surrogado ó hospedaxe e as consultas que iamos facer non precisaban a complexidade de varias coleccións.
+O modelo de datos da Figura \ref{fig:modeloDatos} é o ``esquema'' que usaremos en MongoDB. Dado o noso plantexamento de centrarnos nos hospedaxes (os protagonistas dos \texttt{csv} máis grandes e argumentablemente da aplicación enteira de AirBnB) non houbo moitas decisións de deseño difíciles. O array de prestacións tiña que ser un array en MongoDB e os \emph{scores} son un documento embebido principalmente por azucre sintáctico \cite{syntacticSugar}; en cambio os hospedadores ben podían ter sido unha colección por si mesma. Tal cousa tería sentido se fixésemos consultas hospedador-céntricas, é dicir, se pensásemos nos hospedadores como entidades por si mesmas; non foi o noso caso pois pensamos que o hospedador vén subrogado ao hospedaxe e as consultas que iamos facer non precisaban a complexidade de varias coleccións.
 
-Dito o anterior, a Base de Datos móntase co \emph{script} adxunto \texttt{csv2mongo.py}. Este establece conexión cun cliente de Mongo local e carga os datos no formato especificado, de xeito que podemos facer: 
+Dito o anterior, a base de datos móntase co \emph{script} adxunto \texttt{csv2mongo.py}. Este establece conexión cun cliente de Mongo local e carga os datos no formato especificado, de xeito que podemos facer: 
 
 
 \begin{lstlisting}[style=terminal]
 (.venv)  entrega_03 (main) > python src/mongo/csv2mongo.py
-Inserted 158754 listings imto airbnb.listings
+Inserted 158754 listings into airbnb.listings
 (.venv) entrega_03 (main) > mongosh
 Current Mongosh Log ID: 69347505a2994911f4cd9cc3
 Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.5.10
@@ -297,18 +295,18 @@ airbnb> db.listings.findOne()
 }
 \end{lstlisting}
 
-Pódese ver que a operación é exitosa e a consulta da liña 18 e só un exemplo para demostrar o funcionamento. Ademáis pódese ver que ó final do documento hai un atributo de fila, este vai ser útil na sección \ref{sec:nulosAA} pois imos ter que exportar o resultado da primeira consulta de MongoDB a csv de volta, e ter o identificador de fila vainos valer para emparexar fácilmente. Sen identificador de fila teríamos que exportar a base de datos enteira, pero con el, podemos devolver as columnas que creemos en MongoDB ordeadas por \texttt{row\_id} e teremos a certeza de que vai cuadrar ben.
+Pódese ver que a operación é exitosa e a consulta da liña 18 é só un exemplo para demostrar o funcionamento. Ademais pódese ver que ao final do documento hai un atributo de fila, este vai ser útil na sección \ref{sec:nulosAA} pois imos ter que exportar o resultado da primeira consulta de MongoDB a csv de volta, e ter o identificador de fila vainos valer para emparellar facilmente. Sen identificador de fila teriamos que exportar a base de datos enteira, pero con el, podemos devolver as columnas que creemos en MongoDB ordenadas por \texttt{row\_id} e teremos a certeza de que vai cadrar ben.
 
 \section{Explotación da Base de Datos}
-Agora que hemos definido e implementado a nosa Base de Datos, 
+Agora que definimos e implementamos a nosa base de datos, procedemos á súa explotación.
 
 \subsection*{Consulta 1: Obter un índice de centralidade (dentro da cidade) para cada hospedaxe} 
 \label{consulta1}
-\addcontentsline{toc}{subsection}{Consulta 1}
+\addcontentsline{toc}{subsection}{Consulta 1: Índice de centralidade}
 
-\emph{Xustificación:} como verase na sección \ref{sec:nulosAA}, imos usar este valor para facer prediccións sobre o precio de cada hospedaxe. Ademáis parecíanos un bo uso das funcións nativas de MongoDB.
+\emph{Xustificación:} como se verá na sección \ref{sec:nulosAA}, imos usar este valor para facer prediccións sobre o prezo de cada hospedaxe. Ademais parecíanos un bo uso das funcións nativas de MongoDB.
 
-Para levar acabo esta consulta precisamos calcular os centroides de cada cidade e logo, para cada hospedaxe calcularemos a distacia ó centroide. O seguinte código crea ditos centroides, agregando os hospedaxes por cidade e facendo a media das súas coordenadas.
+Para levar a cabo esta consulta precisamos calcular os centroides de cada cidade e logo, para cada hospedaxe, calcularemos a distancia ao centroide. O seguinte código crea ditos centroides, agregando os hospedaxes por cidade e facendo a media das súas coordenadas.
 
 
 \begin{lstlisting}
@@ -323,7 +321,7 @@ const centroides = db.listings.aggregate([
 ]).toArray();
 \end{lstlisting}
 
-Agora que temos eso só nos queda facer un \texttt{updateMany} no que por cada centroide, collemos os hospedaxes desa cidade e calculamos a distacia euclidea do centroide ó hospedaxe. Malia seren moitas liñas, as liñas 8-13 correspóndense co cálculo.
+Agora que temos iso só nos queda facer un \texttt{updateMany} no que por cada centroide, collemos os hospedaxes desa cidade e calculamos a distancia euclidiana do centroide ao hospedaxe. Malia seren moitas liñas, as liñas 8-13 correspóndense co cálculo.
 
 \begin{lstlisting}
 centroides.forEach(c => {
@@ -347,15 +345,15 @@ centroides.forEach(c => {
 });
 \end{lstlisting}
 
-\emph{Resultados:} Tal cual o fixemos cambia a base de datos, non devolve. Para ver o efecto podemos facer unha mini-consulta de comprobación como \texttt{db.listings.findOne()} e ver que xa figura o novo atributo.
+\emph{Resultados:} Tal cal o fixemos cambia a base de datos, non devolve nada. Para ver o efecto podemos facer unha miniconsulta de comprobación como \texttt{db.listings.findOne()} e ver que xa figura o novo atributo.
 
 
-\subsection*{Consulta 2: Influe foto de perfil no prezo medio?} 
-\addcontentsline{toc}{subsection}{Consulta 2}
+\subsection*{Consulta 2: Inflúe a foto de perfil no prezo medio?} 
+\addcontentsline{toc}{subsection}{Consulta 2: Foto de perfil e prezo}
 
-\emph{Xustificación:} de ser certo, AirBnB debería exisir ós seus hospedadores que se poñan foto, ou mesmo saldría deles. Tamén é interesante dende o punto de vista sociolóxico.
+\emph{Xustificación:} de ser certo, AirBnB debería esixir aos seus hospedadores que poñan foto, ou mesmo sairía deles. Tamén é interesante dende o punto de vista sociolóxico.
 
-Esta consulta é sinxela, só hai que agrupar por valor de \texttt{host.has\_profile\_pic}, agregando o precio
+Esta consulta é sinxela, só hai que agrupar por valor de \texttt{host.has\_profile\_pic}, agregando o prezo.
 
 \begin{lstlisting}
 db.listings.aggregate([
@@ -384,7 +382,7 @@ db.listings.aggregate([
 ])
 \end{lstlisting}
 
-\emph{Resultados:} como pode verse os resultados obtidos (ver abaixo) son algo significativos, posto que ainda que as medias son distintas as desviacións estandar solápanse. En calquera caso, análise de distribucións é algo que debería facerse en R \cite{r_license}, Julia \cite{julia_license} ou Python pero non en MongoDB.
+\emph{Resultados:} como pode verse, os resultados obtidos (ver abaixo) son algo significativos, posto que aínda que as medias son distintas, as desviacións estándar solápanse. En calquera caso, a análise de distribucións é algo que debería facerse en R \cite{r_license}, Julia \cite{julia_license} ou Python pero non en MongoDB.
 \begin{lstlisting}[style=terminal]
 {
   min_price: 8,
@@ -406,7 +404,7 @@ db.listings.aggregate([
 
 
 \subsection*{Consulta 3: Cal é o hospedaxe que ten 40 habitacións?}
-\addcontentsline{toc}{subsection}{Consulta 3}
+\addcontentsline{toc}{subsection}{Consulta 3: Atípicos en habitacións}
 \label{consulta:atipico}
 
 \emph{Xustificación:} É un anómalo realmente? 
@@ -428,7 +426,7 @@ airbnb> db.listings.find({bedrooms :  {$gt : 40}}, {bedrooms : 1}).sort({ bedroo
 airbnb> db.listings.find({_id :  693479deab134920609e549c})
 \end{lstlisting}
 
-\emph{Resultados:} Vemos que é un hotel, polo que non poderíamos decir que é un dato erroneo, e esperaríamos máis hoteles polo que quedarnos con él parece lóxico.
+\emph{Resultados:} Vemos que é un hotel, polo que non poderiamos dicir que é un dato erróneo, e esperariamos máis hoteis polo que quedarnos con el parece lóxico.
 
 \begin{lstlisting}[style=terminal]
 [
@@ -495,11 +493,11 @@ airbnb> db.listings.find({_id :  693479deab134920609e549c})
 ]
 \end{lstlisting}
 
-\subsection*{Consulta 4: cuales son os barrios con hospedadores máis novos? Para cada cidade} 
-\label{}
+\subsection*{Consulta 4: Existen hospedaxes con máis de 5 camas?} 
+\label{consulta4}
+\addcontentsline{toc}{subsection}{Consulta 4: Hospedaxes con moitas camas}
 
-\addcontentsline{toc}{subsection}{Consulta 4}
-\emph{Xustificación:} A plataforma de AirBnB podría sinalar que un hospedaxe ten tantas camas como habitacións o cal estaría ben, por exemplo, para viaxes de parella ou grupos. Pero primero, hai tales hospedaxes?
+\emph{Xustificación:} A plataforma de AirBnB podería sinalar que un hospedaxe ten tantas camas como habitacións, o cal estaría ben, por exemplo, para viaxes de parella ou grupos. Pero primeiro, hai tales hospedaxes?
 
 \begin{lstlisting}
 airbnb> db.listings.find(
@@ -508,7 +506,7 @@ airbnb> db.listings.find(
 | ).sort({ beds: -1 })
 \end{lstlisting}
 
-\emph{Resultados:} Vemos que sí, Hoteis.
+\emph{Resultados:} Vemos que si, Hoteis.
 
 \begin{lstlisting}[style=terminal]
 [
@@ -536,10 +534,10 @@ airbnb> db.listings.find(
 \end{lstlisting}
 
 
-\subsection*{Consulta 4: Cales son os barrios con hospedadores máis novos? Para cada cidade} 
-\addcontentsline{toc}{subsection}{Consulta 2}
+\subsection*{Consulta 5: Cales son os barrios con hospedadores máis novos (para cada cidade)?} 
+\addcontentsline{toc}{subsection}{Consulta 5: Barrios con hospedadores novos}
 
-\emph{Xustificación:} esta consulta é básica para o análise de tendencias e evolución do mercado inmobiliario.
+\emph{Xustificación:} esta consulta é básica para a análise de tendencias e evolución do mercado inmobiliario.
 
 
 \begin{lstlisting}
@@ -595,7 +593,7 @@ db.listings.aggregate([
   }
 ])\end{lstlisting}
 
-\emph{Resultados:} se ben non procede mostrar os resultados completos, abaixo pódese ver as cidades con barrios máis novos. O certo e que a forma de mostrar esta consulta non so compara os barrios dentro dunha cidade pero ademáis as cidades entre sí.
+\emph{Resultados:} se ben non procede mostrar os resultados completos, abaixo pódese ver as cidades con barrios máis novos. O certo é que a forma de mostrar esta consulta non só compara os barrios dentro dunha cidade senón tamén as cidades entre si.
 
 \begin{lstlisting}[style=terminal]
   ...
@@ -626,12 +624,12 @@ db.listings.aggregate([
     city: 'madrid',
     neighbourhoods: [
       {
-        neighbourhood: 'Vicálvaro',
+        neighbourhood: 'Vicalvaro',
         avg_host_year: 2020.0117647058823,
         count: 85
       },
       {
-        neighbourhood: 'Tetuán',
+        neighbourhood: 'Tetuan',
         avg_host_year: 2019.724836212031,
         count: 1679
       },
@@ -687,10 +685,10 @@ db.listings.aggregate([
 
 
 
-\subsection*{Consulta 5: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?} 
-\addcontentsline{toc}{subsection}{Consulta 3}
+\subsection*{Consulta 6: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?} 
+\addcontentsline{toc}{subsection}{Consulta 6: Barrios con hospedaxes grandes}
 
-\emph{Xustificación:} esta información é decisiva nun análisis de desigualdade entre territorios, ou mesmo pode ser de interese gobernamental, para o desenvolvemento de leis.
+\emph{Xustificación:} esta información é decisiva nunha análise de desigualdade entre territorios, ou mesmo pode ser de interese gobernamental, para o desenvolvemento de leis.
 
 
 \begin{lstlisting}
@@ -736,8 +734,8 @@ db.listings.aggregate([
 \end{lstlisting}
 
 \emph{Resultados:} Móstrase abaixo os 3 mellores hospedadores deste mes
-(hospedadores con mellor performance score, composto dunha ponderación do número
-de reviews do último mes, súas reviews por mes e o seu rating).
+(hospedadores con mellor \emph{performance score}, composto dunha ponderación do número
+de reviews do último mes, as súas reviews por mes e o seu rating).
 
 \begin{lstlisting}[style=terminal]
   {
@@ -782,10 +780,10 @@ de reviews do último mes, súas reviews por mes e o seu rating).
 
 
 
-\subsection*{Consulta 6: Cales son os hospedaxes con hospedadores fóra desa cidade?}
-\addcontentsline{toc}{subsection}{Consulta 4}
+\subsection*{Consulta 7: Cales son os hospedaxes con hospedadores fóra desa cidade?}
+\addcontentsline{toc}{subsection}{Consulta 7: Hospedadores fóra da cidade}
 
-\emph{Xustificación:} Ter un hospedador que vive lonxe (noutra cidade) pode ser un inconveniente tanto para os inquilinos como para o propio AirBnB se é que estos están discontentos. Caracterizalos é importante.
+\emph{Xustificación:} Ter un hospedador que vive lonxe (noutra cidade) pode ser un inconveniente tanto para os inquilinos como para o propio AirBnB se é que estes están descontentos. Caracterizalos é importante.
 
 \begin{lstlisting}
 db.listings.aggregate([
@@ -834,7 +832,7 @@ db.listings.aggregate([
 ])
 \end{lstlisting}
 
-\emph{Resultados:} Abaixo podemos ver tres exemplos deste tipo de hospedadores. Curiosamente as tres descripcións están inglés, o cal denota impersonalidade.
+\emph{Resultados:} Abaixo podemos ver tres exemplos deste tipo de hospedadores. Curiosamente as tres descricións están en inglés, o cal denota impersonalidade.
 
 \begin{lstlisting}[style=terminal]
     _id: ObjectId('693479ddab134920609d88b9'),
@@ -861,10 +859,10 @@ db.listings.aggregate([
   ...
 \end{lstlisting}
 
-\subsection*{Consulta 7: Cales son os hospedaxes que estan a facer un bo último mes?}
-\addcontentsline{toc}{subsection}{Consulta 5}
+\subsection*{Consulta 8: Cales son os hospedaxes que están a facer un bo último mes?}
+\addcontentsline{toc}{subsection}{Consulta 8: Performance último mes}
 
-\emph{Xustificación:} esta consula é de carácter moi xeral e o interese pode vir de moitos lados, os hospedadores poden querer estudar que fan eses hospedaxes tan bos; tamén AirBnB pódese ver beneficiado se é capaz de caracterizar tendencias, ou premiar ós mellores hospedaxes.
+\emph{Xustificación:} esta consulta é de carácter moi xeral e o interese pode vir de moitos lados; os hospedadores poden querer estudar que fan eses hospedaxes tan bos; tamén AirBnB pódese ver beneficiado se é capaz de caracterizar tendencias, ou premiar aos mellores hospedaxes.
 
 
 \begin{lstlisting}
@@ -973,29 +971,29 @@ db.listings.aggregate([
 \end{lstlisting}
 
 
-\section{Recheo de nulos usando Aprendizaxe Automático}
+\section{Recheo de nulos usando Aprendizaxe Automática}
 \label{sec:nulosAA}
 
 
-Como a columna \texttt{price} nos \texttt{.csv}s orixinais tiña un 13\% de nulos
+Como a columna \texttt{price} nos \texttt{.csv} orixinais tiña un 13\% de nulos
 (ver Figura \ref{fig:modeloDatos}), decidimos adestrar un modelo de Aprendizaxe
-Automático para \emph{regresar} os valores do prezo. Ademáis, esta tarefa
-parecíanos interesante de por sí. Para facela cosideramos interesante a columna
-de centralidade obtida na Consulta 1. Se ben e certo que sae máis a conta
-calcular esos valores de centralidade directamente en Python, queremos cargar
-esos valores de MongoDB para simular unha ocasión na que sexa máis doado facer
-unha consulta. Para esto usamos o arquivo adxunto \texttt{mongo2csv.py} que
-devolve a devandita columna ordeada polo numero de fila para garanter a
-coherencia e a engade pola dereita ó csv orixinal. Sobre estes datos hai que
-realizar algunas modificacións: as columnas de texto libre (como a descripción
-ou os barrios) eliminanse, as categoricas (como o tempo de resposta ou o tipo de
-propiedade) codificanse \emph{one hot} e as numericas que estaban en porcentaxe
+Automática para \emph{predicir} os valores do prezo. Ademais, esta tarefa
+parecíanos interesante de por si. Para facela consideramos interesante a columna
+de centralidade obtida na Consulta 1. Se ben é certo que sae máis a conta
+calcular eses valores de centralidade directamente en Python, queremos cargar
+eses valores de MongoDB para simular unha ocasión na que sexa máis doado facer
+unha consulta. Para isto usamos o arquivo adxunto \texttt{mongo2csv.py} que
+devolve a devandita columna ordenada polo número de fila para garantir a
+coherencia e a engade pola dereita ao csv orixinal. Sobre estes datos hai que
+realizar algunhas modificacións: as columnas de texto libre (como a descrición
+ou os barrios) elimínanse, as categóricas (como o tempo de resposta ou o tipo de
+propiedade) codifícanse \emph{one hot} e as numéricas que estaban en porcentaxe
 formatéanse. Deste xeito temos uns datos listos para adestrar un modelo con
-eles. O modelo elixido e un XGBoost que baséase en árbores con Boosting e ten
-licencia Apache 2, polo que podería ter efectivamente un uso comercial por parte
-airbnb ou algunha empresa de hospedaxes xa que a licencia o permite. As tarefas
-de limpieza e adestramento fannas \texttt{train.py}, quen tamén devolve tablas
-\LaTeX como saída.
+eles. O modelo elixido é un XGBoost que se basea en árbores con Boosting e ten
+licenza Apache 2, polo que podería ter efectivamente un uso comercial por parte
+de AirBnB ou algunha empresa de hospedaxes xa que a licenza o permite. As tarefas
+de limpeza e adestramento fanas \texttt{train.py}, quen tamén devolve táboas
+\LaTeX{} como saída.
 
 
 \input{../tablas/metricas_modelo.tex}
@@ -1004,24 +1002,24 @@ de limpieza e adestramento fannas \texttt{train.py}, quen tamén devolve tablas
 
 \section{Conclusións}
 Deseñada a base de datos e realizadas as consultas de exemplo, estimamos este
-enfoque do traballo como potencialmente útil para o análise de mercado neste
-sector dos alugueres/turismo. Enforcar a BD hacia os listings permitiunos
+enfoque do traballo como potencialmente útil para a análise de mercado neste
+sector dos alugueres/turismo. Enfocar a BD cara aos listings permitiunos
 aplicar características clave e moi útiles da plataforma MongoDB (como os xa
-mencionados arrays embebidos e documentos anidados) as cales houberan sido mais
-difíciles de aplicar e mostrar súa utilidade se o enfoque principal da base
-seguera sendo as reviews en sí. \\
+mencionados arrays embebidos e documentos anidados) as cales houberan sido máis
+difíciles de aplicar e mostrar a súa utilidade se o enfoque principal da base
+seguise sendo as reviews en si \cite{pandas_license}. \\
 
 Deste modo tamén foi trivial a tarefa de pensar nunha aplicación dun modelo de
 Aprendizaxe Automática, pois pode resolver un problema real, o de suxerir un
-prezo para o usuario que quere publicar un novo listing, ademáis do seu posible
+prezo para o usuario que quere publicar un novo listing, ademais do seu posible
 uso para rechear nulos. \\
 
-Para cerrar esta conclusión gustaríanos sinalar como posible traballo futuro a
-construcción da base de datos tendo as reviews como elemento principal. Isto
-permitiría a construcción dun dataset útil para algúns modelos de Linguaxe
-(estilo BERT). Seu uso principal sería entrenalos sobre todo o texto das reviews
-e que esencialmente realice unha tarefa de análisis de sentimentos sobre eles,
-sendo capaz incluso de asociarlles un rating mais preciso e realista que o do
+Para pechar esta conclusión gustaríanos sinalar como posible traballo futuro a
+construción da base de datos tendo as reviews como elemento principal. Isto
+permitiría a construción dun dataset útil para algúns modelos de Linguaxe
+(estilo BERT). O seu uso principal sería adestralos sobre todo o texto das reviews
+e que esencialmente realice unha tarefa de análise de sentimentos sobre eles,
+sendo capaz incluso de asociarlles un rating máis preciso e realista que o do
 propio usuario (xeralmente os ratings dados polos usuarios non seguen a
 distribución normal, senón que teñen picos nos extremos, moitas reviews teñen 0
 e 5 estrelas). 
