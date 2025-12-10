@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.impute import KNNImputer
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import joblib
@@ -18,7 +19,7 @@ df['price'] = pd.to_numeric(df['price'], errors='coerce')
 df = df.dropna(subset=['price'])
 
 # Eliminación de columnas textuais non necesarias
-cols_texto = ['description', 'neighbourhood', 'neighbourhood_group_cleansed']
+cols_texto = ['description' ]
 df = df.drop([c for c in cols_texto if c in df.columns], axis=1)
 
 # Conversión de columnas categóricas
@@ -26,6 +27,7 @@ cols_categoricas = [
     'host_response_time',
     'property_type',
     'host_location',
+    'neighbourhood_cleansed',
     'city'
 ]
 cols_categoricas = [c for c in cols_categoricas if c in df.columns]
@@ -63,9 +65,21 @@ if 'amenities' in df.columns:
     df = df.drop('amenities', axis=1)
 
 # Imputación de valores numéricos
-for col in df.select_dtypes(include=[np.number]).columns:
-    if df[col].isnull().any():
-        df[col] = df[col].fillna(df[col].median())
+#for col in df.select_dtypes(include=[np.number]).columns:
+#    if df[col].isnull().any():
+#        df[col] = df[col].fillna(df[col].median())
+#
+
+inicio_imp = time.time()
+
+num_cols = df.select_dtypes(include=[np.number]).columns
+imputer = KNNImputer(n_neighbors=5)
+df[num_cols] = imputer.fit_transform(df[num_cols])
+
+print(f'Lista imputacion, tardo {time.time() - inicio_imp} segundos')
+
+
+
 
 # Preparación do conxunto de datos
 X = df.drop('price', axis=1)
@@ -163,4 +177,3 @@ with open(TABLE_DIR + "predicions_exemplo.tex", "w") as f:
 with open(TABLE_DIR + "importancia_variables.tex", "w") as f:
     f.write(importance_df.to_latex(index=False, caption="Importancia das variables", 
                                    label="tab:importancia_variables", escape=True))
-
