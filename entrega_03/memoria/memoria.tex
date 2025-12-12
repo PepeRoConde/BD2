@@ -166,7 +166,7 @@ insular dende este gráfico.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{../diagramas/eda_07_xeografia_9cidades.png}
-    \caption{Distribución xeográfica es 9 cidades.}
+    \caption{Distribución xeográfica de 9 cidades.}
   \label{fig:eda9cidades}
 \end{figure}
 
@@ -878,8 +878,20 @@ db.listings.aggregate([
 
 \subsubsection{Consulta: Cales son os hospedaxes que están a facer un bo último mes?}
 
-\emph{Xustificación:} esta consulta é de carácter moi xeral e o interese pode vir de moitos lados; os hospedadores poden querer estudar que fan eses hospedaxes tan bos; tamén AirBnB pódese ver beneficiado se é capaz de caracterizar tendencias, ou premiar aos mellores hospedaxes.
+\emph{Xustificación:} esta consulta é de carácter moi xeral e o interese pode vir de moitos lados; os hospedadores poden querer estudar que fan eses hospedaxes tan bos; tamén AirBnB pódese ver beneficiado se é capaz de caracterizar tendencias, ou premiar aos mellores hospedaxes. Para identificar os hospedaxes con mellor rendemento recente, definimos unha métrica composta chamada \emph{performance score} que pondera tres aspectos clave:
 
+\begin{equation}
+\text{Performance Score} = 2 \cdot R_{30d} + 1.5 \cdot R_{\text{mes}} + 10 \cdot S_{\text{rating}}
+\end{equation}
+
+onde:
+\begin{itemize}
+    \item $R_{30d}$: número de reviews nos últimos 30 días (peso 2, para priorizar actividade recente)
+    \item $R_{\text{mes}}$: reviews por mes históricas (peso 1.5, para valorar consistencia)
+    \item $S_{\text{rating}}$: puntuación media do hospedaxe (peso 10, para reflectir calidade)
+\end{itemize}
+
+Ademais, calculamos un indicador de popularidade recente: $P = 10 \cdot R_{30d}$, que nos permite identificar hospedaxes con picos de actividade.
 
 \begin{lstlisting}
 db.listings.aggregate([
@@ -947,7 +959,9 @@ db.listings.aggregate([
 ])
 \end{lstlisting}
 
-\emph{Resultados:}
+\emph{Resultados:} Móstranse abaixo os 3 hospedaxes con mellor rendemento do último mes. Obsérvase que a maioría concéntranse en Barcelona e Madrid, cidades con maior volume de turismo. Destaca especialmente o hospedaxe de San Martí (Barcelona) cun performance score de 428.45, indicando unha combinación excepcional de actividade recente (reviews) e calidade (rating). 
+
+É significativo que varios hospedaxes con status ``Excellent'' (performance score $>$ 70) manteñen prezos relativamente moderados (entre 33 € e 324€), suxerindo que a relación calidade-prezo é un factor determinante no éxito recente. A presenza de hospedaxes de diferentes barrios e prezos indica que o bo rendemento non está limitado a un único segmento de mercado.
 
 \begin{lstlisting}[style=terminal]
   {
@@ -983,9 +997,6 @@ db.listings.aggregate([
   },
 
 ...
-
-
-
 \end{lstlisting}
 
 
