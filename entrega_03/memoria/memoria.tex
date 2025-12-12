@@ -14,6 +14,7 @@
 \usepackage{lipsum}
 \usepackage{xcolor}
 \usepackage{float}
+
 \usepackage{epigraph}
 \usepackage{cite}
 \usepackage[listings]{tcolorbox}
@@ -142,7 +143,13 @@ As columnas elixidas pódense ver na Figura \ref{fig:modeloDatos}. A elección f
 
 \subsection{Análise exploratoria do conxunto de datos}  
 
-Comenzamos a análise co obxecto de estudo da Consulta 1 e da sección \ref{sec:nulosAA}, o prezo das vivendas. Vemos que en xeral a distribución $p(\$=X)$ ten as colas moi longas (aínda que por exemplo $p(\$=X|\text{cidade=Madrid})$ non tanto). Vemos que as dúas cidades con maiores abanicos son as insulares, que efectivamente hai unha correlación entre o que custa un hospedaxe e a xente que colle nel (ver Consulta 4) e que o logaritmo é unha mellor forma de representar o prezo.
+Comenzamos a análise co obxecto de estudo da Consulta 1 e da sección
+\ref{sec:nulosAA}, o prezo das vivendas. Vemos que en xeral a distribución
+$p(\$=X)$ ten as colas moi longas (aínda que por exemplo
+$p(\$=X|\text{cidade=Madrid})$ non tanto). Vemos que as dúas cidades con maiores
+abanicos son as insulares, que efectivamente hai unha correlación entre o que
+custa un hospedaxe e a xente que colle nel (ver Consulta 4) e que o logaritmo é
+unha mellor forma de representar o prezo.
 
 \begin{figure}[H]
     \centering
@@ -151,7 +158,10 @@ Comenzamos a análise co obxecto de estudo da Consulta 1 e da sección \ref{sec:
   \label{fig:edaPrezos}
 \end{figure}
   
-No gráfico de abaixo podemos ver o dispersos que están os hospedaxes nas cidades, o cal repercutirá no índice de centralidade (ver Consulta 1). Parécenos curioso que Mallorca estea tan pragada de turismo que se poida recoñecer a forma insular dende este gráfico.
+No gráfico de abaixo podemos ver o dispersos que están os hospedaxes nas
+cidades, o cal repercutirá no índice de centralidade (ver Consulta 1). Parécenos
+curioso que Mallorca estea tan pragada de turismo que se poida recoñecer a forma
+insular dende este gráfico.
 
 \begin{figure}[H]
     \centering
@@ -160,7 +170,14 @@ No gráfico de abaixo podemos ver o dispersos que están os hospedaxes nas cidad
   \label{fig:eda9cidades}
 \end{figure}
 
-Por último queriamos mostrar as distribucións máis dispersas, tanto que parece que están cheas de atípicos. Pero nós pensamos que non é o caso, que simplemente a realidade é dispersa, como veremos en \ref{consulta:atipico}.
+Por último queriamos mostrar as distribucións máis dispersas, tanto que parece
+que están cheas de atípicos. Pero nós pensamos que non é o caso, que simplemente
+a realidade é dispersa, e AirBnB permite facer anuncios de propiedades de todo
+tipo, atendendo ás gráficas da figura \ref{fig:edaOutliers}, apreciamos como hai
+algunhas propiedades con máis de 40 habitacións e 20 baños. Forma de investigar
+máis a fondo se verdaderamente estamos ante a presencia dun \textit{outlier} ou
+anuncio espurio pode ser facer unha consulta (mais detalle posteriormente na
+sección de expltoación [\ref{consulta:atipico}]) 
 
 \begin{figure}[H]
     \centering
@@ -300,111 +317,11 @@ Pódese ver que a operación é exitosa e a consulta da liña 18 é só un exemp
 \section{Explotación da Base de Datos}
 Agora que definimos e implementamos a nosa base de datos, procedemos á súa explotación.
 
-\subsection*{Consulta 1: Obter un índice de centralidade (dentro da cidade) para cada hospedaxe} 
-\label{consulta1}
-\addcontentsline{toc}{subsection}{Consulta 1: Índice de centralidade}
+\subsection{Consultas non analíticas}
 
-\emph{Xustificación:} como se verá na sección \ref{sec:nulosAA}, imos usar este valor para facer prediccións sobre o prezo de cada hospedaxe. Ademais parecíanos un bo uso das funcións nativas de MongoDB.
+Comezamos con dúas consultas sinxelas de exploración e verificación de datos, que non requiren agregacións complexas nin cálculos estatísticos.
 
-Para levar a cabo esta consulta precisamos calcular os centroides de cada cidade e logo, para cada hospedaxe, calcularemos a distancia ao centroide. O seguinte código crea ditos centroides, agregando os hospedaxes por cidade e facendo a media das súas coordenadas.
-
-
-\begin{lstlisting}
-const centroides = db.listings.aggregate([
-  {
-    $group: {
-      _id: "$city",
-      avg_lat: { $avg: "$latitude" },
-      avg_lon: { $avg: "$longitude" }
-    }
-  }
-]).toArray();
-\end{lstlisting}
-
-Agora que temos iso só nos queda facer un \texttt{updateMany} no que por cada centroide, collemos os hospedaxes desa cidade e calculamos a distancia euclidiana do centroide ao hospedaxe. Malia seren moitas liñas, as liñas 8-13 correspóndense co cálculo.
-
-\begin{lstlisting}
-centroides.forEach(c => {
-  db.listings.updateMany(
-    { city: c._id },     // filtro
-    [
-      {
-        $set: {
-          centrality: {
-            $sqrt: {
-              $add: [
-                { $pow: [{ $subtract: ["$latitude", c.avg_lat] }, 2] },
-                { $pow: [{ $subtract: ["$longitude", c.avg_lon] }, 2] }
-              ]
-            }
-          }
-        }
-      }
-    ]
-  );
-});
-\end{lstlisting}
-
-\emph{Resultados:} Tal cal o fixemos cambia a base de datos, non devolve nada. Para ver o efecto podemos facer unha miniconsulta de comprobación como \texttt{db.listings.findOne()} e ver que xa figura o novo atributo.
-
-
-\subsection*{Consulta 2: Inflúe a foto de perfil no prezo medio?} 
-\addcontentsline{toc}{subsection}{Consulta 2: Foto de perfil e prezo}
-
-\emph{Xustificación:} de ser certo, AirBnB debería esixir aos seus hospedadores que poñan foto, ou mesmo sairía deles. Tamén é interesante dende o punto de vista sociolóxico.
-
-Esta consulta é sinxela, só hai que agrupar por valor de \texttt{host.has\_profile\_pic}, agregando o prezo.
-
-\begin{lstlisting}
-db.listings.aggregate([
-  {
-    $group: {
-      _id: "$host.has_profile_pic",
-      avg_price: { $avg: "$price" },
-      min_price: { $min: "$price" },
-      max_price: { $max: "$price" },
-      std_dev_price: { $stdDevSamp: "$price" },
-      count: { $sum: 1 }
-    }
-  },
-  {
-    $project: {
-      has_profile_pic: "$_id",
-      avg_price: { $round: ["$avg_price", 2] },
-      min_price: 1,
-      max_price: 1,
-      std_dev_price: 1,
-      count: 1,
-      _id: 0
-    }
-  },
-  { $sort: { has_profile_pic: 1 } }
-])
-\end{lstlisting}
-
-\emph{Resultados:} como pode verse, os resultados obtidos (ver abaixo) son algo significativos, posto que aínda que as medias son distintas, as desviacións estándar solápanse. En calquera caso, a análise de distribucións é algo que debería facerse en R \cite{r_license}, Julia \cite{julia_license} ou Python pero non en MongoDB.
-\begin{lstlisting}[style=terminal]
-{
-  min_price: 8,
-  max_price: 18000,
-  std_dev_price: 407.5147249606762,
-  count: 4682,
-  has_profile_pic: false,
-  avg_price: 161.12
-},
-{
-  min_price: 8,
-  max_price: 92150,
-  std_dev_price: 1500.7666758984817,
-  count: 154072,
-  has_profile_pic: true,
-  avg_price: 366.86
-}
-\end{lstlisting}
-
-
-\subsection*{Consulta 3: Cal é o hospedaxe que ten 40 habitacións?}
-\addcontentsline{toc}{subsection}{Consulta 3: Atípicos en habitacións}
+\subsubsection{Consulta: Cal é o hospedaxe que ten 40 habitacións?}
 \label{consulta:atipico}
 
 \emph{Xustificación:} É un anómalo realmente? 
@@ -412,7 +329,6 @@ db.listings.aggregate([
 \begin{lstlisting}
 airbnb> db.listings.find({bedrooms :  {$gt : 40}}, {bedrooms : 1}).sort({ bedrooms: -1 })
 \end{lstlisting}
-
 
 \begin{lstlisting}[style=terminal]
 [
@@ -426,7 +342,7 @@ airbnb> db.listings.find({bedrooms :  {$gt : 40}}, {bedrooms : 1}).sort({ bedroo
 airbnb> db.listings.find({_id :  693479deab134920609e549c})
 \end{lstlisting}
 
-\emph{Resultados:} Vemos que é un hotel, polo que non poderiamos dicir que é un dato erróneo, e esperariamos máis hoteis polo que quedarnos con el parece lóxico.
+\emph{Resultados:} Vemos que é un hotel, polo que non poderiamos dicir que é un dato erróneo, e esperariamos máis hoteis polo que quedarnos con él parece lóxico.
 
 \begin{lstlisting}[style=terminal]
 [
@@ -493,9 +409,8 @@ airbnb> db.listings.find({_id :  693479deab134920609e549c})
 ]
 \end{lstlisting}
 
-\subsection*{Consulta 4: Existen hospedaxes con máis de 5 camas?} 
+\subsubsection{Consulta: Existen hospedaxes con máis de 5 camas?} 
 \label{consulta4}
-\addcontentsline{toc}{subsection}{Consulta 4: Hospedaxes con moitas camas}
 
 \emph{Xustificación:} A plataforma de AirBnB podería sinalar que un hospedaxe ten tantas camas como habitacións, o cal estaría ben, por exemplo, para viaxes de parella ou grupos. Pero primeiro, hai tales hospedaxes?
 
@@ -533,9 +448,112 @@ airbnb> db.listings.find(
 ]
 \end{lstlisting}
 
+\subsection{Consultas analíticas}
 
-\subsection*{Consulta 5: Cales son os barrios con hospedadores máis novos (para cada cidade)?} 
-\addcontentsline{toc}{subsection}{Consulta 5: Barrios con hospedadores novos}
+As seguintes consultas empregan agregacións complexas, cálculos estatísticos e análise de patróns para extraer insights dos datos.
+
+\subsubsection{Consulta: Obter un índice de centralidade (dentro da cidade) para cada hospedaxe} 
+\label{consulta1}
+
+\emph{Xustificación:} como se verá na sección \ref{sec:nulosAA}, imos usar este valor para facer prediccións sobre o prezo de cada hospedaxe. Ademais parecíanos un bo uso das funcións nativas de MongoDB.
+
+Para levar a cabo esta consulta precisamos calcular os centroides de cada cidade e logo, para cada hospedaxe, calcularemos a distancia ao centroide. O seguinte código crea ditos centroides, agregando os hospedaxes por cidade e facendo a media das súas coordenadas.
+
+
+\begin{lstlisting}
+const centroides = db.listings.aggregate([
+  {
+    $group: {
+      _id: "$city",
+      avg_lat: { $avg: "$latitude" },
+      avg_lon: { $avg: "$longitude" }
+    }
+  }
+]).toArray();
+\end{lstlisting}
+
+Agora que temos iso só nos queda facer un \texttt{updateMany} no que por cada centroide, collemos os hospedaxes desa cidade e calculamos a distancia euclidiana do centroide ao hospedaxe. Malia seren moitas liñas, as liñas 8-13 correspóndense co cálculo.
+
+\begin{lstlisting}
+centroides.forEach(c => {
+  db.listings.updateMany(
+    { city: c._id },     // filtro
+    [
+      {
+        $set: {
+          centrality: {
+            $sqrt: {
+              $add: [
+                { $pow: [{ $subtract: ["$latitude", c.avg_lat] }, 2] },
+                { $pow: [{ $subtract: ["$longitude", c.avg_lon] }, 2] }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  );
+});
+\end{lstlisting}
+
+\emph{Resultados:} Tal cal o fixemos cambia a base de datos, non devolve nada. Para ver o efecto podemos facer unha miniconsulta de comprobación como \texttt{db.listings.findOne()} e ver que xa figura o novo atributo.
+
+
+\subsubsection{Consulta: Inflúe a foto de perfil no prezo medio?}
+
+\emph{Xustificación:} de ser certo, AirBnB debería esixir aos seus hospedadores que poñan foto, ou mesmo sairía deles. Tamén é interesante dende o punto de vista sociolóxico.
+
+Esta consulta é sinxela, só hai que agrupar por valor de \texttt{host.has\_profile\_pic}, agregando o prezo.
+
+\begin{lstlisting}
+db.listings.aggregate([
+  {
+    $group: {
+      _id: "$host.has_profile_pic",
+      avg_price: { $avg: "$price" },
+      min_price: { $min: "$price" },
+      max_price: { $max: "$price" },
+      std_dev_price: { $stdDevSamp: "$price" },
+      count: { $sum: 1 }
+    }
+  },
+  {
+    $project: {
+      has_profile_pic: "$_id",
+      avg_price: { $round: ["$avg_price", 2] },
+      min_price: 1,
+      max_price: 1,
+      std_dev_price: 1,
+      count: 1,
+      _id: 0
+    }
+  },
+  { $sort: { has_profile_pic: 1 } }
+])
+\end{lstlisting}
+
+\emph{Resultados:} como pode verse, os resultados obtidos (ver abaixo) son algo significativos, posto que aínda que as medias son distintas, as desviacións estándar solápanse. En calquera caso, a análise de distribucións é algo que debería facerse en R \cite{r_license}, Julia \cite{julia_license} ou Python pero non en MongoDB.
+\begin{lstlisting}[style=terminal]
+{
+  min_price: 8,
+  max_price: 18000,
+  std_dev_price: 407.5147249606762,
+  count: 4682,
+  has_profile_pic: false,
+  avg_price: 161.12
+},
+{
+  min_price: 8,
+  max_price: 92150,
+  std_dev_price: 1500.7666758984817,
+  count: 154072,
+  has_profile_pic: true,
+  avg_price: 366.86
+}
+\end{lstlisting}
+
+
+\subsubsection{Consulta: Cales son os barrios con hospedadores máis novos (para cada cidade)?}
 
 \emph{Xustificación:} esta consulta é básica para a análise de tendencias e evolución do mercado inmobiliario.
 
@@ -591,7 +609,8 @@ db.listings.aggregate([
       }
     }
   }
-])\end{lstlisting}
+])
+\end{lstlisting}
 
 \emph{Resultados:} se ben non procede mostrar os resultados completos, abaixo pódese ver as cidades con barrios máis novos. O certo é que a forma de mostrar esta consulta non só compara os barrios dentro dunha cidade senón tamén as cidades entre si.
 
@@ -685,8 +704,7 @@ db.listings.aggregate([
 
 
 
-\subsection*{Consulta 6: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?} 
-\addcontentsline{toc}{subsection}{Consulta 6: Barrios con hospedaxes grandes}
+\subsubsection{Consulta: Cales son os barrios con hospedaxes máis grandes (máis habitacións)?}
 
 \emph{Xustificación:} esta información é decisiva nunha análise de desigualdade entre territorios, ou mesmo pode ser de interese gobernamental, para o desenvolvemento de leis.
 
@@ -780,8 +798,7 @@ de reviews do último mes, as súas reviews por mes e o seu rating).
 
 
 
-\subsection*{Consulta 7: Cales son os hospedaxes con hospedadores fóra desa cidade?}
-\addcontentsline{toc}{subsection}{Consulta 7: Hospedadores fóra da cidade}
+\subsubsection{Consulta: Cales son os hospedaxes con hospedadores fóra desa cidade?}
 
 \emph{Xustificación:} Ter un hospedador que vive lonxe (noutra cidade) pode ser un inconveniente tanto para os inquilinos como para o propio AirBnB se é que estes están descontentos. Caracterizalos é importante.
 
@@ -859,8 +876,7 @@ db.listings.aggregate([
   ...
 \end{lstlisting}
 
-\subsection*{Consulta 8: Cales son os hospedaxes que están a facer un bo último mes?}
-\addcontentsline{toc}{subsection}{Consulta 8: Performance último mes}
+\subsubsection{Consulta: Cales son os hospedaxes que están a facer un bo último mes?}
 
 \emph{Xustificación:} esta consulta é de carácter moi xeral e o interese pode vir de moitos lados; os hospedadores poden querer estudar que fan eses hospedaxes tan bos; tamén AirBnB pódese ver beneficiado se é capaz de caracterizar tendencias, ou premiar aos mellores hospedaxes.
 
@@ -968,6 +984,8 @@ db.listings.aggregate([
 
 ...
 
+
+
 \end{lstlisting}
 
 
@@ -1016,13 +1034,17 @@ uso para rechear nulos. \\
 
 Para pechar esta conclusión gustaríanos sinalar como posible traballo futuro a
 construción da base de datos tendo as reviews como elemento principal. Isto
-permitiría a construción dun dataset útil para algúns modelos de Linguaxe
-(estilo BERT). O seu uso principal sería adestralos sobre todo o texto das reviews
-e que esencialmente realice unha tarefa de análise de sentimentos sobre eles,
+permitiría a obtención dun dataset útil para algúns modelos de Linguaxe (estilo
+BERT). O seu uso principal sería adestralos sobre todo co texto das reviews e
+que esencialmente realice unha tarefa de análise de sentimentos sobre eles,
 sendo capaz incluso de asociarlles un rating máis preciso e realista que o do
-propio usuario (xeralmente os ratings dados polos usuarios non seguen a
+propio usuario xa quex xeralmente os ratings dados polos usuarios non seguen a
 distribución normal, senón que teñen picos nos extremos, moitas reviews teñen 0
-e 5 estrelas). 
+e 5 estrelas. Este fenómeno recibe o nome de patrón de distribución en J e está
+ben documentado [\cite{hu2009overcoming}] e comprobado que adestrar modelos
+sobre datos que seguen tales patróns é máis dificultoso e producen peores
+resultados [\cite{johnson2019survey}] (outro motivo polo que optouse polo cambio
+do enfoque do dataset nesta práctica).
 \newpage
 
 \bibliographystyle{IEEEtran}
